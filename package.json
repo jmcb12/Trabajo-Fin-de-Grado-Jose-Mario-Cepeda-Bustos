@@ -1,0 +1,25 @@
+{
+  "name": "rehabilitacion_ictus",
+  "version": "1.0.0",
+  "description": "Sistema de rehabilitación del habla para pacientes que han sufrido un ictus",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jmcb12/Trabajo-Fin-de-Grado.git"
+  },
+  "keywords": [
+    "Telemedicine",
+    "Stroke",
+    "Express",
+    "Node"
+  ],
+  "author": "Jose Mario Cepeda Bustos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jmcb12/Trabajo-Fin-de-Grado/issues"
+  },
+  "homepage": "https://github.com/jmcb12/Trabajo-Fin-de-Grado#readme"
+}
