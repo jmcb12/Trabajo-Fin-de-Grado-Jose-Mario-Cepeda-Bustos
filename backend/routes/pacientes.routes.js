@@ -10,8 +10,8 @@ router.get("/:id", controller.obtenerPacientePorId);
 
 router.post("/", controller.crearPaciente);
 
-router.put("/:id", controller.actualizarPaciente);
+router.put("/:id/estado", controller.cambiarEstadoPaciente);
 
-router.delete("/:id", controller.eliminarPaciente);
+router.put("/:id", controller.actualizarPaciente);
 
 module.exports = router;

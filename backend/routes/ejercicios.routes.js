@@ -10,6 +10,7 @@ router.get("/:id", controller.obtenerEjercicioPorId);
 router.post("/", controller.crearEjercicio);
 
 router.put("/:id", controller.actualizarEjercicio);
+router.put("/:id/reactivar", controller.reactivarEjercicio);
 
 router.delete("/:id", controller.eliminarEjercicio);
 

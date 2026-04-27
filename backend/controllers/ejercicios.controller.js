@@ -206,3 +206,30 @@ exports.obtenerEjerciciosPorDificultad = function (req, resp) {
         resp.status(400).json("El valor del nivel no es válido");
     }
 };
+
+exports.reactivarEjercicio = function (req, resp) {
+    var id_ejercicio = parseInt(req.params.id);
+
+    if (isNaN(id_ejercicio)) {
+        console.log("Identificador de ejercicio no válido");
+        return resp.status(400).json("Identificador de ejercicio no válido");
+    }
+
+    var sql = "UPDATE ejercicios SET activo = 1 WHERE id_ejercicio = ?";
+
+    conexion.query(sql, [id_ejercicio], function (err, resultado) {
+        if (err) {
+            console.log("Ha ocurrido un error con el servidor", err);
+            resp.status(500).json("Ha ocurrido un error con el servidor");
+        }
+        else {
+            if (resultado.affectedRows != 0) {
+                resp.status(200).json(resultado);
+            }
+            else {
+                console.log("No se ha encontrado ningún ejercicio con ese identificador");
+                resp.status(404).json("No se ha encontrado ningún ejercicio con ese identificador");
+            }
+        }
+    });
+};

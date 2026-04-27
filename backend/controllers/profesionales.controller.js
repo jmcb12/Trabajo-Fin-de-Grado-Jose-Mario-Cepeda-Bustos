@@ -1,8 +1,20 @@
 var conexion = require("../database/conexion");
 
 exports.obtenerProfesionales = function (req, resp) {
-    var sql = "SELECT * FROM profesionales";
-
+    var sql = `
+        SELECT 
+            pr.id_profesional,
+            pr.id_usuario,
+            u.nombre,
+            u.apellidos,
+            u.username,
+            pr.numero_colegiado,
+            pr.especialidad,
+            pr.centro_trabajo,
+            u.activo
+        FROM profesionales pr
+        JOIN usuarios u ON pr.id_usuario = u.id_usuario
+    `;
     conexion.query(sql, function (err, profesionales) {
         if (err) {
             console.log("Ha ocurrido un error en el servidor", err);
@@ -22,8 +34,22 @@ exports.obtenerProfesionalPorId = function (req, resp) {
         return resp.status(400).json("Identificador de profesional no válido");
     }
 
-    var sql = "SELECT * FROM profesionales WHERE id_profesional = ?";
-
+    var sql = `
+        SELECT 
+            pr.id_profesional,
+            pr.id_usuario,
+            u.nombre,
+            u.apellidos,
+            u.username,
+            pr.numero_colegiado,
+            pr.especialidad,
+            pr.centro_trabajo,
+            u.activo
+        FROM profesionales pr
+        JOIN usuarios u ON pr.id_usuario = u.id_usuario
+        WHERE pr.id_profesional = ?
+    `;
+    
     conexion.query(sql, [id], function (err, profesional) {
         if (err) {
             console.log("Ha ocurrido un error con el servidor", err);
@@ -149,12 +175,22 @@ exports.eliminarProfesional = function (req, resp) {
 exports.obtenerPacientesDeProfesional = function (req, resp) {
     var id_profesional = parseInt(req.params.id);
 
-    if (isNaN(id_profesional)) {
+    if (!id_profesional) {
         console.log("Identificador de profesional no válido");
         return resp.status(400).json("Identificador de profesional no válido");
     }
 
-    var sql = "SELECT * FROM pacientes WHERE id_profesional_referencia = ?";
+    var sql = `
+        SELECT 
+            p.id_paciente,
+            p.diagnostico_principal,
+            p.activo,
+            u.nombre,
+            u.apellidos
+        FROM pacientes p
+        JOIN usuarios u ON p.id_usuario = u.id_usuario
+        WHERE p.id_profesional_referencia = ?
+    `;
 
     conexion.query(sql, [id_profesional], function (err, pacientes) {
         if (err) {

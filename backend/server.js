@@ -1,8 +1,9 @@
 var express = require("express");
+var path = require("path");
 var app = express();
 
 app.use(express.json());
-app.use("/appRehab", express.static("appRehabilitacion"));
+app.use(express.static(path.join(__dirname, "../frontend")));
 
 var conexion = require("./database/conexion");
 

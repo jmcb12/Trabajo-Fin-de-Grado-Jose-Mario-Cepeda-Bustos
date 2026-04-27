@@ -10,10 +10,22 @@ exports.iniciarSesion = function (req, resp) {
     }
 
     var sql = `
-        SELECT id_usuario, nombre, apellidos, email, username, rol, activo, fecha_creacion, ultima_conexion
-        FROM usuarios
-        WHERE username = ? AND password = ?
-    `;
+    SELECT 
+        u.id_usuario,
+        u.nombre,
+        u.apellidos,
+        u.username,
+        u.rol,
+        u.activo,
+        u.fecha_creacion,
+        u.ultima_conexion,
+        pr.id_profesional,
+        pa.id_paciente
+    FROM usuarios u
+    LEFT JOIN profesionales pr ON u.id_usuario = pr.id_usuario
+    LEFT JOIN pacientes pa ON u.id_usuario = pa.id_usuario
+    WHERE u.username = ? AND u.password = ?
+`;
 
     conexion.query(sql, [username, password], function (err, usuario) {
         if (err) {
@@ -39,9 +51,11 @@ exports.iniciarSesion = function (req, resp) {
             }
 
             var usuarioRespuesta = {
+                id_usuario: usuario[0].id_usuario,
+                id_profesional: usuario[0].id_profesional,
+                id_paciente: usuario[0].id_paciente,
                 nombre: usuario[0].nombre,
                 apellidos: usuario[0].apellidos,
-                email: usuario[0].email,
                 username: usuario[0].username,
                 rol: usuario[0].rol,
                 activo: usuario[0].activo,

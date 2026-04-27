@@ -2,7 +2,7 @@ var conexion = require("../database/conexion");
 
 exports.obtenerUsuarios = function (req, resp) {
     var sql = `
-        SELECT nombre, apellidos, email, username, rol, activo, fecha_creacion, ultima_conexion
+        SELECT nombre, apellidos, username, rol, activo, fecha_creacion, ultima_conexion
         FROM usuarios
     `;
 
@@ -26,7 +26,7 @@ exports.obtenerUsuarioPorId = function (req, resp) {
     }
 
     var sql = `
-        SELECT nombre, apellidos, email, username, rol, activo, fecha_creacion, ultima_conexion
+        SELECT id_usuario, nombre, apellidos, username, rol, activo, fecha_creacion, ultima_conexion
         FROM usuarios
         WHERE id_usuario = ?
     `;
@@ -51,26 +51,28 @@ exports.obtenerUsuarioPorId = function (req, resp) {
 exports.crearUsuario = function (req, resp) {
     var nombre = req.body.nombre;
     var apellidos = req.body.apellidos;
-    var email = req.body.email;
     var username = req.body.username;
     var password = req.body.password;
     var rol = req.body.rol;
     var activo = req.body.activo;
 
-    if (nombre && apellidos && email && username && password && rol && activo !== undefined) {
+    if (nombre && apellidos && username && password && rol && activo !== undefined) {
         var sql = `
             INSERT INTO usuarios
-            (nombre, apellidos, email, username, password, rol, activo, fecha_creacion, ultima_conexion)
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NULL)
+            (nombre, apellidos, username, password, rol, activo, fecha_creacion, ultima_conexion)
+            VALUES (?, ?, ?, ?, ?, ?, NOW(), NULL)
         `;
 
-        conexion.query(sql, [nombre, apellidos, email, username, password, rol, activo], function (err, resultado) {
+        conexion.query(sql, [nombre, apellidos, username, password, rol, activo], function (err, resultado) {
             if (err) {
                 console.log("Error en la inserción de datos en la BDD", err);
                 resp.status(500).json("Ha ocurrido un error a la hora de insertar los datos");
             }
             else {
-                resp.status(201).json(resultado);
+                resp.status(201).json({
+                    mensaje: "Usuario creado correctamente",
+                    id_usuario: resultado.insertId
+                });
             }
         });
     }
@@ -84,7 +86,6 @@ exports.actualizarUsuario = function (req, resp) {
     var id = parseInt(req.params.id);
     var nombre = req.body.nombre;
     var apellidos = req.body.apellidos;
-    var email = req.body.email;
     var username = req.body.username;
     var password = req.body.password;
     var rol = req.body.rol;
@@ -95,12 +96,11 @@ exports.actualizarUsuario = function (req, resp) {
         return resp.status(400).json("Identificador de usuario no válido");
     }
 
-    if (nombre && apellidos && email && username && password && rol && activo !== undefined) {
+    if (nombre && apellidos && username && password && rol && activo !== undefined) {
         var sql = `
             UPDATE usuarios
             SET nombre = ?,
                 apellidos = ?,
-                email = ?,
                 username = ?,
                 password = ?,
                 rol = ?,
@@ -108,7 +108,7 @@ exports.actualizarUsuario = function (req, resp) {
             WHERE id_usuario = ?
         `;
 
-        conexion.query(sql, [nombre, apellidos, email, username, password, rol, activo, id], function (err, resultado) {
+        conexion.query(sql, [nombre, apellidos, username, password, rol, activo, id], function (err, resultado) {
             if (err) {
                 console.log("Ha ocurrido un error con el servidor", err);
                 resp.status(500).json("Ha ocurrido un error con el servidor");

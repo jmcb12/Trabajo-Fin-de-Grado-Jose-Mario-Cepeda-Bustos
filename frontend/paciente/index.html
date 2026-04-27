@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpeakMe - Paciente</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>SpeakMe · Paciente</h1>
+      <p>Prototipo sencillo del flujo del paciente</p>
+    </div>
+    <div class="fila-botones">
+      <button class="boton secundario" onclick="cerrarSesionPaciente()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <div class="menu-titulo">Acceso</div>
+      <button class="menu-btn" onclick="mostrarPantallaPaciente('pantalla-login')">Login</button>
+
+      <div class="menu-titulo">Aplicación</div>
+      <button class="menu-btn secundario" onclick="mostrarPantallaPaciente('pantalla-home')">Home</button>
+      <button class="menu-btn secundario" onclick="mostrarPantallaPaciente('pantalla-sesiones')">Próximas sesiones</button>
+      <button class="menu-btn secundario" onclick="mostrarPantallaPaciente('pantalla-detalle-sesion')">Detalle de sesión</button>
+      <button class="menu-btn secundario" onclick="mostrarPantallaPaciente('pantalla-ejercicio')">Ejercicio activo</button>
+      <button class="menu-btn secundario" onclick="mostrarPantallaPaciente('pantalla-resumen')">Resumen</button>
+      <button class="menu-btn secundario" onclick="mostrarPantallaPaciente('pantalla-historial')">Historial y resultados</button>
+      <button class="menu-btn secundario" onclick="mostrarPantallaPaciente('pantalla-metricas')">Progreso</button>
+      <button class="menu-btn secundario" onclick="mostrarPantallaPaciente('pantalla-perfil')">Perfil</button>
+    </aside>
+
+    <main>
+      <section id="pantalla-login" class="pantalla">
+        <div class="tarjeta panel-login">
+          <h2>Iniciar sesión</h2>
+          <p>Para probar el flujo del paciente, inicia sesión con un usuario de rol paciente que tengas en la base de datos.</p>
+          <div id="mensaje-login-paciente"></div>
+          <label for="paciente-username">Usuario</label>
+          <input id="paciente-username" type="text" placeholder="usuario">
+          <label for="paciente-password">Contraseña</label>
+          <input id="paciente-password" type="password" placeholder="contraseña">
+          <button class="boton" onclick="loginPaciente()">Entrar</button>
+          <div class="footer-mini">Después del login se cargan sesiones, resultados, métricas y perfil básico.</div>
+        </div>
+      </section>
+
+      <section id="pantalla-home" class="pantalla oculto">
+        <div class="grid-3">
+          <div class="kpi">
+            <div class="numero" id="kpi-proxima-sesion">-</div>
+            <div>Próxima sesión</div>
+          </div>
+          <div class="kpi">
+            <div class="numero" id="kpi-sesiones-paciente">0</div>
+            <div>Sesiones encontradas</div>
+          </div>
+          <div class="kpi">
+            <div class="numero" id="kpi-precision-paciente">0%</div>
+            <div>Precisión media</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:18px;">
+          <div class="tarjeta">
+            <h2>Resumen rápido</h2>
+            <p id="saludo-paciente">Aquí aparecerán los datos básicos del paciente.</p>
+            <div class="fila-botones">
+              <button class="boton" onclick="mostrarPantallaPaciente('pantalla-sesiones')">Ver sesiones</button>
+              <button class="boton secundario" onclick="mostrarPantallaPaciente('pantalla-metricas')">Ver progreso</button>
+            </div>
+          </div>
+          <div class="tarjeta">
+            <h2>Última información cargada</h2>
+            <ul class="lista" id="lista-home-paciente"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="pantalla-sesiones" class="pantalla oculto">
+        <div class="tarjeta">
+          <h2>Próximas sesiones / sesiones del paciente</h2>
+          <p>Aquí se muestran las sesiones que devuelve el backend para el paciente actual.</p>
+          <div id="contenedor-sesiones-paciente"></div>
+        </div>
+      </section>
+
+      <section id="pantalla-detalle-sesion" class="pantalla oculto">
+        <div class="tarjeta">
+          <h2>Detalle de sesión</h2>
+          <p>Primero elige una sesión en el listado y luego pulsa el botón de detalle.</p>
+          <div id="detalle-sesion-paciente"></div>
+        </div>
+      </section>
+
+      <section id="pantalla-ejercicio" class="pantalla oculto">
+        <div class="tarjeta centrada">
+          <h2>Ejercicio activo</h2>
+          <p>Esta pantalla es una simulación sencilla para el TFG. Muestra los ejercicios asociados a una sesión y deja marcar el ejercicio como completado visualmente.</p>
+          <div id="ejercicios-sesion-paciente"></div>
+          <div class="fila-botones">
+            <button class="boton" onclick="simularGrabacion()">Grabar respuesta</button>
+            <button class="boton secundario" onclick="mostrarPantallaPaciente('pantalla-resumen')">Ir a resumen</button>
+          </div>
+          <div id="mensaje-ejercicio-paciente" style="margin-top:14px;"></div>
+        </div>
+      </section>
+
+      <section id="pantalla-resumen" class="pantalla oculto">
+        <div class="tarjeta centrada">
+          <h2>Resumen de sesión</h2>
+          <div id="resumen-sesion-paciente"></div>
+        </div>
+      </section>
+
+      <section id="pantalla-historial" class="pantalla oculto">
+        <div class="grid-2">
+          <div class="tarjeta">
+            <h2>Historial de sesiones</h2>
+            <div id="historial-sesiones-paciente"></div>
+          </div>
+          <div class="tarjeta">
+            <h2>Resultados del paciente</h2>
+            <div id="resultados-paciente"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pantalla-metricas" class="pantalla oculto">
+        <div class="grid-2">
+          <div class="tarjeta">
+            <h2>Métricas globales</h2>
+            <div id="metricas-globales-paciente"></div>
+          </div>
+          <div class="tarjeta">
+            <h2>Evolución</h2>
+            <div id="evolucion-paciente"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pantalla-perfil" class="pantalla oculto">
+        <div class="tarjeta centrada">
+          <h2>Perfil del paciente</h2>
+          <div id="perfil-paciente"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./js/clientePaciente.js"></script>
+</body>
+</html>

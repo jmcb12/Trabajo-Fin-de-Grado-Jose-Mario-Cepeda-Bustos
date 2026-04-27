@@ -2,8 +2,8 @@ var mysql = require("mysql");
 
 var database = {
     host: "localhost",
-    user: "mario_tfg",
-    password: "wzPd[KTi)pOkm3[X",
+    user: "root",
+    password: "",
     database: "tfg_rehabilitacion",
     port: 3306
 };

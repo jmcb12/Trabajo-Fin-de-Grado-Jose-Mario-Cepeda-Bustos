@@ -1,0 +1,87 @@
+.oculto {
+    display: none;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: black;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+button {
+    padding: 5px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+
+
+fieldset {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+legend {
+    font-weight: bold;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input, select, button {
+    padding: 8px;
+    font-size: 14px;
+    width: auto;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+button {
+    background-color: #f4f4f4;
+}
+
+.seccion {
+    display: none;
+}
+
+.activa {
+    display: block;
+}
+
+.visible{
+    display: inline;
+}
