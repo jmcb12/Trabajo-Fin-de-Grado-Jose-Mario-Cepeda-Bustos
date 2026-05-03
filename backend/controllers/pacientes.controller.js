@@ -31,6 +31,7 @@ exports.obtenerPacientes = function (req, resp) {
     });
 };
 
+
 exports.obtenerPacientePorId = function (req, resp) {
     var id = parseInt(req.params.id);
 
@@ -44,16 +45,17 @@ exports.obtenerPacientePorId = function (req, resp) {
             p.id_paciente,
             p.id_usuario,
             p.id_profesional_referencia,
-            u.nombre,
-            u.apellidos,
-            u.username,
             p.fecha_nacimiento,
             p.sexo,
             p.diagnostico_principal,
             p.nivel_afasia,
             p.fecha_inicio_tratamiento,
             p.observaciones,
-            p.activo
+            p.activo,
+            u.username,
+            u.password,
+            u.nombre,
+            u.apellidos
         FROM pacientes p
         JOIN usuarios u ON p.id_usuario = u.id_usuario
         WHERE p.id_paciente = ?
@@ -75,6 +77,7 @@ exports.obtenerPacientePorId = function (req, resp) {
         }
     });
 };
+
 
 exports.crearPaciente = function (req, resp) {
     var id_usuario = req.body.id_usuario;
@@ -129,6 +132,7 @@ exports.crearPaciente = function (req, resp) {
         resp.status(400).json("Formato de los datos erróneo");
     }
 };
+
 
 exports.actualizarPaciente = function (req, resp) {
     var id_paciente = parseInt(req.params.id);
@@ -202,7 +206,29 @@ exports.obtenerSesionesDePaciente = function (req, resp) {
         return resp.status(400).json("Identificador de paciente no válido");
     }
 
-    var sql = "SELECT * FROM sesiones WHERE id_paciente = ?";
+    var sql = `
+        SELECT 
+            s.id_sesion,
+            s.id_paciente,
+            s.id_profesional,
+            s.fecha_hora_inicio,
+            s.fecha_hora_fin,
+            s.estado,
+            s.observaciones,
+            COUNT(se.id_sesion_ejercicio) AS numero_ejercicios
+        FROM sesiones s
+        LEFT JOIN sesion_ejercicios se ON s.id_sesion = se.id_sesion
+        WHERE s.id_paciente = ?
+        GROUP BY 
+            s.id_sesion,
+            s.id_paciente,
+            s.id_profesional,
+            s.fecha_hora_inicio,
+            s.fecha_hora_fin,
+            s.estado,
+            s.observaciones
+        ORDER BY s.fecha_hora_inicio DESC
+    `;
 
     conexion.query(sql, [id_paciente], function (err, sesiones) {
         if (err) {
@@ -220,6 +246,7 @@ exports.obtenerSesionesDePaciente = function (req, resp) {
         }
     });
 };
+
 
 exports.obtenerResultadosDePaciente = function (req, resp) {
     var id_paciente = parseInt(req.params.id);
@@ -268,6 +295,7 @@ exports.obtenerResultadosDePaciente = function (req, resp) {
     });
 };
 
+
 exports.obtenerMetricasDePaciente = function (req, resp) {
     var id_paciente = parseInt(req.params.id);
 
@@ -305,6 +333,7 @@ exports.obtenerMetricasDePaciente = function (req, resp) {
         }
     });
 };
+
 
 exports.cambiarEstadoPaciente = function (req, resp) {
     var id_paciente = parseInt(req.params.id);

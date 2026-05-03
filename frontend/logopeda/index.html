@@ -6,6 +6,12 @@
   <title>App Logopeda</title>
 
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
 </head>
 
 <body>
@@ -295,59 +301,288 @@
     <button type="button" onclick="volverDesdePapeleraEjercicios()">Volver</button>
   </div>
 
+  <div id="pantallaMenuPaciente" class="pantalla oculto">
+    <h1>Menú del paciente</h1>
 
+    <h2 id="menuPacienteNombre">Nombre y apellidos</h2>
 
+    <p><strong>Sexo:</strong> <span id="menuPacienteSexo"></span></p>
+    <p><strong>Fecha de nacimiento:</strong> <span id="menuPacienteFechaNacimiento"></span></p>
+    <p><strong>Diagnóstico principal:</strong> <span id="menuPacienteDiagnostico"></span></p>
+    <p><strong>Nivel de afasia:</strong> <span id="menuPacienteNivelAfasia"></span></p>
+    <p><strong>Fecha de inicio de tratamiento:</strong> <span id="menuPacienteFechaInicio"></span></p>
+    <p><strong>Observaciones:</strong> <span id="menuPacienteObservaciones"></span></p>
 
-  <div id="pantallaPapeleraEjercicios" class="pantalla oculto"></div>
+    <br>
+    <button type="button" onclick="irEditarPaciente()">Editar datos</button>
 
-  <div id="pantallaPerfil" class="pantalla oculto">
-    <h1>Mi perfil</h1>
+    <br><br>
 
-    <p>Esta pantalla la implementaremos más adelante.</p>
+    <h2>Progreso y métricas</h2>
+    <button type="button" onclick="irProgresoPaciente()">Acceder al progreso</button>
 
-    <button onclick="mostrarPantalla('pantallaInicio')">
-      Volver
-    </button>
+    <br><br>
+
+    <h2>Sesiones</h2>
+    <button type="button" onclick="irSesionesPaciente()">Acceder a sesiones</button>
+
+    <br><br><br>
+
+    <button type="button" onclick="volverAlMenuLogopeda()">Volver</button>
   </div>
 
+  <div id="pantallaEditarPaciente" class="pantalla oculto">
+    <h1>Editar paciente</h1>
 
-  <div id="pantallaDashboardPaciente" class="pantalla oculto">
-    <h1>Dashboard del paciente</h1>
+    <p>Modifique los datos del paciente a continuación</p>
 
-    <p id="pacienteSeleccionadoTexto"></p>
+    <form id="formEditarPaciente">
+      <h2>Datos de acceso</h2>
 
-    <button onclick="mostrarPantalla('pantallaInicio')">
-      Volver
-    </button>
+      <label for="edit_username_paciente">Nombre de usuario</label>
+      <input type="text" id="edit_username_paciente">
+
+      <label for="edit_password_paciente">Contraseña</label>
+      <input type="text" id="edit_password_paciente">
+
+      <h2>Datos personales</h2>
+
+      <label for="edit_nombre_paciente">Nombre</label>
+      <input type="text" id="edit_nombre_paciente">
+
+      <label for="edit_apellidos_paciente">Apellidos</label>
+      <input type="text" id="edit_apellidos_paciente">
+
+      <label for="edit_fecha_nacimiento_paciente">Fecha de nacimiento</label>
+      <input type="date" id="edit_fecha_nacimiento_paciente">
+
+      <label for="edit_sexo_paciente">Sexo</label>
+      <select id="edit_sexo_paciente">
+        <option value="">Seleccione una opción</option>
+        <option value="M">Masculino</option>
+        <option value="F">Femenino</option>
+      </select>
+
+      <h2>Datos clínicos</h2>
+
+      <label for="edit_diagnostico_paciente">Diagnóstico principal</label>
+      <input type="text" id="edit_diagnostico_paciente">
+
+      <label for="edit_nivel_afasia_paciente">Nivel de afasia</label>
+      <select id="edit_nivel_afasia_paciente">
+        <option value="">Seleccione una opción</option>
+        <option value="leve">Leve</option>
+        <option value="moderada">Moderada</option>
+        <option value="severa">Severa</option>
+      </select>
+
+      <label for="edit_fecha_inicio_paciente">Fecha de inicio de tratamiento</label>
+      <input type="date" id="edit_fecha_inicio_paciente">
+
+      <label for="edit_observaciones_paciente">Observaciones</label>
+      <textarea id="edit_observaciones_paciente"></textarea>
+
+      <br><br>
+
+      <button type="button" id="btnRestaurarPaciente">Restaurar</button>
+      <button type="submit">Enviar</button>
+      <button type="button" id="btnVolverEditarPaciente">Volver</button>
+    </form>
   </div>
 
+  <div id="pantallaSesionesPaciente" class="pantalla oculto">
+    <h1>Sesiones</h1>
 
-  <div id="pantallaPacientes" class="pantalla oculto">
-    <h1>Gestión de pacientes</h1>
+    <p>
+      A continuación se muestran las sesiones del paciente
+      <span id="nombrePacienteSesiones"></span>
+    </p>
 
-    <button onclick="mostrarPantalla('pantallaInicio')">
-      Volver
-    </button>
+    <label for="filtroSesionesPaciente">Filtrar por estado:</label>
+    <select id="filtroSesionesPaciente" onchange="filtrarSesionesPaciente()">
+      <option value="todos">Todas</option>
+      <option value="pendiente">Pendientes</option>
+      <option value="realizada">Realizadas</option>
+      <option value="revisada">Revisadas</option>
+    </select>
+
+    <br><br>
+
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Fecha de creación</th>
+          <th>Estado</th>
+          <th>Fecha de realización</th>
+          <th>Número de ejercicios</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="tablaSesionesPaciente"></tbody>
+    </table>
+
+    <br><br>
+
+    <button type="button" onclick="irCrearSesion()">Crear sesión</button>
+
+    <br><br><br>
+
+    <button type="button" onclick="volverDesdeSesionesPaciente()">Volver</button>
   </div>
 
+  <div id="pantallaResultadosSesion" class="pantalla oculto">
+    <h1>Resultados de la sesión</h1>
 
-  <div id="pantallaSesiones" class="pantalla oculto">
-    <h1>Gestión de sesiones</h1>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Ejercicio</th>
+          <th>Nombre del ejercicio</th>
+          <th>Tipo de ejercicio</th>
+          <th>Intentos</th>
+          <th>WER</th>
+          <th>Precisión</th>
+          <th>Tiempo de respuesta</th>
+          <th>Duración del habla</th>
+          <th>Tasa de éxito (%)</th>
+        </tr>
+      </thead>
+      <tbody id="tablaResultadosSesion"></tbody>
+    </table>
 
-    <button onclick="mostrarPantalla('pantallaInicio')">
-      Volver
-    </button>
+    <br><br>
+
+    <button type="button" onclick="generarInformeSesion()">Generar informe de la sesión</button>
+
+    <br><br><br>
+
+    <button type="button" onclick="volverDesdeResultadosSesion()">Volver</button>
   </div>
 
+  <div id="pantallaProgresoPaciente" class="pantalla oculto">
+    <h1>Progreso del paciente</h1>
 
+    <div>
+      <h2>Métricas globales</h2>
 
+      <p><strong>Precisión:</strong> <span id="metricaPrecision"></span></p>
+      <p><strong>WER (Word Error Rate):</strong> <span id="metricaWer"></span></p>
+      <p><strong>Tasa de éxito de ejercicios (%):</strong> <span id="metricaExito"></span></p>
+      <p><strong>Promedio de intentos por ejercicio:</strong> <span id="metricaIntentos"></span></p>
+      <p><strong>Tiempo de respuesta medio (ms):</strong> <span id="metricaTiempoRespuesta"></span></p>
+      <p><strong>Duración del habla:</strong> <span id="metricaDuracionHabla"></span></p>
+    </div>
 
-  <div id="pantallaResultados" class="pantalla oculto">
-    <h1>Resultados y métricas</h1>
+    <div>
+      <button type="button" onclick="generarInformeProgresoPaciente()">Generar informe</button>
+      <button type="button" onclick="exportarDatosPacienteCSV()">Exportar datos en formato CSV</button>
+    </div>
 
-    <button onclick="mostrarPantalla('pantallaInicio')">
-      Volver
-    </button>
+    <br><br>
+
+    <div>
+      <h2>Progreso global</h2>
+      <p><strong><span id="textoProgresoGlobal"></span></strong></p>
+
+      <div style="width: 420px; height: 24px; border: 1px solid #777;">
+        <div id="barraProgresoGlobal" style="height: 100%; width: 0%; background-color: royalblue;"></div>
+      </div>
+    </div>
+
+    <br><br>
+
+    <div>
+      <h2>Gráficas de resultados</h2>
+
+      <label for="filtroGraficaProgreso">Filtrar métrica:</label>
+      <select id="filtroGraficaProgreso" onchange="actualizarGraficaProgreso()">
+        <option value="todas">Todas</option>
+        <option value="precision">Precisión</option>
+        <option value="wer">WER</option>
+        <option value="exito">Éxito</option>
+        <option value="tiempo_respuesta">Tiempo de respuesta</option>
+        <option value="duracion_habla">Duración del habla</option>
+      </select>
+
+      <br><br>
+
+      <canvas id="graficaProgresoPaciente" width="700" height="400"></canvas>
+    </div>
+
+    <br><br>
+
+    <button type="button" onclick="volverDesdeProgresoPaciente()">Volver</button>
+  </div>
+
+  <div id="pantallaCrearSesion" class="pantalla oculto">
+    <h1>Crear sesión</h1>
+
+    <h2>Ejercicios</h2>
+    <p>
+      Arrastre los ejercicios desde la biblioteca a la sesión y ordénelos de arriba abajo.
+      Puede indicar el número máximo de intentos por ejercicio.
+    </p>
+
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
+      <div style="width: 45%;">
+        <h3>Ejercicios de la sesión</h3>
+        <ul id="listaEjerciciosSesion"
+          style="min-height: 300px; border: 1px solid #999; padding: 10px; list-style: none;"></ul>
+      </div>
+
+      <div style="width: 45%;">
+        <h3>Lista de ejercicios</h3>
+        <ul id="listaBibliotecaEjercicios"
+          style="min-height: 300px; border: 1px solid #999; padding: 10px; list-style: none;"></ul>
+      </div>
+    </div>
+
+    <br><br>
+
+    <h2>Observaciones</h2>
+    <textarea id="observacionesCrearSesion" rows="6" cols="80"></textarea>
+
+    <br><br>
+
+    <button type="button" onclick="guardarNuevaSesion()">Crear sesión</button>
+
+    <br><br><br>
+
+    <button type="button" onclick="volverDesdeCrearSesion()">Volver</button>
+  </div>
+
+  <div id="pantallaEditarSesion" class="pantalla oculto">
+    <h1>Editar sesión</h1>
+
+    <h2>Ejercicios</h2>
+    <p>
+      Arrastre los ejercicios y ordénelos para editar la sesión, indicando el número de intentos límite por ejercicio
+    </p>
+
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
+      <div style="width: 45%;">
+        <h3>Ejercicios de la sesión</h3>
+        <ul id="listaEditarEjerciciosSesion"
+          style="min-height: 300px; border: 1px solid #999; padding: 10px; list-style: none;"></ul>
+      </div>
+
+      <div style="width: 45%;">
+        <h3>Lista de ejercicios</h3>
+        <ul id="listaEditarBibliotecaEjercicios"
+          style="min-height: 300px; border: 1px solid #999; padding: 10px; list-style: none;"></ul>
+      </div>
+    </div>
+
+    <br><br>
+
+    <h2>Observaciones</h2>
+    <textarea id="observacionesEditarSesion" rows="6" cols="80"></textarea>
+
+    <br><br>
+
+    <button type="button" onclick="volverDesdeEditarSesion()">Volver</button>
+    <button type="button" onclick="restablecerPantallaEditarSesion()">Restablecer</button>
+    <button type="button" onclick="guardarEdicionSesion()">Editar sesión</button>
   </div>
 
 

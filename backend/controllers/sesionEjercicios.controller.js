@@ -30,6 +30,7 @@ exports.obtenerSesionEjercicioPorId = function (req, resp) {
 exports.actualizarSesionEjercicio = function (req, resp) {
     var id_sesion_ejercicio = parseInt(req.params.id);
     var orden = parseInt(req.body.orden);
+    var max_intentos = parseInt(req.body.max_intentos);
     var completado = req.body.completado;
 
     if (isNaN(id_sesion_ejercicio)) {
@@ -37,14 +38,14 @@ exports.actualizarSesionEjercicio = function (req, resp) {
         return resp.status(400).json("Identificador no válido");
     }
 
-    if (!isNaN(orden) && completado !== undefined) {
+    if (!isNaN(orden) && !isNaN(max_intentos) && completado !== undefined) {
         var sql = `
             UPDATE sesion_ejercicios
-            SET orden = ?, completado = ?
+            SET orden = ?, max_intentos = ?, completado = ?
             WHERE id_sesion_ejercicio = ?
         `;
 
-        conexion.query(sql, [orden, completado, id_sesion_ejercicio], function (err, resultado) {
+        conexion.query(sql, [orden, max_intentos, completado, id_sesion_ejercicio], function (err, resultado) {
             if (err) {
                 console.log("Ha ocurrido un error con el servidor", err);
                 resp.status(500).json("Ha ocurrido un error con el servidor");
@@ -92,3 +93,4 @@ exports.eliminarSesionEjercicio = function (req, resp) {
         }
     });
 };
+

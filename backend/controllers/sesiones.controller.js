@@ -47,31 +47,27 @@ exports.crearSesion = function (req, resp) {
     var fecha_hora_inicio = req.body.fecha_hora_inicio;
     var fecha_hora_fin = req.body.fecha_hora_fin;
     var estado = req.body.estado;
-    var modo = req.body.modo;
     var observaciones = req.body.observaciones;
 
-    var estados_validos = ["pendiente", "en_progreso", "finalizada", "cancelada"];
-    var modos_validos = ["supervisada", "autonoma"];
+    var estados_validos = ["pendiente", "realizada", "revisada"];
 
     if (
         !isNaN(parseInt(id_paciente)) &&
         (id_profesional === null || !isNaN(parseInt(id_profesional))) &&
         fecha_hora_inicio &&
         estado &&
-        modo &&
         observaciones !== undefined &&
-        estados_validos.includes(estado) &&
-        modos_validos.includes(modo)
+        estados_validos.includes(estado)
     ) {
         var sql = `
             INSERT INTO sesiones
-            (id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin, estado, modo, observaciones)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin, estado, observaciones)
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
 
         conexion.query(
             sql,
-            [id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin || null, estado, modo, observaciones || null],
+            [id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin || null, estado, observaciones || null],
             function (err, resultado) {
                 if (err) {
                     console.log("Ha ocurrido un error con el servidor", err);
@@ -96,11 +92,9 @@ exports.actualizarSesion = function (req, resp) {
     var fecha_hora_inicio = req.body.fecha_hora_inicio;
     var fecha_hora_fin = req.body.fecha_hora_fin;
     var estado = req.body.estado;
-    var modo = req.body.modo;
     var observaciones = req.body.observaciones;
 
-    var estados_validos = ["pendiente", "en_progreso", "finalizada", "cancelada"];
-    var modos_validos = ["supervisada", "autonoma"];
+    var estados_validos = ["pendiente", "realizada", "revisada"];
 
     if (isNaN(id_sesion)) {
         console.log("Identificador de sesión no válido");
@@ -112,10 +106,8 @@ exports.actualizarSesion = function (req, resp) {
         (id_profesional === null || !isNaN(parseInt(id_profesional))) &&
         fecha_hora_inicio &&
         estado &&
-        modo &&
         observaciones !== undefined &&
-        estados_validos.includes(estado) &&
-        modos_validos.includes(modo)
+        estados_validos.includes(estado)
     ) {
         var sql = `
             UPDATE sesiones SET
@@ -124,14 +116,13 @@ exports.actualizarSesion = function (req, resp) {
                 fecha_hora_inicio = ?,
                 fecha_hora_fin = ?,
                 estado = ?,
-                modo = ?,
                 observaciones = ?
             WHERE id_sesion = ?
         `;
 
         conexion.query(
             sql,
-            [id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin || null, estado, modo, observaciones || null, id_sesion],
+            [id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin || null, estado, observaciones || null, id_sesion],
             function (err, resultado) {
                 if (err) {
                     console.log("Ha ocurrido un error con el servidor", err);
@@ -163,7 +154,7 @@ exports.finalizarSesion = function (req, resp) {
         return resp.status(400).json("Identificador de sesión no válido");
     }
 
-    var sql = 'UPDATE sesiones SET estado = "finalizada", fecha_hora_fin = NOW() WHERE id_sesion = ?';
+    var sql = 'UPDATE sesiones SET estado = "realizada", fecha_hora_fin = NOW() WHERE id_sesion = ?';
 
     conexion.query(sql, [id_sesion], function (err, resultado) {
         if (err) {
@@ -283,6 +274,7 @@ exports.obtenerEjerciciosDeSesion = function (req, resp) {
             e.instruccion,
             e.duracion_maxima_seg,
             se.orden,
+            se.max_intentos,
             se.completado
         FROM sesion_ejercicios se
         JOIN ejercicios e ON se.id_ejercicio = e.id_ejercicio
@@ -311,30 +303,58 @@ exports.asociarEjercicioASesion = function (req, resp) {
     var id_sesion = parseInt(req.params.id);
     var id_ejercicio = parseInt(req.body.id_ejercicio);
     var orden = parseInt(req.body.orden);
+    var max_intentos = parseInt(req.body.max_intentos);
     var completado = req.body.completado;
 
-    if (isNaN(id_sesion) || isNaN(id_ejercicio) || isNaN(orden) || completado === undefined) {
+    if (isNaN(id_sesion) || isNaN(id_ejercicio) || isNaN(orden) || isNaN(max_intentos) || completado === undefined) {
         console.log("Los datos introducidos no son válidos");
         return resp.status(400).json("Los datos introducidos no son válidos");
     }
 
     var sql = `
-        INSERT INTO sesion_ejercicios (id_sesion, id_ejercicio, orden, completado)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO sesion_ejercicios (id_sesion, id_ejercicio, orden, max_intentos, completado)
+        VALUES (?, ?, ?, ?, ?)
     `;
 
-    conexion.query(sql, [id_sesion, id_ejercicio, orden, completado], function (err, resultado) {
+    conexion.query(sql, [id_sesion, id_ejercicio, orden, max_intentos, completado], function (err, resultado) {
         if (err) {
             console.log("Ha ocurrido un error con el servidor", err);
             resp.status(500).json("Ha ocurrido un error con el servidor");
         }
         else {
             if (resultado.affectedRows != 0) {
-                resp.status(201).json("Ejercicio asociado a la sesión correctamente");
+                resp.status(201).json(resultado);
             }
             else {
                 console.log("No se ha podido asociar el ejercicio a la sesión");
                 resp.status(500).json("No se ha podido asociar el ejercicio a la sesión");
+            }
+        }
+    });
+};
+
+exports.marcarSesionRevisada = function (req, resp) {
+    var id_sesion = parseInt(req.params.id);
+
+    if (isNaN(id_sesion)) {
+        console.log("Identificador de sesión no válido");
+        return resp.status(400).json("Identificador de sesión no válido");
+    }
+
+    var sql = 'UPDATE sesiones SET estado = "revisada" WHERE id_sesion = ?';
+
+    conexion.query(sql, [id_sesion], function (err, resultado) {
+        if (err) {
+            console.log("Ha ocurrido un error en el servidor", err);
+            resp.status(500).json("Ha ocurrido un error en el servidor");
+        }
+        else {
+            if (resultado.affectedRows != 0) {
+                resp.status(200).json(resultado);
+            }
+            else {
+                console.log("No se ha encontrado ninguna sesión con ese identificador");
+                resp.status(404).json("No se ha encontrado ninguna sesión con ese identificador");
             }
         }
     });

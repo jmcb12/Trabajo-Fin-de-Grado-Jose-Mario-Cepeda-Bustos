@@ -14,5 +14,6 @@ router.post("/:id/ejercicios", controller.asociarEjercicioASesion);
 router.put("/:id", controller.actualizarSesion);
 router.put("/:id/finalizar", controller.finalizarSesion);
 router.put("/:id/cancelar", controller.cancelarSesion);
+router.put("/:id/revisar", controller.marcarSesionRevisada);
 
 module.exports = router;

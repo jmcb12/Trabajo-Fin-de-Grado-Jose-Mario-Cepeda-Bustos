@@ -8,13 +8,13 @@ exports.obtenerProfesionales = function (req, resp) {
             u.nombre,
             u.apellidos,
             u.username,
-            pr.numero_colegiado,
             pr.especialidad,
             pr.centro_trabajo,
             u.activo
         FROM profesionales pr
         JOIN usuarios u ON pr.id_usuario = u.id_usuario
     `;
+
     conexion.query(sql, function (err, profesionales) {
         if (err) {
             console.log("Ha ocurrido un error en el servidor", err);
@@ -41,7 +41,6 @@ exports.obtenerProfesionalPorId = function (req, resp) {
             u.nombre,
             u.apellidos,
             u.username,
-            pr.numero_colegiado,
             pr.especialidad,
             pr.centro_trabajo,
             u.activo
@@ -69,17 +68,16 @@ exports.obtenerProfesionalPorId = function (req, resp) {
 
 exports.crearProfesional = function (req, resp) {
     var id_usuario = req.body.id_usuario;
-    var numero_colegiado = req.body.numero_colegiado;
     var especialidad = req.body.especialidad;
     var centro_trabajo = req.body.centro_trabajo;
 
-    if (!isNaN(parseInt(id_usuario)) && numero_colegiado && especialidad && centro_trabajo) {
+    if (!isNaN(parseInt(id_usuario)) && especialidad && centro_trabajo) {
         var sql = `
-            INSERT INTO profesionales (id_usuario, numero_colegiado, especialidad, centro_trabajo)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO profesionales (id_usuario, especialidad, centro_trabajo)
+            VALUES (?, ?, ?)
         `;
 
-        conexion.query(sql, [id_usuario, numero_colegiado, especialidad, centro_trabajo], function (err, resultado) {
+        conexion.query(sql, [id_usuario, especialidad, centro_trabajo], function (err, resultado) {
             if (err) {
                 console.log("Ha ocurrido un error con el servidor", err);
                 resp.status(500).json("Ha ocurrido un error con el servidor");
@@ -97,7 +95,6 @@ exports.crearProfesional = function (req, resp) {
 
 exports.actualizarProfesional = function (req, resp) {
     var id = parseInt(req.params.id);
-    var numero_colegiado = req.body.numero_colegiado;
     var especialidad = req.body.especialidad;
     var centro_trabajo = req.body.centro_trabajo;
 
@@ -106,14 +103,14 @@ exports.actualizarProfesional = function (req, resp) {
         return resp.status(400).json("Identificador de profesional no válido");
     }
 
-    if (numero_colegiado && especialidad && centro_trabajo) {
+    if (especialidad && centro_trabajo) {
         var sql = `
             UPDATE profesionales
-            SET numero_colegiado = ?, especialidad = ?, centro_trabajo = ?
+            SET especialidad = ?, centro_trabajo = ?
             WHERE id_profesional = ?
         `;
 
-        conexion.query(sql, [numero_colegiado, especialidad, centro_trabajo, id], function (err, resultado) {
+        conexion.query(sql, [especialidad, centro_trabajo, id], function (err, resultado) {
             if (err) {
                 console.log("Ha ocurrido un error con el servidor", err);
                 resp.status(500).json("Ha ocurrido un error con el servidor");
