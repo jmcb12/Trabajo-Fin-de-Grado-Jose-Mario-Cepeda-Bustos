@@ -26,9 +26,11 @@ if (usuarioLogueado != null) {
 
 
 window.onload = function () {
+  aplicarEstiloGuardado();
   cargarDatosLogopeda();
   cargarPacientes();
   cargarEjercicios();
+  mostrarVistaPrincipal("pacientes");
 };
 
 
@@ -40,6 +42,11 @@ function mostrarPantalla(idPantalla) {
   });
 
   document.getElementById(idPantalla).classList.remove("oculto");
+
+  let menuPerfil = document.getElementById("menuPerfil");
+  if (menuPerfil) {
+    menuPerfil.classList.add("oculto");
+  }
 }
 
 function formatearFecha(fecha) {
@@ -60,6 +67,54 @@ function formatearFecha(fecha) {
   return dia + "-" + mes + "-" + anio;
 }
 
+function formatearFechaHora(fecha) {
+  if (!fecha) {
+    return "---";
+  }
+
+  let fechaObj = new Date(fecha);
+
+  if (isNaN(fechaObj.getTime())) {
+    return "---";
+  }
+
+  let dia = String(fechaObj.getDate()).padStart(2, "0");
+  let mes = String(fechaObj.getMonth() + 1).padStart(2, "0");
+  let anio = fechaObj.getFullYear();
+
+  let horas = String(fechaObj.getHours()).padStart(2, "0");
+  let minutos = String(fechaObj.getMinutes()).padStart(2, "0");
+
+  return dia + "-" + mes + "-" + anio + " " + horas + ":" + minutos;
+}
+
+function formatearFechaInput(fecha) {
+  if (!fecha) {
+    return "";
+  }
+
+  let fechaObj = new Date(fecha);
+
+  if (isNaN(fechaObj.getTime())) {
+    return "";
+  }
+
+  let dia = String(fechaObj.getDate()).padStart(2, "0");
+  let mes = String(fechaObj.getMonth() + 1).padStart(2, "0");
+  let anio = fechaObj.getFullYear();
+
+  return anio + "-" + mes + "-" + dia;
+}
+
+function formatearTipoEjercicio(tipo) {
+  if (!tipo) {
+    return "";
+  }
+
+  let texto = tipo.replaceAll("_", " ");
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
 function cargarDatosLogopeda() {
   if (usuarioLogueado == null) {
     alert("No has iniciado sesión");
@@ -68,7 +123,7 @@ function cargarDatosLogopeda() {
   }
 
   document.getElementById("tituloBienvenida").textContent =
-    "Bienvenido, doctor " + usuarioLogueado.nombre + " " + usuarioLogueado.apellidos;
+    "Bienvenido, " + usuarioLogueado.nombre + " " + usuarioLogueado.apellidos;
 }
 
 function cargarDatosEjercicioEditar(idEjercicio) {
@@ -245,22 +300,23 @@ function pintarTablaPacientes(listaPacientes) {
     }
 
     fila.innerHTML = `
-            <td>${paciente.nombre}</td>
-            <td>${paciente.apellidos}</td>
-            <td>${paciente.diagnostico_principal}</td>
-            <td>
-                <button 
-                    onclick="cambiarEstadoPaciente(${paciente.id_paciente}, ${paciente.activo})"
-                    style="background-color: ${colorEstado};">
-                    ${textoEstado}
-                </button>
-            </td>
-            <td>
-                <button onclick="seleccionarPaciente(${paciente.id_paciente})">
-                    Seleccionar
-                </button>
-            </td>
-        `;
+        <td>${paciente.nombre}</td>
+        <td>${paciente.apellidos}</td>
+        <td>${paciente.diagnostico_principal || ""}</td>
+        <td>${formatearFechaHora(paciente.ultima_conexion)}</td>
+        <td>
+            <button 
+                onclick="cambiarEstadoPaciente(${paciente.id_paciente}, ${paciente.activo})"
+                style="background-color: ${colorEstado};">
+                ${textoEstado}
+            </button>
+        </td>
+        <td>
+            <button onclick="seleccionarPaciente(${paciente.id_paciente})">
+                Seleccionar
+            </button>
+        </td>
+    `;
 
     tabla.appendChild(fila);
   });
@@ -280,7 +336,7 @@ function pintarTablaEjercicios(listaEjercicios) {
 
     fila.innerHTML = `
       <td>${ejercicio.nombre}</td>
-      <td>${ejercicio.tipo_ejercicio}</td>
+      <td>${formatearTipoEjercicio(ejercicio.tipo_ejercicio)}</td>
       <td>${ejercicio.nivel_dificultad}</td>
       <td>${ejercicio.duracion_maxima_seg}</td>
       <td>
@@ -313,7 +369,7 @@ function pintarTablaPapeleraEjercicios(listaEjercicios) {
 
     fila.innerHTML = `
       <td>${ejercicio.nombre}</td>
-      <td>${ejercicio.tipo_ejercicio}</td>
+      <td>${formatearTipoEjercicio(ejercicio.tipo_ejercicio)}</td>
       <td>${ejercicio.nivel_dificultad}</td>
       <td>${ejercicio.duracion_maxima_seg}</td>
       <td>
@@ -381,16 +437,16 @@ function pintarTablaResultadosSesion(listaResultados) {
   resultadosAgrupados.forEach(function (resultado) {
     let werMedio = (resultado.suma_wer / resultado.intentos).toFixed(2);
     let precisionMedia = (resultado.suma_precision / resultado.intentos).toFixed(2);
-    let tiempoRespuestaMedio = (resultado.suma_tiempo_respuesta / resultado.intentos).toFixed(2);
-    let duracionHablaMedia = (resultado.suma_duracion_habla / resultado.intentos).toFixed(2);
-    let tasaExito = ((resultado.suma_exito / resultado.intentos) * 100).toFixed(2);
+    let tiempoRespuestaMedio = Math.round(resultado.suma_tiempo_respuesta / resultado.intentos);
+    let duracionHablaMedia = Math.round(resultado.suma_duracion_habla / resultado.intentos);
+    let tasaExito = Math.round((resultado.suma_exito / resultado.intentos) * 100);
 
     let fila = document.createElement("tr");
 
     fila.innerHTML = `
       <td>${resultado.orden}</td>
       <td>${resultado.nombre_ejercicio}</td>
-      <td>${resultado.tipo_ejercicio}</td>
+      <td>${formatearTipoEjercicio(resultado.tipo_ejercicio)}</td>
       <td>${resultado.intentos}</td>
       <td>${werMedio}</td>
       <td>${precisionMedia}</td>
@@ -478,6 +534,40 @@ function filtrarSesionesPaciente() {
 
     pintarTablaSesionesPaciente(sesionesFiltradas);
   }
+}
+
+function filtrarEjerciciosCrearSesion() {
+  let filtro = document.getElementById("filtroCrearSesionEjercicios").value;
+  let listaBiblioteca = document.getElementById("listaBibliotecaEjercicios");
+  let items = listaBiblioteca.querySelectorAll("li");
+
+  items.forEach(function (item) {
+    let tipo = item.getAttribute("data-tipo-ejercicio");
+
+    if (filtro == "todos" || tipo == filtro) {
+      item.style.display = "";
+    }
+    else {
+      item.style.display = "none";
+    }
+  });
+}
+
+function filtrarEjerciciosEditarSesion() {
+  let filtro = document.getElementById("filtroEditarSesionEjercicios").value;
+  let listaBiblioteca = document.getElementById("listaEditarBibliotecaEjercicios");
+  let items = listaBiblioteca.querySelectorAll("li");
+
+  items.forEach(function (item) {
+    let tipo = item.getAttribute("data-tipo-ejercicio");
+
+    if (filtro == "todos" || tipo == filtro) {
+      item.style.display = "";
+    }
+    else {
+      item.style.display = "none";
+    }
+  });
 }
 
 function resetearFiltroPacientes() {
@@ -573,6 +663,31 @@ function cambiarEstadoPaciente(idPaciente, activo) {
   });
 }
 
+function cambiarVistaPrincipal() {
+  let vista = document.getElementById("selectorVistaPrincipal").value;
+
+  let bloquePacientes = document.getElementById("bloquePacientes");
+  let bloqueEjercicios = document.getElementById("bloqueEjercicios");
+
+  if (vista == "pacientes") {
+    bloquePacientes.classList.remove("oculto");
+    bloqueEjercicios.classList.add("oculto");
+    resetearFiltroPacientes();
+    pintarTablaPacientes(pacientes);
+  }
+  else if (vista == "ejercicios") {
+    bloqueEjercicios.classList.remove("oculto");
+    bloquePacientes.classList.add("oculto");
+    resetearFiltroEjercicios();
+
+    let ejerciciosActivos = ejercicios.filter(function (ejercicio) {
+      return ejercicio.activo == 1;
+    });
+
+    pintarTablaEjercicios(ejerciciosActivos);
+  }
+}
+
 function seleccionarPaciente(idPaciente) {
   localStorage.setItem("idPacienteSeleccionado", idPaciente);
   cargarDatosMenuPaciente(idPaciente);
@@ -640,20 +755,13 @@ function editarEjercicio(idEjercicio) {
 }
 
 function irPantallaPacientes() {
-  resetearFiltroPacientes();
-  pintarTablaPacientes(pacientes);
   mostrarPantalla("pantallaInicio");
+  mostrarVistaPrincipal("pacientes");
 }
 
 function irBibliotecaEjercicios() {
-  resetearFiltroEjercicios();
-
-  let ejerciciosActivos = ejercicios.filter(function (ejercicio) {
-    return ejercicio.activo == 1;
-  });
-
-  pintarTablaEjercicios(ejerciciosActivos);
-  mostrarPantalla("pantallaEjercicios");
+  mostrarPantalla("pantallaInicio");
+  mostrarVistaPrincipal("ejercicios");
 }
 
 function irCrearEjercicio() {
@@ -710,16 +818,24 @@ function irCrearSesion() {
   mostrarPantalla("pantallaCrearSesion");
 }
 
+function irEditarPerfil() {
+  document.getElementById("menuPerfil").classList.add("oculto");
+  alert("Más adelante aquí se abrirá la pantalla de editar perfil");
+}
+
+function irAccesibilidad() {
+  let menuPerfil = document.getElementById("menuPerfil");
+  if (menuPerfil) {
+    menuPerfil.classList.add("oculto");
+  }
+
+  prepararPantallaAccesibilidad();
+  mostrarPantalla("pantallaAccesibilidad");
+}
+
 function volverDesdePapeleraEjercicios() {
   resetearFiltroPapeleraEjercicios();
-  resetearFiltroEjercicios();
-
-  let ejerciciosActivos = ejercicios.filter(function (ejercicio) {
-    return ejercicio.activo == 1;
-  });
-
-  pintarTablaEjercicios(ejerciciosActivos);
-  mostrarPantalla("pantallaEjercicios");
+  irBibliotecaEjercicios();
 }
 
 function volverAlMenuLogopeda() {
@@ -774,6 +890,10 @@ function volverDesdeEditarSesion() {
   cargarSesionesPaciente(idPaciente);
 }
 
+function volverDesdeAccesibilidad() {
+  irPantallaPacientes();
+}
+
 function rellenarFormularioEditarEjercicio(ejercicio) {
   document.getElementById("edit_ej_nombre").value = ejercicio.nombre || "";
   document.getElementById("edit_ej_texto_estimulo").value = ejercicio.texto_estimulo || "";
@@ -819,11 +939,11 @@ function rellenarFormularioEditarPaciente(paciente) {
   document.getElementById("edit_password_paciente").value = paciente.password || "";
   document.getElementById("edit_nombre_paciente").value = paciente.nombre || "";
   document.getElementById("edit_apellidos_paciente").value = paciente.apellidos || "";
-  document.getElementById("edit_fecha_nacimiento_paciente").value = paciente.fecha_nacimiento || "";
+  document.getElementById("edit_fecha_nacimiento_paciente").value = formatearFechaInput(paciente.fecha_nacimiento);
   document.getElementById("edit_sexo_paciente").value = paciente.sexo || "";
   document.getElementById("edit_diagnostico_paciente").value = paciente.diagnostico_principal || "";
   document.getElementById("edit_nivel_afasia_paciente").value = paciente.nivel_afasia || "";
-  document.getElementById("edit_fecha_inicio_paciente").value = paciente.fecha_inicio_tratamiento || "";
+  document.getElementById("edit_fecha_inicio_paciente").value = formatearFechaInput(paciente.fecha_inicio_tratamiento);
   document.getElementById("edit_observaciones_paciente").value = paciente.observaciones || "";
 }
 
@@ -839,16 +959,22 @@ function rellenarMetricasGlobalesPaciente() {
     (metricasPaciente.wer_medio || 0).toFixed(2);
 
   document.getElementById("metricaExito").textContent =
-    (metricasPaciente.tasa_exito || 0).toFixed(2);
+    Math.round(metricasPaciente.tasa_exito || 0);
+
+  document.getElementById("metricaTiempoRespuesta").textContent =
+    Math.round(metricasPaciente.tiempo_respuesta_medio || 0);
+
+  document.getElementById("metricaDuracionHabla").textContent =
+    Math.round(metricasPaciente.duracion_habla_media || 0);
 
   document.getElementById("metricaIntentos").textContent =
     (metricasPaciente.numero_intentos || 0);
 
   document.getElementById("metricaTiempoRespuesta").textContent =
-    (metricasPaciente.tiempo_respuesta_medio || 0).toFixed(2);
+    (metricasPaciente.tiempo_respuesta_medio || 0);
 
   document.getElementById("metricaDuracionHabla").textContent =
-    (metricasPaciente.duracion_habla_media || 0).toFixed(2);
+    (metricasPaciente.duracion_habla_media || 0);
 
   let porcentajeMejora = calcularPorcentajeMejoraGlobal();
   document.getElementById("textoProgresoGlobal").textContent =
@@ -875,6 +1001,7 @@ function rellenarPantallaEditarSesion() {
     let item = document.createElement("li");
     item.setAttribute("data-id-ejercicio", ejercicioSesion.id_ejercicio);
     item.setAttribute("data-id-sesion-ejercicio", ejercicioSesion.id_sesion_ejercicio);
+    item.setAttribute("data-tipo-ejercicio", ejercicioSesion.tipo_ejercicio);
     item.style.border = "1px solid #ccc";
     item.style.padding = "10px";
     item.style.marginBottom = "10px";
@@ -1077,7 +1204,7 @@ function generarInformeSesion() {
     doc.text(
       resultado.orden + ". " +
       resultado.nombre_ejercicio +
-      " | Tipo: " + resultado.tipo_ejercicio +
+      " | Tipo: " + formatearTipoEjercicio(resultado.tipo_ejercicio) +
       " | Intentos: " + resultado.intentos +
       " | WER: " + werMedio +
       " | Precisión: " + precisionMedia +
@@ -1179,6 +1306,24 @@ function actualizarGraficaProgreso() {
       }
     }
   });
+}
+
+function actualizarImagenDemoAccesibilidad(estilo) {
+  let imagen = document.getElementById("imagenDemoAccesibilidad");
+
+  if (!imagen) {
+    return;
+  }
+
+  if (estilo == "alto-contraste") {
+    imagen.src = "img/accesibilidad-demo-contraste.png";
+  }
+  else if (estilo == "letra-grande") {
+    imagen.src = "img/accesibilidad-demo-letra-grande.png";
+  }
+  else {
+    imagen.src = "img/accesibilidad-demo-normal.png";
+  }
 }
 
 function calcularPorcentajeMejoraGlobal() {
@@ -1366,6 +1511,7 @@ function prepararPantallaCrearSesion() {
   ejerciciosDisponiblesSesion.forEach(function (ejercicio) {
     let item = document.createElement("li");
     item.setAttribute("data-id-ejercicio", ejercicio.id_ejercicio);
+    item.setAttribute("data-tipo-ejercicio", ejercicio.tipo_ejercicio);
     item.style.border = "1px solid #ccc";
     item.style.padding = "10px";
     item.style.marginBottom = "10px";
@@ -1385,6 +1531,17 @@ function prepararPantallaCrearSesion() {
   });
 
   activarSortableEjercicios();
+}
+
+function prepararPantallaAccesibilidad() {
+  let estiloGuardado = localStorage.getItem("estiloAccesibilidad");
+
+  if (!estiloGuardado) {
+    estiloGuardado = "normal";
+  }
+
+  document.getElementById("selectorAccesibilidad").value = estiloGuardado;
+  actualizarImagenDemoAccesibilidad(estiloGuardado);
 }
 
 function activarSortableEjercicios() {
@@ -1594,6 +1751,89 @@ function guardarEdicionSesion() {
       });
     }
   });
+}
+
+function toggleMenuPerfil() {
+  let menu = document.getElementById("menuPerfil");
+  menu.classList.toggle("oculto");
+}
+
+function mostrarVistaPrincipal(vista) {
+  let bloquePacientes = document.getElementById("bloquePacientes");
+  let bloqueEjercicios = document.getElementById("bloqueEjercicios");
+
+  let tabPacientes = document.getElementById("tabPacientes");
+  let tabEjercicios = document.getElementById("tabEjercicios");
+
+  if (vista == "pacientes") {
+    bloquePacientes.classList.remove("oculto");
+    bloqueEjercicios.classList.add("oculto");
+
+    tabPacientes.classList.add("tab-activa");
+    tabEjercicios.classList.remove("tab-activa");
+
+    resetearFiltroPacientes();
+    pintarTablaPacientes(pacientes);
+  }
+  else if (vista == "ejercicios") {
+    bloqueEjercicios.classList.remove("oculto");
+    bloquePacientes.classList.add("oculto");
+
+    tabEjercicios.classList.add("tab-activa");
+    tabPacientes.classList.remove("tab-activa");
+
+    resetearFiltroEjercicios();
+
+    let ejerciciosActivos = ejercicios.filter(function (ejercicio) {
+      return ejercicio.activo == 1;
+    });
+
+    pintarTablaEjercicios(ejerciciosActivos);
+  }
+}
+
+function aplicarEstiloAccesibilidad() {
+  let estilo = document.getElementById("selectorAccesibilidad").value;
+
+  localStorage.setItem("estiloAccesibilidad", estilo);
+
+  document.body.classList.remove("accesibilidad-normal");
+  document.body.classList.remove("accesibilidad-alto-contraste");
+  document.body.classList.remove("accesibilidad-letra-grande");
+
+  if (estilo == "alto-contraste") {
+    document.body.classList.add("accesibilidad-alto-contraste");
+  }
+  else if (estilo == "letra-grande") {
+    document.body.classList.add("accesibilidad-letra-grande");
+  }
+  else {
+    document.body.classList.add("accesibilidad-normal");
+  }
+
+  actualizarImagenDemoAccesibilidad(estilo);
+}
+
+function aplicarEstiloGuardado() {
+  let estiloGuardado = localStorage.getItem("estiloAccesibilidad");
+
+  if (!estiloGuardado) {
+    estiloGuardado = "normal";
+  }
+
+  document.body.classList.remove("accesibilidad-normal");
+  document.body.classList.remove("accesibilidad-alto-contraste");
+  document.body.classList.remove("accesibilidad-letra-grande");
+
+  if (estiloGuardado == "alto-contraste") {
+    document.body.classList.add("accesibilidad-alto-contraste");
+  }
+  else if (estiloGuardado == "letra-grande") {
+    document.body.classList.add("accesibilidad-letra-grande");
+  }
+  else {
+    document.body.classList.add("accesibilidad-normal");
+  }
 }
 
 document.addEventListener("DOMContentLoaded", function () {

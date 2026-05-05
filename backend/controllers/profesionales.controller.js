@@ -183,7 +183,8 @@ exports.obtenerPacientesDeProfesional = function (req, resp) {
             p.diagnostico_principal,
             p.activo,
             u.nombre,
-            u.apellidos
+            u.apellidos,
+            u.ultima_conexion
         FROM pacientes p
         JOIN usuarios u ON p.id_usuario = u.id_usuario
         WHERE p.id_profesional_referencia = ?

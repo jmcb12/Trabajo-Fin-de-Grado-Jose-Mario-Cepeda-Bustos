@@ -195,6 +195,7 @@ exports.obtenerResultadosPorSesion = function (req, resp) {
             se.id_sesion_ejercicio,
             e.id_ejercicio,
             e.nombre AS nombre_ejercicio,
+            e.tipo_ejercicio,
             se.orden,
             re.numero_intento,
             re.respuesta_esperada,

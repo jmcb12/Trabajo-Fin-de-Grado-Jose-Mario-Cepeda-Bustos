@@ -20,7 +20,8 @@ table {
     margin-bottom: 20px;
 }
 
-th, td {
+th,
+td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: center;
@@ -61,7 +62,9 @@ label {
     font-weight: bold;
 }
 
-input, select, button {
+input,
+select,
+button {
     padding: 8px;
     font-size: 14px;
     width: auto;
@@ -82,6 +85,22 @@ button {
     display: block;
 }
 
-.visible{
+.visible {
     display: inline;
+}
+
+.tab-activa {
+    font-weight: bold;
+    background-color: #d9d9d9;
+}
+
+#tabsPrincipal button {
+    padding: 10px 20px;
+    border: 1px solid #666;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+#tabsPrincipal button:not(.tab-activa) {
+    background-color: #e6e6e6;
 }

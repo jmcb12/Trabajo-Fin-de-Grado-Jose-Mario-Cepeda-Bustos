@@ -16,60 +16,106 @@
 
 <body>
 
+  <header id="headerLogopeda">
+    <div class="header-contenido">
+      <div class="header-izquierda">
+        <h1 class="logo-app">SpeakMe Rehab</h1>
+        <p class="subtitulo-app">Panel del profesional</p>
+      </div>
+
+      <div class="header-derecha">
+        <span id="headerNombreProfesional">Logopeda</span>
+      </div>
+    </div>
+  </header>
+
   <div id="pantallaInicio" class="pantalla">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <h1 id="tituloBienvenida">Bienvenido, doctor</h1>
 
-    <h1 id="tituloBienvenida">Bienvenido, doctor</h1>
+      <div style="position:relative;">
+        <button type="button" onclick="toggleMenuPerfil()">Mi perfil</button>
 
-    <button onclick="mostrarPantalla('pantallaAltaPaciente')">
-      Crear paciente
-    </button>
-
-    <button onclick="irBibliotecaEjercicios()">
-      EJERCICIOS
-    </button>
-
-    <button onclick="mostrarPantalla('pantallaPerfil')">
-      Mi perfil
-    </button>
-
-    <br><br>
-
-    <label for="filtroPacientes">Filtrar pacientes:</label>
-    <select id="filtroPacientes" onchange="filtrarPacientes()">
-      <option value="todos">Todos</option>
-      <option value="activo">Activos</option>
-      <option value="desactivado">Desactivados</option>
-    </select>
-
-    <br><br>
-
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Apellidos</th>
-          <th>Diagnóstico</th>
-          <th>Estado</th>
-          <th>Seleccionar</th>
-        </tr>
-      </thead>
-
-      <tbody id="tablaPacientes">
-        <!-- Aquí se cargarán los pacientes desde JavaScript -->
-      </tbody>
-    </table>
+        <div id="menuPerfil" class="oculto"
+          style="position:absolute; right:0; top:40px; border:1px solid #999; background:white; min-width:180px; z-index:1000;">
+          <button type="button" style="display:block; width:100%;" onclick="irEditarPerfil()">Editar perfil</button>
+          <button type="button" style="display:block; width:100%;" onclick="irAccesibilidad()">Accesibilidad</button>
+          <button type="button" style="display:block; width:100%;" onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
 
     <br>
 
-    <button onclick="cargarPacientesConFiltro()">
-      Recargar tabla
-    </button>
+    <div id="tabsPrincipal" style="display:flex; gap:0;">
+      <button type="button" id="tabPacientes" onclick="mostrarVistaPrincipal('pacientes')">Pacientes</button>
+      <button type="button" id="tabEjercicios" onclick="mostrarVistaPrincipal('ejercicios')">Ejercicios</button>
+    </div>
 
-    <br><br>
+    <br>
 
-    <button onclick="cerrarSesion()">
-      Cerrar sesión
-    </button>
+    <div id="bloquePacientes">
+      <select id="filtroPacientes" onchange="filtrarPacientes()">
+        <option value="todos">Todos</option>
+        <option value="activo">Activo</option>
+        <option value="desactivado">Desactivado</option>
+      </select>
+
+      <br><br>
+
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Diagnóstico</th>
+            <th>Última conexión</th>
+            <th>Estado</th>
+            <th>Seleccionar</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPacientes"></tbody>
+      </table>
+
+      <br><br>
+
+      <button type="button" onclick="cargarPacientesConFiltro()">Recargar tabla</button>
+      <button type="button" onclick="mostrarPantalla('pantallaAltaPaciente')">Crear paciente</button>
+    </div>
+
+    <div id="bloqueEjercicios" class="oculto">
+      <p>Ejercicios disponibles</p>
+
+      <select id="filtroEjercicios" onchange="filtrarEjercicios()">
+        <option value="todos">Todos</option>
+        <option value="repeticion_palabra">Repetición de palabra</option>
+        <option value="repeticion_frase">Repetición de frase</option>
+        <option value="denominacion">Denominación</option>
+        <option value="lectura">Lectura</option>
+        <option value="articulacion_guiada">Articulación guiada</option>
+      </select>
+
+      <br><br>
+
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Dificultad</th>
+            <th>Duración (s)</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody id="tablaEjercicios"></tbody>
+      </table>
+
+      <br><br>
+
+      <button type="button" onclick="irCrearEjercicio()">Crear ejercicio</button>
+      <button type="button" onclick="irPapeleraEjercicios()">🗑️</button>
+    </div>
   </div>
 
   <div id="pantallaAltaPaciente" class="pantalla oculto">
@@ -133,49 +179,6 @@
       <button type="button" id="btnLimpiarPaciente">Limpiar</button>
       <button type="submit">Dar de alta paciente</button>
     </form>
-  </div>
-
-  <div id="pantallaEjercicios" class="pantalla oculto">
-    <h1>Ejercicios</h1>
-
-    <p>Ejercicios disponibles</p>
-
-    <label for="filtroEjercicios">Filtrar por tipo:</label>
-    <select id="filtroEjercicios" onchange="filtrarEjercicios()">
-      <option value="todos">Todos</option>
-      <option value="repeticion_palabra">Repetición de palabra</option>
-      <option value="repeticion_frase">Repetición de frase</option>
-      <option value="denominacion">Denominación</option>
-      <option value="lectura">Lectura</option>
-      <option value="articulacion_guiada">Articulación guiada</option>
-    </select>
-
-    <br><br>
-
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Tipo</th>
-          <th>Dificultad</th>
-          <th>Duración (s)</th>
-          <th>Editar</th>
-          <th>Eliminar</th>
-        </tr>
-      </thead>
-
-      <tbody id="tablaEjercicios">
-      </tbody>
-    </table>
-
-    <br>
-
-    <button onclick="irCrearEjercicio()">Crear ejercicio</button>
-    <button onclick="irPapeleraEjercicios()">Papelera</button>
-
-    <br><br>
-
-    <button onclick="mostrarPantalla('pantallaInicio')">Volver</button>
   </div>
 
   <div id="pantallaCrearEjercicio" class="pantalla oculto">
@@ -442,8 +445,8 @@
           <th>Intentos</th>
           <th>WER</th>
           <th>Precisión</th>
-          <th>Tiempo de respuesta</th>
-          <th>Duración del habla</th>
+          <th>Tiempo de respuesta (ms)</th>
+          <th>Duración del habla (ms)</th>
           <th>Tasa de éxito (%)</th>
         </tr>
       </thead>
@@ -531,6 +534,16 @@
       </div>
 
       <div style="width: 45%;">
+        <label for="filtroCrearSesionEjercicios">Filtrar por tipo:</label>
+        <select id="filtroCrearSesionEjercicios" onchange="filtrarEjerciciosCrearSesion()">
+          <option value="todos">Todos</option>
+          <option value="repeticion_palabra">Repetición de palabra</option>
+          <option value="repeticion_frase">Repetición de frase</option>
+          <option value="denominacion">Denominación</option>
+          <option value="lectura">Lectura</option>
+          <option value="articulacion_guiada">Articulación guiada</option>
+        </select>
+        <br><br>
         <h3>Lista de ejercicios</h3>
         <ul id="listaBibliotecaEjercicios"
           style="min-height: 300px; border: 1px solid #999; padding: 10px; list-style: none;"></ul>
@@ -567,6 +580,16 @@
       </div>
 
       <div style="width: 45%;">
+        <label for="filtroEditarSesionEjercicios">Filtrar por tipo:</label>
+        <select id="filtroEditarSesionEjercicios" onchange="filtrarEjerciciosEditarSesion()">
+          <option value="todos">Todos</option>
+          <option value="repeticion_palabra">Repetición de palabra</option>
+          <option value="repeticion_frase">Repetición de frase</option>
+          <option value="denominacion">Denominación</option>
+          <option value="lectura">Lectura</option>
+          <option value="articulacion_guiada">Articulación guiada</option>
+        </select>
+        <br><br>
         <h3>Lista de ejercicios</h3>
         <ul id="listaEditarBibliotecaEjercicios"
           style="min-height: 300px; border: 1px solid #999; padding: 10px; list-style: none;"></ul>
@@ -585,6 +608,113 @@
     <button type="button" onclick="guardarEdicionSesion()">Editar sesión</button>
   </div>
 
+  <div id="pantallaAccesibilidad" class="pantalla oculto">
+    <h1>Accesibilidad</h1>
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:40px;">
+      <div style="flex:1;">
+        <p>Seleccione un estilo de visualización de la plataforma</p>
+
+        <select id="selectorAccesibilidad" onchange="aplicarEstiloAccesibilidad()">
+          <option value="normal">Normal</option>
+          <option value="alto-contraste">Alto contraste</option>
+          <option value="letra-grande">Letras grandes</option>
+        </select>
+
+        <br><br><br>
+
+        <h2>Nuestro compromiso</h2>
+        <p>
+          SpeakMe Rehab se ha comprometido a hacer accesible su sitio web, de conformidad con el
+          <strong>Real Decreto 1112/2018, de 7 de septiembre</strong>, por el que se transpone la
+          <strong>Directiva (UE) 2016/2102</strong> del Parlamento Europeo y del Consejo.
+        </p>
+        <p>
+          Esta declaración de accesibilidad se aplica al sitio web actual y a la correspondiente aplicación móvil de la plataforma.
+        </p>
+        </section>
+
+        <section id="cumplimiento">
+          <h2>Situación de cumplimiento</h2>
+          <p>Este sitio web es <strong>parcialmente conforme</strong> con el Real Decreto 1112/2018.</p>
+        </section>
+
+        <section id="contenido-no-accesible">
+          <h2>Contenido no accesible</h2>
+          <p>
+            Nos comprometemos a hacer plenamente accesible nuestra página web. Sin embargo, hay varios aspectos que
+            no podemos gestionar ya que son debidos a errores externos:
+          </p>
+          <ul>
+            <li>
+              <strong>Estado de conformidad:</strong> En cuanto a la accesibilidad de nuestro sitio web nos
+              comprometemos a garantizar la máxima calidad en todas nuestras páginas. Cierto es que determinados
+              elementos externos provocan errores, siendo estos imposibles de solucionar y pudiendo afectar a
+              algunas tecnologías de ayuda como los lectores de pantalla.
+            </li>
+          </ul>
+        </section>
+
+        <section id="preparacion">
+          <h2>Preparación de la presente declaración de accesibilidad</h2>
+          <p>
+            Esta declaración fue preparada el <strong>5 de mayo de 2026</strong>, tras una autoevaluación del
+            sitio web basada en las directrices de accesibilidad WCAG 2.1 (Nivel AA).
+          </p>
+          <p>
+            Tras una nueva revisión de accesibilidad de caracter manual el <strong>12 de mayo de 2026</strong>
+            se realiza una revisión de la declaración de accesibilidad y se observa que esta sigue siendo correcta,
+            ya que no se encuentran errores nuevos.
+          </p>
+          <p><strong>Última revisión de la declaración:</strong> 12 de mayo de 2026.</p>
+        </section>
+
+        <section id="observaciones">
+          <h2>Observaciones y datos de contacto</h2>
+          <p>
+            Si encuentra dificultades para acceder al contenido del sitio web o tiene sugerencias sobre cómo podemos
+            mejorar nuestra accesibilidad, no dude en contactar con nosotros através del teléfono 608265966.
+          </p>
+        </section>
+
+        <section id="compromiso-accesibilidad">
+          <h2>Compromiso con la accesibilidad</h2>
+          <p>
+            SpeakMe garantiza que su sitio web es accesible para todos los usuarios, incluidas las
+            personas que tienen una discapacidad:
+          </p>
+          <ul>
+            <li>Las imágenes tienen textos alternativos.</li>
+            <li>Se han tomado todas las medidas necesarias para asegurar el cumplimiento con los estándares
+              internacionales de accesibilidad.</li>
+            <li>Los elementos interactivos están correctamente etiquetados (formularios, tablas, mapas...).</li>
+          </ul>
+          <p>
+            Para garantizar la accesibilidad, este sitio web ha sido evaluado utilizando herramientas automáticas de
+            evaluación y revisiones manuales, asegurando así que cumple con los estándares de las
+            <strong>WCAG 2.1 (Nivel AA)</strong>.
+          </p>
+        </section>
+        </p>
+      </div>
+
+      <div style="flex:1; text-align:center;">
+        <img id="imagenDemoAccesibilidad" src="img/accesibilidad-demo-normal.png"
+          alt="Vista previa del estilo de la plataforma" style="max-width:300px; border:1px solid #ccc;">
+      </div>
+    </div>
+
+    <br><br><br>
+
+    <button type="button" onclick="volverDesdeAccesibilidad()">Volver</button>
+  </div>
+
+  <footer id="footerLogopeda">
+    <div class="footer-contenido">
+      <span>TFG · Plataforma de telerehabilitación para pacientes con afasia</span>
+      <span>© 2026</span>
+    </div>
+  </footer>
 
   <script src="js/rest.js"></script>
   <script src="js/clienteLogopeda.js"></script>
