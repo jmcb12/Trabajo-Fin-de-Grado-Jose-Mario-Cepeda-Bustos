@@ -20,6 +20,9 @@ exports.iniciarSesion = function (req, resp) {
         u.fecha_creacion,
         u.ultima_conexion,
         pr.id_profesional,
+        pr.centro_trabajo,
+        pr.telefono,
+        pr.foto_perfil,
         pa.id_paciente
     FROM usuarios u
     LEFT JOIN profesionales pr ON u.id_usuario = pr.id_usuario
@@ -54,6 +57,9 @@ exports.iniciarSesion = function (req, resp) {
                 id_usuario: usuario[0].id_usuario,
                 id_profesional: usuario[0].id_profesional,
                 id_paciente: usuario[0].id_paciente,
+                centro_trabajo: usuario[0].centro_trabajo,
+                telefono: usuario[0].telefono,
+                foto_perfil: usuario[0].foto_perfil,
                 nombre: usuario[0].nombre,
                 apellidos: usuario[0].apellidos,
                 username: usuario[0].username,

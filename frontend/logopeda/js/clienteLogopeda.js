@@ -30,6 +30,7 @@ window.onload = function () {
   cargarDatosLogopeda();
   cargarPacientes();
   cargarEjercicios();
+  prepararEventosEditarProfesional();
   mostrarVistaPrincipal("pacientes");
 };
 
@@ -124,6 +125,16 @@ function cargarDatosLogopeda() {
 
   document.getElementById("tituloBienvenida").textContent =
     "Bienvenido, " + usuarioLogueado.nombre + " " + usuarioLogueado.apellidos;
+
+  let fotoPerfilHeader = document.getElementById("fotoPerfilHeader");
+
+  if (fotoPerfilHeader) {
+    if (usuarioLogueado.foto_perfil) {
+      fotoPerfilHeader.src = usuarioLogueado.foto_perfil;
+    } else {
+      fotoPerfilHeader.src = "/media/fotosPerfil/default.png";
+    }
+  }
 }
 
 function cargarDatosEjercicioEditar(idEjercicio) {
@@ -820,7 +831,8 @@ function irCrearSesion() {
 
 function irEditarPerfil() {
   document.getElementById("menuPerfil").classList.add("oculto");
-  alert("Más adelante aquí se abrirá la pantalla de editar perfil");
+  cargarDatosEditarProfesional();
+  mostrarPantalla("pantallaEditarProfesional");
 }
 
 function irAccesibilidad() {
@@ -1076,6 +1088,32 @@ function cargarResultadosSesion(idSesion) {
   });
 }
 
+function cargarDatosEditarProfesional() {
+  if (usuarioLogueado == null) {
+    alert("No has iniciado sesión");
+    window.location.href = "../index.html";
+    return;
+  }
+
+  document.getElementById("edit_prof_username").value = usuarioLogueado.username || "";
+  document.getElementById("edit_prof_password").value = "";
+  document.getElementById("edit_prof_nombre").value = usuarioLogueado.nombre || "";
+  document.getElementById("edit_prof_apellidos").value = usuarioLogueado.apellidos || "";
+  document.getElementById("edit_prof_telefono").value = usuarioLogueado.telefono || "";
+  document.getElementById("edit_prof_centro").value = usuarioLogueado.centro_trabajo || "";
+
+  document.getElementById("edit_prof_foto_preview").src =
+    usuarioLogueado.foto_perfil || "/media/fotosPerfil/default.png";
+}
+
+function volverDesdeEditarProfesional() {
+  mostrarPantalla("pantallaInicio");
+}
+
+function restablecerEditarProfesional() {
+  cargarDatosEditarProfesional();
+}
+
 function editarSesion(idSesion) {
   localStorage.setItem("idSesionSeleccionada", idSesion);
   cargarPantallaEditarSesion(idSesion);
@@ -1327,18 +1365,24 @@ function actualizarImagenDemoAccesibilidad(estilo) {
 }
 
 function calcularPorcentajeMejoraGlobal() {
-  if (!evolucionPaciente || evolucionPaciente.length < 2) {
+  if (!metricasPaciente) {
     return 0;
   }
 
-  let primera = parseFloat(evolucionPaciente[0].precision_media || 0);
-  let ultima = parseFloat(evolucionPaciente[evolucionPaciente.length - 1].precision_media || 0);
+  let precision = parseFloat(metricasPaciente.precision_media || 0);
+  let exito = parseFloat(metricasPaciente.tasa_exito || 0);
 
-  if (primera <= 0) {
-    return ultima;
+  let progreso = (0.5 * precision) + (0.5 * exito);
+
+  if (progreso < 0) {
+    progreso = 0;
   }
 
-  return ((ultima - primera) / primera) * 100;
+  if (progreso > 100) {
+    progreso = 100;
+  }
+
+  return progreso;
 }
 
 function exportarDatosPacienteCSV() {
@@ -1405,7 +1449,7 @@ function generarInformeProgresoPaciente() {
   doc.text("Profesional: " + usuarioLogueado.nombre + " " + usuarioLogueado.apellidos, 14, y);
   y += 8;
 
-  doc.text("Porcentaje de mejora: " + calcularPorcentajeMejoraGlobal().toFixed(2) + "%", 14, y);
+  doc.text("Progreso global: " + Math.round(calcularPorcentajeMejoraGlobal()) + "%", 14, y);
   y += 12;
 
   doc.text("Métricas globales:", 14, y);
@@ -1415,13 +1459,13 @@ function generarInformeProgresoPaciente() {
   y += 8;
   doc.text("WER: " + (metricasPaciente.wer_medio || 0).toFixed(2), 14, y);
   y += 8;
-  doc.text("Tasa de éxito: " + (metricasPaciente.tasa_exito || 0).toFixed(2), 14, y);
+  doc.text("Tasa de éxito: " + Math.round(metricasPaciente.tasa_exito || 0), 14, y);
   y += 8;
   doc.text("Número de intentos: " + (metricasPaciente.numero_intentos || 0), 14, y);
   y += 8;
-  doc.text("Tiempo de respuesta medio: " + (metricasPaciente.tiempo_respuesta_medio || 0).toFixed(2), 14, y);
+  doc.text("Tiempo de respuesta medio: " + Math.round(metricasPaciente.tiempo_respuesta_medio || 0), 14, y);
   y += 8;
-  doc.text("Duración del habla media: " + (metricasPaciente.duracion_habla_media || 0).toFixed(2), 14, y);
+  doc.text("Duración del habla media: " + Math.round(metricasPaciente.duracion_habla_media || 0), 14, y);
   y += 12;
 
   if (graficaProgreso != null) {
@@ -1490,6 +1534,36 @@ function generarInformeProgresoPaciente() {
 
     let imagen = generarGraficaTemporal(grafica.titulo, grafica.campo);
     doc.addImage(imagen, "PNG", 14, 30, 180, 90);
+
+    let yTabla = 135;
+
+    doc.setFontSize(12);
+    doc.text("Valores medios por sesión:", 14, yTabla);
+    yTabla += 10;
+
+    doc.setFontSize(11);
+    doc.text("Sesión", 20, yTabla);
+    doc.text("Valor", 80, yTabla);
+    yTabla += 8;
+
+    evolucionPaciente.forEach(function (sesion, indice) {
+      let valor = parseFloat(sesion[grafica.campo] || 0);
+
+      if (
+        grafica.campo == "tasa_exito" ||
+        grafica.campo == "tiempo_respuesta_medio" ||
+        grafica.campo == "duracion_habla_media"
+      ) {
+        valor = Math.round(valor);
+      }
+      else {
+        valor = valor.toFixed(2);
+      }
+
+      doc.text("Sesión " + (indice + 1), 20, yTabla);
+      doc.text(String(valor), 80, yTabla);
+      yTabla += 8;
+    });
   });
 
   doc.save("informe_progreso_paciente.pdf");
@@ -1542,6 +1616,27 @@ function prepararPantallaAccesibilidad() {
 
   document.getElementById("selectorAccesibilidad").value = estiloGuardado;
   actualizarImagenDemoAccesibilidad(estiloGuardado);
+}
+
+function prepararEventosEditarProfesional() {
+  var formEditarProfesional = document.getElementById("formEditarProfesional");
+
+  if (formEditarProfesional) {
+    formEditarProfesional.addEventListener("submit", function (evento) {
+      evento.preventDefault();
+      guardarDatosProfesional();
+    });
+  }
+
+  var inputFoto = document.getElementById("edit_prof_foto");
+
+  if (inputFoto) {
+    inputFoto.addEventListener("change", function () {
+      if (this.files && this.files[0]) {
+        guardarFotoPerfilProfesional(this.files[0]);
+      }
+    });
+  }
 }
 
 function activarSortableEjercicios() {
@@ -1753,6 +1848,53 @@ function guardarEdicionSesion() {
   });
 }
 
+function guardarDatosProfesional() {
+  if (!usuarioLogueado || !usuarioLogueado.id_profesional) {
+    alert("No se ha encontrado el profesional que ha iniciado sesión");
+    return;
+  }
+
+  var datos = {
+    username: document.getElementById("edit_prof_username").value.trim(),
+    password: document.getElementById("edit_prof_password").value.trim(),
+    nombre: document.getElementById("edit_prof_nombre").value.trim(),
+    apellidos: document.getElementById("edit_prof_apellidos").value.trim(),
+    telefono: document.getElementById("edit_prof_telefono").value.trim(),
+    centro_trabajo: document.getElementById("edit_prof_centro").value.trim(),
+    foto_perfil: usuarioLogueado.foto_perfil || "/media/fotosPerfil/default.png"
+  };
+
+  if (!datos.username || !datos.nombre || !datos.apellidos) {
+    alert("Usuario, nombre y apellidos son obligatorios");
+    return;
+  }
+
+  rest.put(
+    "/api/profesionales/" + usuarioLogueado.id_profesional,
+    datos,
+    function (estado, respuesta) {
+      if (estado != 200) {
+        alert("No se han podido guardar los datos del profesional");
+        return;
+      }
+
+      usuarioLogueado.username = respuesta.username;
+      usuarioLogueado.nombre = respuesta.nombre;
+      usuarioLogueado.apellidos = respuesta.apellidos;
+      usuarioLogueado.telefono = respuesta.telefono;
+      usuarioLogueado.centro_trabajo = respuesta.centro_trabajo;
+      usuarioLogueado.foto_perfil = respuesta.foto_perfil;
+
+      localStorage.setItem("usuarioLogueado", JSON.stringify(usuarioLogueado));
+
+      cargarDatosLogopeda();
+
+      alert("Perfil actualizado correctamente");
+      mostrarPantalla("pantallaInicio");
+    }
+  );
+}
+
 function toggleMenuPerfil() {
   let menu = document.getElementById("menuPerfil");
   menu.classList.toggle("oculto");
@@ -1834,6 +1976,77 @@ function aplicarEstiloGuardado() {
   else {
     document.body.classList.add("accesibilidad-normal");
   }
+}
+
+function cancelarSesionEditando() {
+  if (sesionEditando == null) {
+    alert("No se ha cargado ninguna sesión");
+    return;
+  }
+
+  if (sesionEditando.estado == "cancelada") {
+    alert("La sesión ya está cancelada");
+    return;
+  }
+
+  let confirmar = confirm("¿Seguro que quieres cancelar esta sesión? No se tendrá en cuenta para las métricas.");
+
+  if (!confirmar) {
+    return;
+  }
+
+  rest.put("/api/sesiones/" + sesionEditando.id_sesion + "/cancelar", {}, function (estado, respuesta) {
+    if (estado != 200) {
+      alert("Error al cancelar la sesión");
+      return;
+    }
+
+    alert("Sesión cancelada correctamente");
+
+    let idPaciente = localStorage.getItem("idPacienteSeleccionado");
+
+    if (idPaciente) {
+      cargarSesionesPaciente(idPaciente);
+    }
+  });
+}
+
+function seleccionarNuevaFotoPerfil() {
+  document.getElementById("edit_prof_foto").click();
+}
+
+function guardarFotoPerfilProfesional(archivo) {
+  if (!usuarioLogueado || !usuarioLogueado.id_profesional) {
+    alert("No se ha encontrado el profesional que ha iniciado sesión");
+    return;
+  }
+
+  var formData = new FormData();
+  formData.append("foto_perfil", archivo);
+
+  rest.postForm(
+    "/api/profesionales/" + usuarioLogueado.id_profesional + "/foto-perfil",
+    formData,
+    function (estado, respuesta) {
+      if (estado != 200) {
+        alert("No se ha podido subir la foto de perfil");
+        return;
+      }
+
+      usuarioLogueado.foto_perfil = respuesta.foto_perfil;
+      localStorage.setItem("usuarioLogueado", JSON.stringify(usuarioLogueado));
+
+      document.getElementById("edit_prof_foto_preview").src = respuesta.foto_perfil;
+
+      var fotoHeader = document.getElementById("fotoPerfilHeader");
+
+      if (fotoHeader) {
+        fotoHeader.src = respuesta.foto_perfil;
+      }
+
+      alert("Foto de perfil actualizada correctamente");
+    }
+  );
 }
 
 document.addEventListener("DOMContentLoaded", function () {

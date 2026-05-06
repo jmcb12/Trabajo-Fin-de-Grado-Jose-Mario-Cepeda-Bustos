@@ -20,6 +20,7 @@ exports.obtenerMetricasPorPaciente = function (req, resp) {
         JOIN sesion_ejercicios se ON s.id_sesion = se.id_sesion
         JOIN resultados_ejercicio re ON se.id_sesion_ejercicio = re.id_sesion_ejercicio
         WHERE s.id_paciente = ?
+        AND s.estado <> 'cancelada'
     `;
 
     conexion.query(sql, [id_paciente], function (err, metricas) {
@@ -58,6 +59,7 @@ exports.obtenerMetricasPorSesion = function (req, resp) {
         FROM sesion_ejercicios se
         JOIN resultados_ejercicio re ON se.id_sesion_ejercicio = re.id_sesion_ejercicio
         WHERE se.id_sesion = ?
+        AND s.estado <> 'cancelada'
     `;
 
     conexion.query(sql, [id_sesion], function (err, metricas) {
@@ -99,6 +101,7 @@ exports.obtenerEvolucionPaciente = function (req, resp) {
         JOIN sesion_ejercicios se ON s.id_sesion = se.id_sesion
         JOIN resultados_ejercicio re ON se.id_sesion_ejercicio = re.id_sesion_ejercicio
         WHERE s.id_paciente = ?
+        AND s.estado <> 'cancelada'
         GROUP BY s.id_sesion, s.fecha_hora_inicio
         ORDER BY s.fecha_hora_inicio ASC
     `;

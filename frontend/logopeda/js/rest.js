@@ -50,6 +50,32 @@
         rest("DELETE", url, callback);
     };
 
+    rest.postForm = function (url, formData, callback) {
+        var xhr = new XMLHttpRequest();
+
+        xhr.open("POST", "http://localhost:3000" + url, true);
+
+        xhr.onload = function () {
+            var respuesta = xhr.responseText;
+
+            if (respuesta != "") {
+                try {
+                    respuesta = JSON.parse(respuesta);
+                } catch (error) {
+                    respuesta = xhr.responseText;
+                }
+            }
+
+            callback(xhr.status, respuesta);
+        };
+
+        xhr.onerror = function () {
+            callback(500, "Error de conexión con el servidor");
+        };
+
+        xhr.send(formData);
+    };
+
     window.rest = rest;
 
 })();

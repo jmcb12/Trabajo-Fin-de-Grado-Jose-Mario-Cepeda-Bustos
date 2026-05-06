@@ -3,53 +3,82 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>App Logopeda</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel del logopeda | SpeakMe Rehab</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <link rel="stylesheet" href="css/style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
+
 </head>
 
 <body>
 
-  <header id="headerLogopeda">
-    <div class="header-contenido">
-      <div class="header-izquierda">
-        <h1 class="logo-app">SpeakMe Rehab</h1>
-        <p class="subtitulo-app">Panel del profesional</p>
+  <header id="headerLogopeda" class="navbar navbar-expand-lg">
+    <div class="container-fluid px-4 py-2">
+      <div>
+        <h1 class="logo-app mb-0">SpeakMe Rehab</h1>
+        <p class="subtitulo-app mb-0">Panel del profesional</p>
       </div>
 
-      <div class="header-derecha">
-        <span id="headerNombreProfesional">Logopeda</span>
+      <div>
+        <span id="headerNombreProfesional" class="badge rounded-pill text-bg-light">Logopeda</span>
       </div>
     </div>
   </header>
 
   <div id="pantallaInicio" class="pantalla">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-      <h1 id="tituloBienvenida">Bienvenido, doctor</h1>
+    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+      <div>
+        <h1 id="tituloBienvenida">Bienvenido, doctor</h1>
+        <p class="text-muted mb-0">Gestiona pacientes, sesiones, ejercicios y seguimiento clínico.</p>
+      </div>
 
-      <div style="position:relative;">
-        <button type="button" onclick="toggleMenuPerfil()">Mi perfil</button>
+      <div class="position-relative">
+        <button type="button" class="btn btn-primary d-flex align-items-center gap-2" onclick="toggleMenuPerfil()">
+          <img id="fotoPerfilHeader" src="/media/fotosPerfil/default.png" alt="Foto de perfil"
+            class="foto-perfil-header">
+          <span>Mi perfil</span>
+        </button>
 
-        <div id="menuPerfil" class="oculto"
-          style="position:absolute; right:0; top:40px; border:1px solid #999; background:white; min-width:180px; z-index:1000;">
-          <button type="button" style="display:block; width:100%;" onclick="irEditarPerfil()">Editar perfil</button>
-          <button type="button" style="display:block; width:100%;" onclick="irAccesibilidad()">Accesibilidad</button>
-          <button type="button" style="display:block; width:100%;" onclick="cerrarSesion()">Cerrar sesión</button>
+        <div id="menuPerfil" class="oculto shadow rounded bg-white p-2">
+          <button type="button" class="btn btn-light w-100 text-start" onclick="irEditarPerfil()">
+            <i class="bi bi-pencil-square"></i>
+            Editar perfil
+          </button>
+          <button type="button" class="btn btn-light w-100 text-start" onclick="irAccesibilidad()">
+            <i class="bi bi-universal-access"></i>
+            Accesibilidad
+          </button>
+          <button type="button" class="btn btn-light w-100 text-start text-danger" onclick="cerrarSesion()">
+            <i class="bi bi-box-arrow-right"></i>
+            Cerrar sesión
+          </button>
         </div>
       </div>
     </div>
 
     <br>
 
-    <div id="tabsPrincipal" style="display:flex; gap:0;">
-      <button type="button" id="tabPacientes" onclick="mostrarVistaPrincipal('pacientes')">Pacientes</button>
-      <button type="button" id="tabEjercicios" onclick="mostrarVistaPrincipal('ejercicios')">Ejercicios</button>
+    <div id="tabsPrincipal" class="btn-group" role="group">
+      <button type="button" id="tabPacientes" class="btn btn-outline-primary"
+        onclick="mostrarVistaPrincipal('pacientes')">
+        <i class="bi bi-people"></i>
+        Pacientes
+      </button>
+      <button type="button" id="tabEjercicios" class="btn btn-outline-primary"
+        onclick="mostrarVistaPrincipal('ejercicios')">
+        <i class="bi bi-journal-medical"></i>
+        Ejercicios
+      </button>
     </div>
 
     <br>
@@ -79,8 +108,15 @@
 
       <br><br>
 
-      <button type="button" onclick="cargarPacientesConFiltro()">Recargar tabla</button>
-      <button type="button" onclick="mostrarPantalla('pantallaAltaPaciente')">Crear paciente</button>
+      <button type="button" class="btn btn-outline-secondary" onclick="cargarPacientesConFiltro()">
+        <i class="bi bi-arrow-clockwise"></i>
+        Recargar tabla
+      </button>
+      <button type="button" class="btn btn-primary" onclick="mostrarPantalla('pantallaAltaPaciente')">
+        <i class="bi bi-person-plus"></i>
+        Crear paciente
+      </button>
+
     </div>
 
     <div id="bloqueEjercicios" class="oculto">
@@ -113,8 +149,15 @@
 
       <br><br>
 
-      <button type="button" onclick="irCrearEjercicio()">Crear ejercicio</button>
-      <button type="button" onclick="irPapeleraEjercicios()">🗑️</button>
+      <button type="button" class="btn btn-primary" onclick="irCrearEjercicio()">
+        <i class="bi bi-plus-circle"></i>
+        Crear ejercicio
+      </button>
+      <button type="button" class="btn btn-outline-danger" onclick="irPapeleraEjercicios()">
+        <i class="bi bi-trash"></i>
+        Papelera
+      </button>
+
     </div>
   </div>
 
@@ -305,33 +348,90 @@
   </div>
 
   <div id="pantallaMenuPaciente" class="pantalla oculto">
-    <h1>Menú del paciente</h1>
+    <div class="mb-4">
+      <p class="text-muted mb-1">Ficha del paciente</p>
+      <h1 id="menuPacienteNombre" class="mb-0">Nombre y apellidos</h1>
+    </div>
 
-    <h2 id="menuPacienteNombre">Nombre y apellidos</h2>
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h2 class="h5 mb-3">
+              <i class="bi bi-person-vcard"></i>
+              Datos del paciente
+            </h2>
 
-    <p><strong>Sexo:</strong> <span id="menuPacienteSexo"></span></p>
-    <p><strong>Fecha de nacimiento:</strong> <span id="menuPacienteFechaNacimiento"></span></p>
-    <p><strong>Diagnóstico principal:</strong> <span id="menuPacienteDiagnostico"></span></p>
-    <p><strong>Nivel de afasia:</strong> <span id="menuPacienteNivelAfasia"></span></p>
-    <p><strong>Fecha de inicio de tratamiento:</strong> <span id="menuPacienteFechaInicio"></span></p>
-    <p><strong>Observaciones:</strong> <span id="menuPacienteObservaciones"></span></p>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <p class="text-muted mb-1">Sexo</p>
+                <p class="fw-semibold mb-0"><span id="menuPacienteSexo"></span></p>
+              </div>
 
-    <br>
-    <button type="button" onclick="irEditarPaciente()">Editar datos</button>
+              <div class="col-md-6">
+                <p class="text-muted mb-1">Fecha de nacimiento</p>
+                <p class="fw-semibold mb-0"><span id="menuPacienteFechaNacimiento"></span></p>
+              </div>
 
-    <br><br>
+              <div class="col-md-6">
+                <p class="text-muted mb-1">Diagnóstico principal</p>
+                <p class="fw-semibold mb-0"><span id="menuPacienteDiagnostico"></span></p>
+              </div>
 
-    <h2>Progreso y métricas</h2>
-    <button type="button" onclick="irProgresoPaciente()">Acceder al progreso</button>
+              <div class="col-md-6">
+                <p class="text-muted mb-1">Nivel de afasia</p>
+                <p class="fw-semibold mb-0"><span id="menuPacienteNivelAfasia"></span></p>
+              </div>
 
-    <br><br>
+              <div class="col-md-6">
+                <p class="text-muted mb-1">Inicio de tratamiento</p>
+                <p class="fw-semibold mb-0"><span id="menuPacienteFechaInicio"></span></p>
+              </div>
 
-    <h2>Sesiones</h2>
-    <button type="button" onclick="irSesionesPaciente()">Acceder a sesiones</button>
+              <div class="col-12">
+                <p class="text-muted mb-1">Observaciones</p>
+                <p class="fw-semibold mb-0"><span id="menuPacienteObservaciones"></span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <br><br><br>
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h2 class="h5 mb-3">
+              <i class="bi bi-grid-1x2"></i>
+              Accesos rápidos
+            </h2>
 
-    <button type="button" onclick="volverAlMenuLogopeda()">Volver</button>
+            <div class="d-grid gap-2">
+              <button type="button" class="btn btn-primary" onclick="irEditarPaciente()">
+                <i class="bi bi-pencil-square"></i>
+                Editar datos
+              </button>
+
+              <button type="button" class="btn btn-outline-primary" onclick="irProgresoPaciente()">
+                <i class="bi bi-graph-up-arrow"></i>
+                Progreso y métricas
+              </button>
+
+              <button type="button" class="btn btn-outline-primary" onclick="irSesionesPaciente()">
+                <i class="bi bi-calendar-check"></i>
+                Sesiones
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <button type="button" class="btn btn-outline-secondary" onclick="volverAlMenuLogopeda()">
+        <i class="bi bi-arrow-left"></i>
+        Volver
+      </button>
+    </div>
   </div>
 
   <div id="pantallaEditarPaciente" class="pantalla oculto">
@@ -436,22 +536,24 @@
   <div id="pantallaResultadosSesion" class="pantalla oculto">
     <h1>Resultados de la sesión</h1>
 
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Ejercicio</th>
-          <th>Nombre del ejercicio</th>
-          <th>Tipo de ejercicio</th>
-          <th>Intentos</th>
-          <th>WER</th>
-          <th>Precisión</th>
-          <th>Tiempo de respuesta (ms)</th>
-          <th>Duración del habla (ms)</th>
-          <th>Tasa de éxito (%)</th>
-        </tr>
-      </thead>
-      <tbody id="tablaResultadosSesion"></tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Ejercicio</th>
+            <th>Nombre del ejercicio</th>
+            <th>Tipo de ejercicio</th>
+            <th>Intentos</th>
+            <th>WER</th>
+            <th>Precisión</th>
+            <th>Tiempo de respuesta (ms)</th>
+            <th>Duración del habla (ms)</th>
+            <th>Tasa de éxito (%)</th>
+          </tr>
+        </thead>
+        <tbody id="tablaResultadosSesion"></tbody>
+      </table>
+    </div>
 
     <br><br>
 
@@ -487,8 +589,8 @@
       <h2>Progreso global</h2>
       <p><strong><span id="textoProgresoGlobal"></span></strong></p>
 
-      <div style="width: 420px; height: 24px; border: 1px solid #777;">
-        <div id="barraProgresoGlobal" style="height: 100%; width: 0%; background-color: royalblue;"></div>
+      <div class="progress" style="width: 420px; height: 24px;">
+        <div id="barraProgresoGlobal" class="progress-bar" style="width: 0%;"></div>
       </div>
     </div>
 
@@ -604,6 +706,7 @@
     <br><br>
 
     <button type="button" onclick="volverDesdeEditarSesion()">Volver</button>
+    <button type="button" onclick="cancelarSesionEditando()">Cancelar sesión</button>
     <button type="button" onclick="restablecerPantallaEditarSesion()">Restablecer</button>
     <button type="button" onclick="guardarEdicionSesion()">Editar sesión</button>
   </div>
@@ -630,7 +733,8 @@
           <strong>Directiva (UE) 2016/2102</strong> del Parlamento Europeo y del Consejo.
         </p>
         <p>
-          Esta declaración de accesibilidad se aplica al sitio web actual y a la correspondiente aplicación móvil de la plataforma.
+          Esta declaración de accesibilidad se aplica al sitio web actual y a la correspondiente aplicación móvil de la
+          plataforma.
         </p>
         </section>
 
@@ -709,13 +813,100 @@
     <button type="button" onclick="volverDesdeAccesibilidad()">Volver</button>
   </div>
 
-  <footer id="footerLogopeda">
-    <div class="footer-contenido">
-      <span>TFG · Plataforma de telerehabilitación para pacientes con afasia</span>
-      <span>© 2026</span>
+  <div id="pantallaEditarProfesional" class="pantalla oculto">
+    <h1>Editar mi perfil</h1>
+
+    <form id="formEditarProfesional">
+      <div class="row g-4 align-items-start">
+
+        <div class="col-lg-7">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <h2 class="h5 mb-3">
+                <i class="bi bi-person-lines-fill"></i>
+                Datos del profesional
+              </h2>
+
+              <label for="edit_prof_username">Usuario</label>
+              <input type="text" id="edit_prof_username" required>
+
+              <label for="edit_prof_password">Contraseña</label>
+              <input type="password" id="edit_prof_password" placeholder="Dejar vacío para mantener la actual">
+
+              <label for="edit_prof_nombre">Nombre</label>
+              <input type="text" id="edit_prof_nombre" required>
+
+              <label for="edit_prof_apellidos">Apellidos</label>
+              <input type="text" id="edit_prof_apellidos" required>
+
+              <label for="edit_prof_telefono">Teléfono</label>
+              <input type="text" id="edit_prof_telefono">
+
+              <label for="edit_prof_centro">Centro de trabajo</label>
+              <input type="text" id="edit_prof_centro">
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+              <h2 class="h5 mb-3">
+                <i class="bi bi-image"></i>
+                Foto de perfil
+              </h2>
+
+              <img id="edit_prof_foto_preview" src="/media/fotosPerfil/default.png" alt="Foto de perfil del profesional"
+                class="foto-perfil-edicion">
+
+              <input type="file" id="edit_prof_foto" accept="image/png, image/jpeg, image/webp" class="oculto">
+
+              <div class="mt-3">
+                <button type="button" class="btn btn-outline-primary" onclick="seleccionarNuevaFotoPerfil()">
+                  <i class="bi bi-upload"></i>
+                  Cambiar foto
+                </button>
+              </div>
+
+              <p class="text-muted small mt-3 mb-0">
+                Formatos admitidos: JPG, PNG o WEBP.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-4 d-flex gap-2 flex-wrap">
+        <button type="button" class="btn btn-outline-secondary" onclick="volverDesdeEditarProfesional()">
+          <i class="bi bi-arrow-left"></i>
+          Volver
+        </button>
+
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-circle"></i>
+          Guardar cambios
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <footer id="footerLogopeda" class="mt-5">
+    <div class="container-fluid px-4 py-3">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <p class="mb-0 text-muted">
+          SpeakMe Rehab · Plataforma de apoyo a la rehabilitación del habla postictus
+        </p>
+
+        <p class="mb-0 text-muted small">
+          Trabajo Fin de Grado · Jose Mario Cepeda Bustos · © 2026
+        </p>
+      </div>
     </div>
   </footer>
 
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/rest.js"></script>
   <script src="js/clienteLogopeda.js"></script>
 </body>

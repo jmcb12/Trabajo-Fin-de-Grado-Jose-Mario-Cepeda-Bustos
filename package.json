@@ -4,6 +4,7 @@
   "description": "Sistema de rehabilitación del habla para pacientes que han sufrido un ictus",
   "main": "index.js",
   "scripts": {
+    "start": "node backend/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,5 +22,10 @@
   "bugs": {
     "url": "https://github.com/jmcb12/Trabajo-Fin-de-Grado/issues"
   },
-  "homepage": "https://github.com/jmcb12/Trabajo-Fin-de-Grado#readme"
+  "homepage": "https://github.com/jmcb12/Trabajo-Fin-de-Grado#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "multer": "^2.1.1",
+    "mysql": "^2.18.1"
+  }
 }

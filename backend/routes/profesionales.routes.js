@@ -7,6 +7,7 @@ router.get("/:id/pacientes", controller.obtenerPacientesDeProfesional);
 router.get("/:id", controller.obtenerProfesionalPorId);
 
 router.post("/", controller.crearProfesional);
+router.post("/:id/foto-perfil", controller.subirFotoPerfil, controller.guardarFotoPerfilProfesional);
 
 router.put("/:id", controller.actualizarProfesional);
 

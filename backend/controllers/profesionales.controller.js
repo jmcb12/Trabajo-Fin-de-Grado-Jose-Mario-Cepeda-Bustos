@@ -1,3 +1,41 @@
+var path = require("path");
+var fs = require("fs");
+var multer = require("multer");
+
+var carpetaFotosPerfil = path.join(__dirname, "../../media/fotosPerfil");
+
+if (!fs.existsSync(carpetaFotosPerfil)) {
+    fs.mkdirSync(carpetaFotosPerfil, { recursive: true });
+}
+
+var almacenamientoFotosPerfil = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, carpetaFotosPerfil);
+    },
+    filename: function (req, file, cb) {
+        var extension = path.extname(file.originalname);
+        var nombreArchivo = "profesional_" + req.params.id + "_" + Date.now() + extension;
+        cb(null, nombreArchivo);
+    }
+});
+
+var filtroFotosPerfil = function (req, file, cb) {
+    if (
+        file.mimetype == "image/jpeg" ||
+        file.mimetype == "image/png" ||
+        file.mimetype == "image/webp"
+    ) {
+        cb(null, true);
+    } else {
+        cb(new Error("Solo se permiten imágenes JPG, PNG o WEBP"), false);
+    }
+};
+
+exports.subirFotoPerfil = multer({
+    storage: almacenamientoFotosPerfil,
+    fileFilter: filtroFotosPerfil
+}).single("foto_perfil");
+
 var conexion = require("../database/conexion");
 
 exports.obtenerProfesionales = function (req, resp) {
@@ -8,8 +46,9 @@ exports.obtenerProfesionales = function (req, resp) {
             u.nombre,
             u.apellidos,
             u.username,
-            pr.especialidad,
             pr.centro_trabajo,
+            pr.telefono,
+            pr.foto_perfil,
             u.activo
         FROM profesionales pr
         JOIN usuarios u ON pr.id_usuario = u.id_usuario
@@ -41,8 +80,9 @@ exports.obtenerProfesionalPorId = function (req, resp) {
             u.nombre,
             u.apellidos,
             u.username,
-            pr.especialidad,
             pr.centro_trabajo,
+            pr.telefono,
+            pr.foto_perfil,
             u.activo
         FROM profesionales pr
         JOIN usuarios u ON pr.id_usuario = u.id_usuario
@@ -68,16 +108,18 @@ exports.obtenerProfesionalPorId = function (req, resp) {
 
 exports.crearProfesional = function (req, resp) {
     var id_usuario = req.body.id_usuario;
-    var especialidad = req.body.especialidad;
     var centro_trabajo = req.body.centro_trabajo;
+    var telefono = req.body.telefono || null;
+    var foto_perfil = req.body.foto_perfil || null;
 
-    if (!isNaN(parseInt(id_usuario)) && especialidad && centro_trabajo) {
+    if (!isNaN(parseInt(id_usuario)) && centro_trabajo) {
         var sql = `
-            INSERT INTO profesionales (id_usuario, especialidad, centro_trabajo)
-            VALUES (?, ?, ?)
+            INSERT INTO profesionales 
+            (id_usuario, centro_trabajo, telefono, foto_perfil)
+            VALUES (?, ?, ?, ?)
         `;
 
-        conexion.query(sql, [id_usuario, especialidad, centro_trabajo], function (err, resultado) {
+        conexion.query(sql, [id_usuario, centro_trabajo, telefono, foto_perfil], function (err, resultado) {
             if (err) {
                 console.log("Ha ocurrido un error con el servidor", err);
                 resp.status(500).json("Ha ocurrido un error con el servidor");
@@ -95,22 +137,23 @@ exports.crearProfesional = function (req, resp) {
 
 exports.actualizarProfesional = function (req, resp) {
     var id = parseInt(req.params.id);
-    var especialidad = req.body.especialidad;
     var centro_trabajo = req.body.centro_trabajo;
+    var telefono = req.body.telefono || null;
+    var foto_perfil = req.body.foto_perfil || null;
 
     if (isNaN(id)) {
         console.log("Identificador de profesional no válido");
         return resp.status(400).json("Identificador de profesional no válido");
     }
 
-    if (especialidad && centro_trabajo) {
+    if (centro_trabajo) {
         var sql = `
             UPDATE profesionales
-            SET especialidad = ?, centro_trabajo = ?
+            SET centro_trabajo = ?, telefono = ?, foto_perfil = ?
             WHERE id_profesional = ?
         `;
 
-        conexion.query(sql, [especialidad, centro_trabajo, id], function (err, resultado) {
+        conexion.query(sql, [centro_trabajo, telefono, foto_perfil, id], function (err, resultado) {
             if (err) {
                 console.log("Ha ocurrido un error con el servidor", err);
                 resp.status(500).json("Ha ocurrido un error con el servidor");
@@ -198,5 +241,40 @@ exports.obtenerPacientesDeProfesional = function (req, resp) {
         else {
             resp.status(200).json(pacientes);
         }
+    });
+};
+
+exports.guardarFotoPerfilProfesional = function (req, resp) {
+    var id_profesional = parseInt(req.params.id);
+
+    if (isNaN(id_profesional)) {
+        return resp.status(400).json("Identificador de profesional no válido");
+    }
+
+    if (!req.file) {
+        return resp.status(400).json("No se ha recibido ninguna imagen");
+    }
+
+    var rutaFoto = "/media/fotosPerfil/" + req.file.filename;
+
+    var sql = `
+        UPDATE profesionales
+        SET foto_perfil = ?
+        WHERE id_profesional = ?
+    `;
+
+    conexion.query(sql, [rutaFoto, id_profesional], function (err, resultado) {
+        if (err) {
+            console.log("Error al guardar la foto de perfil", err);
+            return resp.status(500).json("Error al guardar la foto de perfil");
+        }
+
+        if (resultado.affectedRows == 0) {
+            return resp.status(404).json("No se ha encontrado el profesional");
+        }
+
+        resp.status(200).json({
+            foto_perfil: rutaFoto
+        });
     });
 };

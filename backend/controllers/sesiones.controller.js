@@ -49,7 +49,7 @@ exports.crearSesion = function (req, resp) {
     var estado = req.body.estado;
     var observaciones = req.body.observaciones;
 
-    var estados_validos = ["pendiente", "realizada", "revisada"];
+    var estados_validos = ["pendiente", "realizada", "revisada", "cancelada"];
 
     if (
         !isNaN(parseInt(id_paciente)) &&
@@ -94,7 +94,7 @@ exports.actualizarSesion = function (req, resp) {
     var estado = req.body.estado;
     var observaciones = req.body.observaciones;
 
-    var estados_validos = ["pendiente", "realizada", "revisada"];
+    var estados_validos = ["pendiente", "realizada", "revisada", "cancelada"];
 
     if (isNaN(id_sesion)) {
         console.log("Identificador de sesión no válido");
