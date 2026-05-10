@@ -7,16 +7,15 @@ let resultadosHistoricosPaciente = [];
 let ejerciciosDisponiblesSesion = [];
 let ejerciciosOriginalesSesion = [];
 
-let usuarioLogueado = JSON.parse(localStorage.getItem("usuarioLogueado"));
-
+let usuarioLogueado = null;
 let idProfesional = null;
-let ejercicioEditando = null;
 let pacienteSeleccionado = null;
+let ejercicioEditando = null;
 let pacienteEditando = null;
+let sesionEditando = null;
 let sesionRevisando = null;
 let graficaProgreso = null;
 let metricasPaciente = null;
-let sesionEditando = null;
 
 
 
@@ -27,13 +26,47 @@ if (usuarioLogueado != null) {
 
 window.onload = function () {
   aplicarEstiloGuardado();
-  cargarDatosLogopeda();
-  cargarPacientes();
-  cargarEjercicios();
   prepararEventosEditarProfesional();
-  mostrarVistaPrincipal("pacientes");
+  mostrarPantalla("pantallaLoginLogopeda");
 };
 
+
+function iniciarSesionLogopeda(event) {
+  event.preventDefault();
+
+  let username = document.getElementById("loginUsuarioLogopeda").value.trim();
+  let password = document.getElementById("loginPasswordLogopeda").value.trim();
+
+  if (username == "" || password == "") {
+    alert("Introduce usuario y contraseña");
+    return;
+  }
+
+  rest.post("/api/auth/login", {
+    username: username,
+    password: password
+  }, function (estado, datos) {
+
+    if (estado != 200) {
+      alert("Usuario o contraseña incorrectos");
+      return;
+    }
+
+    if (datos.rol != "logopeda" && datos.rol != "profesional") {
+      alert("Este acceso es solo para profesionales");
+      return;
+    }
+
+    usuarioLogueado = datos;
+    idProfesional = datos.id_profesional;
+
+    cargarDatosLogopeda();
+    cargarPacientes();
+    cargarEjercicios();
+    mostrarPantalla("pantallaInicio");
+    mostrarVistaPrincipal("pacientes");
+  });
+}
 
 function mostrarPantalla(idPantalla) {
   let pantallas = document.querySelectorAll(".pantalla");
@@ -700,14 +733,19 @@ function cambiarVistaPrincipal() {
 }
 
 function seleccionarPaciente(idPaciente) {
-  localStorage.setItem("idPacienteSeleccionado", idPaciente);
   cargarDatosMenuPaciente(idPaciente);
 }
 
 function cerrarSesion() {
-  localStorage.clear();
+  usuarioLogueado = null;
+  idProfesional = null;
 
-  window.location.href = "../index.html";
+  pacientes = [];
+  ejercicios = [];
+  sesionesPaciente = [];
+  resultadosSesion = [];
+
+  mostrarPantalla("pantallaLoginLogopeda");
 }
 
 function limpiarFormularioPaciente() {
@@ -761,7 +799,6 @@ function obtenerInstruccionSegunTipo(tipo) {
 }
 
 function editarEjercicio(idEjercicio) {
-  localStorage.setItem("idEjercicioSeleccionado", idEjercicio);
   cargarDatosEjercicioEditar(idEjercicio);
 }
 
@@ -792,36 +829,30 @@ function irPapeleraEjercicios() {
 }
 
 function irEditarPaciente() {
-  let idPaciente = localStorage.getItem("idPacienteSeleccionado");
-
-  if (!idPaciente) {
+  if (!pacienteSeleccionado) {
     alert("No se ha seleccionado ningún paciente");
     return;
   }
 
-  cargarDatosPacienteEditar(idPaciente);
+  cargarDatosPacienteEditar(pacienteSeleccionado.id_paciente);
 }
 
 function irProgresoPaciente() {
-  let idPaciente = localStorage.getItem("idPacienteSeleccionado");
-
-  if (!idPaciente) {
+  if (!pacienteSeleccionado) {
     alert("No se ha seleccionado ningún paciente");
     return;
   }
 
-  cargarPantallaProgresoPaciente(idPaciente);
+  cargarPantallaProgresoPaciente(pacienteSeleccionado.id_paciente);
 }
 
 function irSesionesPaciente() {
-  let idPaciente = localStorage.getItem("idPacienteSeleccionado");
-
-  if (!idPaciente) {
+  if (!pacienteSeleccionado) {
     alert("No se ha seleccionado ningún paciente");
     return;
   }
 
-  cargarSesionesPaciente(idPaciente);
+  cargarSesionesPaciente(pacienteSeleccionado.id_paciente);
 }
 
 function irCrearSesion() {
@@ -855,14 +886,12 @@ function volverAlMenuLogopeda() {
 }
 
 function volverAlMenuPaciente() {
-  let idPaciente = localStorage.getItem("idPacienteSeleccionado");
-
-  if (!idPaciente) {
+  if (!pacienteSeleccionado) {
     alert("No se ha seleccionado ningún paciente");
     return;
   }
 
-  cargarDatosMenuPaciente(idPaciente);
+  cargarDatosMenuPaciente(pacienteSeleccionado.id_paciente);
 }
 
 function volverDesdeSesionesPaciente() {
@@ -871,14 +900,12 @@ function volverDesdeSesionesPaciente() {
 }
 
 function volverDesdeResultadosSesion() {
-  let idPaciente = localStorage.getItem("idPacienteSeleccionado");
-
-  if (!idPaciente) {
+  if (!pacienteSeleccionado) {
     alert("No se ha seleccionado ningún paciente");
     return;
   }
 
-  cargarSesionesPaciente(idPaciente);
+  cargarSesionesPaciente(pacienteSeleccionado.id_paciente);
 }
 
 function volverDesdeProgresoPaciente() {
@@ -892,14 +919,12 @@ function volverDesdeCrearSesion() {
 }
 
 function volverDesdeEditarSesion() {
-  let idPaciente = localStorage.getItem("idPacienteSeleccionado");
-
-  if (!idPaciente) {
+  if (!pacienteSeleccionado) {
     alert("No se ha seleccionado ningún paciente");
     return;
   }
 
-  cargarSesionesPaciente(idPaciente);
+  cargarSesionesPaciente(pacienteSeleccionado.id_paciente);
 }
 
 function volverDesdeAccesibilidad() {
@@ -1115,12 +1140,10 @@ function restablecerEditarProfesional() {
 }
 
 function editarSesion(idSesion) {
-  localStorage.setItem("idSesionSeleccionada", idSesion);
   cargarPantallaEditarSesion(idSesion);
 }
 
 function revisarSesion(idSesion) {
-  localStorage.setItem("idSesionSeleccionada", idSesion);
 
   let sesion = sesionesPaciente.find(function (s) {
     return s.id_sesion == idSesion;
@@ -1676,8 +1699,12 @@ function activarSortableEditarSesion() {
 }
 
 function guardarNuevaSesion() {
-  let idPaciente = localStorage.getItem("idPacienteSeleccionado");
+  if (!pacienteSeleccionado) {
+    alert("No se ha seleccionado ningún paciente");
+    return;
+  }
 
+  let idPaciente = pacienteSeleccionado.id_paciente;
   if (!idPaciente) {
     alert("No se ha seleccionado ningún paciente");
     return;
@@ -1837,9 +1864,8 @@ function guardarEdicionSesion() {
 
           if (insertadas == total) {
             alert("Sesión actualizada correctamente");
-            let idPaciente = localStorage.getItem("idPacienteSeleccionado");
-            if (idPaciente) {
-              cargarSesionesPaciente(idPaciente);
+            if (pacienteSeleccionado) {
+              cargarSesionesPaciente(pacienteSeleccionado.id_paciente);
             }
           }
         });
@@ -1885,7 +1911,7 @@ function guardarDatosProfesional() {
       usuarioLogueado.centro_trabajo = respuesta.centro_trabajo;
       usuarioLogueado.foto_perfil = respuesta.foto_perfil;
 
-      localStorage.setItem("usuarioLogueado", JSON.stringify(usuarioLogueado));
+      sessionStorage.setItem("usuarioLogueado", JSON.stringify(usuarioLogueado));
 
       cargarDatosLogopeda();
 
@@ -2003,11 +2029,10 @@ function cancelarSesionEditando() {
 
     alert("Sesión cancelada correctamente");
 
-    let idPaciente = localStorage.getItem("idPacienteSeleccionado");
-
-    if (idPaciente) {
-      cargarSesionesPaciente(idPaciente);
+    if (pacienteSeleccionado) {
+      cargarSesionesPaciente(pacienteSeleccionado.id_paciente);
     }
+
   });
 }
 
@@ -2034,7 +2059,7 @@ function guardarFotoPerfilProfesional(archivo) {
       }
 
       usuarioLogueado.foto_perfil = respuesta.foto_perfil;
-      localStorage.setItem("usuarioLogueado", JSON.stringify(usuarioLogueado));
+      sessionStorage.setItem("usuarioLogueado", JSON.stringify(usuarioLogueado));
 
       document.getElementById("edit_prof_foto_preview").src = respuesta.foto_perfil;
 
@@ -2184,7 +2209,13 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("formEditarEjercicio").addEventListener("submit", function (event) {
     event.preventDefault();
 
-    var idEjercicio = localStorage.getItem("idEjercicioSeleccionado");
+    if (ejercicioEditando == null) {
+      alert("No se ha cargado ningún ejercicio");
+      return;
+    }
+
+    var idEjercicio = ejercicioEditando.id_ejercicio;
+
 
     var nombre = document.getElementById("edit_ej_nombre").value.trim();
     var texto_estimulo = document.getElementById("edit_ej_texto_estimulo").value.trim();

@@ -35,7 +35,37 @@
     </div>
   </header>
 
-  <div id="pantallaInicio" class="pantalla">
+  <div id="pantallaLoginLogopeda" class="pantalla">
+    <div class="card shadow-sm mx-auto" style="max-width: 430px;">
+      <div class="card-body p-4">
+
+        <div class="text-center mb-4">
+          <i class="bi bi-person-circle fs-1 text-primary"></i>
+          <h2 class="mt-2">Acceso profesional</h2>
+          <p class="text-muted">Introduce tus credenciales para acceder al panel del logopeda</p>
+        </div>
+
+        <form onsubmit="iniciarSesionLogopeda(event)">
+          <div class="mb-3">
+            <label for="loginUsuarioLogopeda" class="form-label">Usuario</label>
+            <input type="text" class="form-control form-control-lg" id="loginUsuarioLogopeda" required>
+          </div>
+
+          <div class="mb-4">
+            <label for="loginPasswordLogopeda" class="form-label">Contraseña</label>
+            <input type="password" class="form-control form-control-lg" id="loginPasswordLogopeda" required>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg w-100">
+            Entrar
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="pantallaInicio" class="pantalla oculto">
     <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
       <div>
         <h1 id="tituloBienvenida">Bienvenido, doctor</h1>
@@ -907,7 +937,7 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/rest.js"></script>
+  <script src="../js/rest.js"></script>
   <script src="js/clienteLogopeda.js"></script>
 </body>
 

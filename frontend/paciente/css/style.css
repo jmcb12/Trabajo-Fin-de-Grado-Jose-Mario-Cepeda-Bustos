@@ -1,193 +1,299 @@
+:root {
+    --azul-principal: #2563eb;
+    --azul-oscuro: #1e3a8a;
+    --fondo-general: #f3f6fb;
+    --texto-principal: #1f2937;
+    --borde-suave: #e5e7eb;
+    --sombra-suave: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
 
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#f6f8fc;
-  color:#1f2937;
+* {
+    box-sizing: border-box;
 }
-header{
-  background:#ffffff;
-  border-bottom:1px solid #dbe2ef;
-  padding:16px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:sticky;
-  top:0;
-  z-index:10;
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    color: var(--texto-principal);
+    background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.13), transparent 32rem),
+        linear-gradient(180deg, #f8fafc 0%, var(--fondo-general) 100%);
+    font-family: Arial, sans-serif;
 }
-header h1{margin:0;font-size:24px}
-header p{margin:4px 0 0;color:#6b7280;font-size:14px}
-.layout{
-  display:grid;
-  grid-template-columns:260px 1fr;
-  min-height:calc(100vh - 74px);
+
+.oculto {
+    display: none;
 }
-aside{
-  background:#ffffff;
-  border-right:1px solid #dbe2ef;
-  padding:20px 14px;
+
+header {
+    background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-principal));
+    color: white;
+    box-shadow: var(--sombra-suave);
+    padding: 1.1rem 1rem;
+    text-align: center;
 }
-.menu-titulo{
-  font-size:13px;
-  text-transform:uppercase;
-  color:#6b7280;
-  margin:16px 0 8px;
+
+#logoPaciente {
+    margin: 0;
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: white;
+    cursor: pointer;
 }
-.menu-btn{
-  width:100%;
-  margin-bottom:8px;
-  border:none;
-  background:#eef4ff;
-  color:#2E6BFF;
-  text-align:left;
-  padding:12px 14px;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:bold;
+
+main {
+    width: 100%;
+    padding: 1rem;
 }
-.menu-btn.secundario{
-  background:#fff;
-  color:#1f2937;
-  border:1px solid #dbe2ef;
+
+.pantalla {
+    width: min(480px, calc(100% - 0.5rem));
+    min-height: 72vh;
+    margin: 1rem auto;
+    padding: 1.4rem;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 1.25rem;
+    box-shadow: var(--sombra-suave);
 }
-main{
-  padding:20px;
+
+h2,
+h3 {
+    color: #111827;
+    letter-spacing: -0.03em;
 }
-.pantalla{display:block}
-.oculto{display:none !important}
-.tarjeta{
-  background:#fff;
-  border:1px solid #dbe2ef;
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:18px;
-  box-shadow:0 6px 16px rgba(0,0,0,.04);
+
+h2 {
+    margin-bottom: 1.3rem;
+    font-size: 1.8rem;
+    font-weight: 800;
 }
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-h2{margin-top:0}
-h3{margin-top:0;font-size:18px}
-p{line-height:1.45}
-label{
-  display:block;
-  margin-top:12px;
-  margin-bottom:6px;
-  font-weight:bold;
-  font-size:14px;
+
+h3 {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 750;
 }
-input, select, textarea{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #cfd8e3;
-  font:inherit;
-  background:#fff;
+
+p {
+    color: #4b5563;
+    font-size: 1.08rem;
+    line-height: 1.45;
 }
-textarea{min-height:110px;resize:vertical}
-.boton{
-  border:none;
-  background:#2E6BFF;
-  color:#fff;
-  padding:12px 18px;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:bold;
-  margin-top:14px;
+
+#saludoPaciente {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
 }
-.boton.secundario{
-  background:#eaf1ff;
-  color:#2E6BFF;
+
+#textoSesionPendiente {
+    margin-bottom: 1.7rem;
 }
-.boton.peligro{background:#ef4444}
-.boton.exito{background:#2FBF71}
-.fila-botones{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:8px;
+
+button {
+    width: 100%;
+    min-height: 58px;
+    margin: 0.35rem 0;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--azul-principal);
+    border-radius: 0.8rem;
+    background-color: var(--azul-principal);
+    color: white;
+    font-size: 1.05rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.18);
 }
-.kpi{
-  background:#f9fbff;
-  border:1px solid #dbe2ef;
-  border-radius:14px;
-  padding:14px;
+
+#pantalla-menu button:not(#btnEmpezarSesion),
+#pantalla-menu-sesion button:last-of-type,
+#pantalla-resumen button,
+#pantalla-progreso button,
+#pantalla-ayuda button,
+#pantalla-cerrar-sesion button:first-of-type {
+    background-color: white;
+    color: var(--azul-principal);
+    border: 1px solid var(--azul-principal);
+    box-shadow: none;
 }
-.kpi .numero{
-  font-size:28px;
-  font-weight:bold;
-  color:#2E6BFF;
+
+#pantalla-cerrar-sesion button:last-of-type {
+    background-color: #dc2626;
+    border-color: #dc2626;
+    color: white;
 }
-.lista{
-  list-style:none;
-  padding:0;
-  margin:0;
+
+button:active {
+    transform: scale(0.98);
 }
-.lista li{
-  border:1px solid #dbe2ef;
-  border-radius:12px;
-  padding:12px;
-  margin-bottom:10px;
-  background:#fbfdff;
+
+button:focus,
+button:focus-visible {
+    outline: 4px solid #facc15;
+    outline-offset: 3px;
 }
-.tabla{
-  width:100%;
-  border-collapse:collapse;
+
+#numeroEjerciciosSesion {
+    color: var(--azul-oscuro);
+    font-size: 1.5rem;
 }
-.tabla th,.tabla td{
-  border-bottom:1px solid #e5e7eb;
-  text-align:left;
-  padding:10px 8px;
-  font-size:14px;
+
+#contadorEjercicio,
+#contadorIntento {
+    margin-bottom: 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #64748b;
 }
-.estado{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:bold;
+
+#instruccionEjercicio {
+    margin-top: 1.2rem;
+    font-weight: 700;
+    color: #374151;
 }
-.pendiente{background:#fff2d9;color:#b76e00}
-.en_progreso{background:#e8efff;color:#2E6BFF}
-.finalizada{background:#def8e9;color:#17874d}
-.cancelada{background:#ffe1e1;color:#c62828}
-.mensaje{
-  padding:12px 14px;
-  border-radius:12px;
-  margin-bottom:14px;
-  font-size:14px;
+
+#contenidoEjercicio,
+#contenidoGrabacion {
+    margin: 2rem 0;
+    padding: 1.4rem 1rem;
+    text-align: center;
+    background-color: #f8fafc;
+    border: 1px solid var(--borde-suave);
+    border-radius: 1rem;
 }
-.ok{background:#def8e9;color:#17874d}
-.error{background:#ffe1e1;color:#b42318}
-.info{background:#eaf1ff;color:#2E6BFF}
-.barra{
-  width:100%;
-  height:12px;
-  background:#e5e7eb;
-  border-radius:999px;
-  overflow:hidden;
+
+#contenidoEjercicio h2,
+#contenidoGrabacion h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--azul-oscuro);
 }
-.barra > div{
-  height:100%;
-  background:#2E6BFF;
+
+#pantalla-grabacion h2 {
+    color: var(--azul-oscuro);
 }
-.centrada{
-  max-width:780px;
-  margin:0 auto;
+
+#tiempoRestante {
+    margin: 1.4rem 0;
+    padding: 0.8rem;
+    text-align: center;
+    font-weight: 700;
+    color: var(--azul-oscuro);
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 0.8rem;
 }
-.panel-login{
-  max-width:440px;
-  margin:30px auto;
+
+#respuestaDetectada {
+    margin: 2rem 0;
+    text-align: center;
+    font-size: 1.8rem;
+    color: var(--azul-oscuro);
 }
-.footer-mini{
-  margin-top:30px;
-  color:#6b7280;
-  font-size:14px;
+
+#intentosRestantesDetectado,
+#intentosRestantesNoDetectado {
+    text-align: center;
+    color: var(--azul-principal);
 }
-@media (max-width: 900px){
-  .layout{grid-template-columns:1fr}
-  aside{border-right:none;border-bottom:1px solid #dbe2ef}
-  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+
+#pantalla-feedback {
+    text-align: center;
+}
+
+#pantalla-feedback h2 {
+    font-size: 2rem;
+}
+
+#pantalla-fin-sesion h2 {
+    text-transform: uppercase;
+}
+
+#pantalla-resumen p,
+#pantalla-progreso p {
+    margin-bottom: 1.3rem;
+    font-weight: 700;
+}
+
+progress {
+    width: 100%;
+    height: 1.4rem;
+    margin: 0.5rem 0 1rem 0;
+}
+
+#pantalla-ayuda p {
+    font-weight: 650;
+}
+
+#pantalla-error h2 {
+    color: #dc2626;
+}
+
+footer {
+    width: min(480px, calc(100% - 2rem));
+    margin: 0 auto 1rem;
+    padding: 1rem;
+    color: #64748b;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 1rem;
+}
+
+@media (max-width: 576px) {
+    main {
+        padding: 0.75rem;
+    }
+
+    .pantalla {
+        width: 100%;
+        min-height: 74vh;
+        margin: 0.75rem auto;
+        padding: 1.2rem;
+        border-radius: 1rem;
+    }
+
+    #logoPaciente {
+        font-size: 1.55rem;
+    }
+
+    h2 {
+        font-size: 1.6rem;
+    }
+
+    #saludoPaciente {
+        font-size: 1.8rem;
+    }
+
+    p {
+        font-size: 1rem;
+    }
+
+    button {
+        min-height: 60px;
+        font-size: 1rem;
+    }
+
+    #contenidoEjercicio h2,
+    #contenidoGrabacion h2,
+    #respuestaDetectada {
+        font-size: 1.55rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .pantalla {
+        padding: 1rem;
+    }
+
+    h2 {
+        font-size: 1.45rem;
+    }
+
+    button {
+        font-size: 0.95rem;
+    }
 }
