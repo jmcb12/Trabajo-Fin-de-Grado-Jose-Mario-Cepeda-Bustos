@@ -13,6 +13,9 @@ let tiempoInicioEjercicio = null;
 let tiempoInicioGrabacion = null;
 let temporizadorGrabacion = null;
 let reconocimientoVoz = null;
+let grabadorAudio = null;
+let fragmentosAudio = [];
+let audioDefinitivo = null;
 
 let ejerciciosRealizados = 0;
 let intentosRealizados = 0;
@@ -46,7 +49,7 @@ function iniciarSesionPaciente(event) {
   let password = document.getElementById("loginPasswordPaciente").value.trim();
 
   if (username == "" || password == "") {
-    alert("Introduce usuario y contraseña");
+    mostrarAvisoPaciente("Aviso", "Introduce usuario y contraseña", "warning");
     return;
   }
 
@@ -56,12 +59,12 @@ function iniciarSesionPaciente(event) {
   }, function (estado, datos) {
 
     if (estado != 200) {
-      alert("Usuario o contraseña incorrectos");
+      mostrarAvisoPaciente("Error", "Usuario o contraseña incorrectos", "danger");
       return;
     }
 
     if (datos.rol != "paciente") {
-      alert("Este acceso es solo para pacientes");
+      mostrarAvisoPaciente("Aviso", "Este acceso es solo para pacientes", "warning");
       return;
     }
 
@@ -86,6 +89,34 @@ function mostrarPantalla(idPantalla) {
 }
 
 
+function mostrarAvisoPaciente(titulo, mensaje, tipo) {
+  let modalTitulo = document.getElementById("modalAvisoPacienteTitulo");
+  let modalTexto = document.getElementById("modalAvisoPacienteTexto");
+  let modalHeader = document.getElementById("modalAvisoPacienteHeader");
+
+  modalTitulo.textContent = titulo;
+  modalTexto.textContent = mensaje;
+
+  modalHeader.className = "modal-header";
+
+  if (tipo == "success") {
+    modalHeader.classList.add("bg-success-subtle");
+  }
+  else if (tipo == "danger") {
+    modalHeader.classList.add("bg-danger-subtle");
+  }
+  else if (tipo == "warning") {
+    modalHeader.classList.add("bg-warning-subtle");
+  }
+  else {
+    modalHeader.classList.add("bg-primary-subtle");
+  }
+
+  let modal = new bootstrap.Modal(document.getElementById("modalAvisoPaciente"));
+  modal.show();
+}
+
+
 function cargarDatosPaciente() {
   if (usuarioLogueado == null) {
     mostrarPantalla("pantalla-login-paciente");
@@ -93,14 +124,14 @@ function cargarDatosPaciente() {
   }
 
   if (usuarioLogueado.rol != "paciente") {
-    alert("El usuario no es un paciente");
+    mostrarAvisoPaciente("Aviso", "El usuario no es un paciente", "warning");
     localStorage.removeItem("usuarioPaciente");
     mostrarPantalla("pantalla-login-paciente");
     return;
   }
 
   if (idPaciente == null) {
-    alert("No se ha encontrado el paciente asociado al usuario");
+    mostrarAvisoPaciente("Error", "No se ha encontrado el paciente asociado al usuario", "danger");
     window.location.href = "../index.html";
     return;
   }
@@ -165,7 +196,7 @@ function volverMenuPrincipal() {
 
 function abrirMenuSesion() {
   if (sesionPendiente == null) {
-    alert("No tienes ninguna sesión pendiente");
+    mostrarAvisoPaciente("Aviso", "No tienes ninguna sesión pendiente", "warning");
     return;
   }
 
@@ -179,7 +210,7 @@ function abrirMenuSesion() {
       mostrarPantalla("pantalla-menu-sesion");
     }
     else {
-      alert("Error al cargar los ejercicios de la sesión");
+      mostrarAvisoPaciente("Error", "Error al cargar los ejercicios de la sesión", "danger");
     }
   });
 }
@@ -244,7 +275,17 @@ function pintarContenidoEjercicio(idContenedor, ejercicio) {
   let contenedor = document.getElementById(idContenedor);
 
   if (ejercicio.tipo_ejercicio == "denominacion") {
-    contenedor.innerHTML = "<p>[ Imagen asociada al ejercicio ]</p>";
+    if (ejercicio.imagen_denominacion) {
+      contenedor.innerHTML = `
+        <img 
+          src="${ejercicio.imagen_denominacion}" 
+          alt="Imagen del ejercicio de denominación"
+          style="max-width:100%; max-height:260px; border-radius:12px;">
+      `;
+    }
+    else {
+      contenedor.innerHTML = "<p>[ Imagen asociada al ejercicio ]</p>";
+    }
   }
   else {
     contenedor.innerHTML = "<h2>\"" + ejercicio.texto_estimulo + "\"</h2>";
@@ -298,6 +339,8 @@ function iniciarGrabacion() {
   mostrarPantalla("pantalla-grabacion");
 
   iniciarReconocimientoVoz();
+
+  iniciarGrabacionAudio();
 
   let tiempoMaximo = ejercicio.duracion_maxima_seg;
 
@@ -353,6 +396,47 @@ function iniciarReconocimientoVoz() {
 }
 
 
+function iniciarGrabacionAudio() {
+  audioDefinitivo = null;
+  fragmentosAudio = [];
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    return;
+  }
+
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function (stream) {
+      grabadorAudio = new MediaRecorder(stream);
+
+      grabadorAudio.ondataavailable = function (event) {
+        if (event.data && event.data.size > 0) {
+          fragmentosAudio.push(event.data);
+        }
+      };
+
+      grabadorAudio.onstop = function () {
+        audioDefinitivo = new Blob(fragmentosAudio, { type: "audio/webm" });
+
+        stream.getTracks().forEach(function (track) {
+          track.stop();
+        });
+      };
+
+      grabadorAudio.start();
+    })
+    .catch(function () {
+      audioDefinitivo = null;
+    });
+}
+
+
+function pararGrabacionAudio() {
+  if (grabadorAudio != null && grabadorAudio.state != "inactive") {
+    grabadorAudio.stop();
+  }
+}
+
+
 function terminarGrabacion() {
   if (temporizadorGrabacion != null) {
     clearInterval(temporizadorGrabacion);
@@ -367,6 +451,8 @@ function terminarGrabacion() {
       console.log("No se pudo parar el reconocimiento");
     }
   }
+
+  pararGrabacionAudio();
 
   setTimeout(function () {
     mostrarResultadoEjercicio();
@@ -405,6 +491,8 @@ function mostrarResultadoEjercicio() {
 
 
 function repetirEjercicioSinRespuesta() {
+  audioDefinitivo = null;
+  fragmentosAudio = [];
   pintarEjercicioActual();
 }
 
@@ -413,6 +501,9 @@ function repetirEjercicioConRespuesta() {
   let ejercicio = obtenerEjercicioActual();
 
   if (intentoActual < ejercicio.max_intentos) {
+    audioDefinitivo = null;
+    fragmentosAudio = [];
+
     intentoActual++;
     intentosRealizados++;
     pintarEjercicioActual();
@@ -433,15 +524,12 @@ function continuarEjercicio() {
 
 
 function saltarEjercicio() {
-  ejercicioActual++;
-  intentoActual = 1;
+  let ejercicio = obtenerEjercicioActual();
 
-  if (ejercicioActual >= ejerciciosSesion.length) {
-    finalizarSesion();
-  }
-  else {
-    pintarEjercicioActual();
-  }
+  respuestaObtenida = "";
+  intentosRealizados++;
+
+  guardarResultadoEjercicio(ejercicio);
 }
 
 
@@ -472,25 +560,37 @@ function guardarResultadoEjercicio(ejercicio) {
     exito = 1;
   }
 
-  let datosResultado = {
-    id_sesion_ejercicio: ejercicio.id_sesion_ejercicio,
-    numero_intento: intentoActual,
-    respuesta_esperada: respuestaEsperada,
-    respuesta_obtenida: respuestaObtenida,
-    precision_porcentaje: precision,
-    wer: wer,
-    tiempo_respuesta_ms: tiempoRespuestaMs,
-    duracion_habla_ms: duracionHablaMs,
-    exito: exito,
-    observaciones: "Resultado registrado desde la aplicación del paciente"
-  };
+  let formData = new FormData();
 
-  rest.post("/api/resultados", datosResultado, function (estado, datos) {
+  formData.append("id_sesion_ejercicio", ejercicio.id_sesion_ejercicio);
+  formData.append("numero_intento", intentoActual);
+  formData.append("respuesta_esperada", respuestaEsperada || "");
+  formData.append("respuesta_obtenida", respuestaObtenida || "");
+  formData.append("precision_porcentaje", precision);
+  formData.append("wer", wer);
+  formData.append("tiempo_respuesta_ms", tiempoRespuestaMs);
+  formData.append("duracion_habla_ms", duracionHablaMs);
+  formData.append("exito", exito);
+  formData.append("observaciones", "Resultado registrado desde la aplicación del paciente");
+
+  if (audioDefinitivo != null) {
+    let nombreAudio =
+      "audio_sesion_" + sesionPendiente.id_sesion +
+      "_ejercicio_" + ejercicio.id_ejercicio +
+      "_intento_" + intentoActual +
+      ".webm";
+
+    formData.append("audio_paciente", audioDefinitivo, nombreAudio);
+  }
+
+  rest.postForm("/api/resultados", formData, function (estado, datos) {
     if (estado == 201 || estado == 200) {
+      audioDefinitivo = null;
+      fragmentosAudio = [];
       marcarEjercicioCompletado(ejercicio);
     }
     else {
-      alert("Error al guardar el resultado del ejercicio");
+      mostrarAvisoPaciente("Error", "Error al guardar el resultado del ejercicio", "danger");
     }
   });
 }
@@ -513,7 +613,7 @@ function marcarEjercicioCompletado(ejercicio) {
       mostrarPantalla("pantalla-feedback");
     }
     else {
-      alert("Error al marcar el ejercicio como completado");
+      mostrarAvisoPaciente("Error", "Error al marcar el ejercicio como completado", "danger");
     }
   });
 }
@@ -615,7 +715,7 @@ function finalizarSesion() {
       mostrarPantalla("pantalla-fin-sesion");
     }
     else {
-      alert("Error al finalizar la sesión");
+      mostrarAvisoPaciente("Error", "Error al finalizar la sesión", "danger");
       mostrarPantalla("pantalla-fin-sesion");
     }
   });

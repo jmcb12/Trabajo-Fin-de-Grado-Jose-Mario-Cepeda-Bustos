@@ -300,3 +300,89 @@ canvas {
         flex: 1 1 auto;
     }
 }
+
+.contenedor-drag-sesion {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.columna-drag {
+    width: 45%;
+}
+
+.columna-ejercicios-seleccionados {
+    margin-top: 115px;
+}
+
+.lista-drag-ejercicios {
+    min-height: 300px;
+    max-height: 420px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid #999;
+    padding: 10px;
+    list-style: none;
+}
+
+.lista-drag-ejercicios li {
+    margin-bottom: 0.5rem;
+}
+
+table button {
+    border: 1px solid var(--azul-principal);
+    border-radius: 0.55rem;
+    background-color: white;
+    color: var(--azul-principal);
+    padding: 0.4rem 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 650;
+    transition: all 0.15s ease-in-out;
+}
+
+table button:hover {
+    background-color: var(--azul-principal);
+    color: white;
+}
+
+table button[style*="lightgreen"] {
+    border-color: #16a34a;
+    background-color: #dcfce7 !important;
+    color: #166534;
+}
+
+table button[style*="lightgreen"]:hover {
+    background-color: #16a34a !important;
+    color: white;
+}
+
+table button[style*="salmon"] {
+    border-color: #dc2626;
+    background-color: #fee2e2 !important;
+    color: #991b1b;
+}
+
+table button[style*="salmon"]:hover {
+    background-color: #dc2626 !important;
+    color: white;
+}
+
+table button[onclick*="eliminar"] {
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
+table button[onclick*="eliminar"]:hover {
+    background-color: #dc2626;
+    color: white;
+}
+
+table button[onclick*="reactivar"] {
+    border-color: #16a34a;
+    color: #166534;
+}
+
+table button[onclick*="reactivar"]:hover {
+    background-color: #16a34a;
+    color: white;
+}

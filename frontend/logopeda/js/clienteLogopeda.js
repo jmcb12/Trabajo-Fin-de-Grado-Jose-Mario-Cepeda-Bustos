@@ -38,8 +38,7 @@ function iniciarSesionLogopeda(event) {
   let password = document.getElementById("loginPasswordLogopeda").value.trim();
 
   if (username == "" || password == "") {
-    alert("Introduce usuario y contraseña");
-    return;
+    mostrarAvisoBootstrap("Aviso", "Introduce usuario y contraseña", "warning"); return;
   }
 
   rest.post("/api/auth/login", {
@@ -48,13 +47,11 @@ function iniciarSesionLogopeda(event) {
   }, function (estado, datos) {
 
     if (estado != 200) {
-      alert("Usuario o contraseña incorrectos");
-      return;
+      mostrarAvisoBootstrap("Error", "Usuario o contraseña incorrectos", "danger"); return;
     }
 
     if (datos.rol != "logopeda" && datos.rol != "profesional") {
-      alert("Este acceso es solo para profesionales");
-      return;
+      mostrarAvisoBootstrap("Aviso", "Este acceso es solo para profesionales", "warning"); return;
     }
 
     usuarioLogueado = datos;
@@ -81,6 +78,58 @@ function mostrarPantalla(idPantalla) {
   if (menuPerfil) {
     menuPerfil.classList.add("oculto");
   }
+}
+
+function mostrarAvisoBootstrap(titulo, mensaje, tipo) {
+  let modalTitulo = document.getElementById("modalAvisoTitulo");
+  let modalTexto = document.getElementById("modalAvisoTexto");
+  let modalHeader = document.getElementById("modalAvisoHeader");
+
+  modalTitulo.textContent = titulo;
+  modalTexto.textContent = mensaje;
+
+  modalHeader.className = "modal-header";
+
+  if (tipo == "success") {
+    modalHeader.classList.add("bg-success-subtle");
+  }
+  else if (tipo == "danger") {
+    modalHeader.classList.add("bg-danger-subtle");
+  }
+  else if (tipo == "warning") {
+    modalHeader.classList.add("bg-warning-subtle");
+  }
+  else {
+    modalHeader.classList.add("bg-primary-subtle");
+  }
+
+  let modal = new bootstrap.Modal(document.getElementById("modalAvisoBootstrap"));
+  modal.show();
+}
+
+function mostrarConfirmacionBootstrap(titulo, mensaje, funcionConfirmar) {
+  let modalTitulo = document.getElementById("modalConfirmacionTitulo");
+  let modalTexto = document.getElementById("modalConfirmacionTexto");
+  let botonConfirmar = document.getElementById("btnConfirmarAccionBootstrap");
+
+  modalTitulo.textContent = titulo;
+  modalTexto.textContent = mensaje;
+
+  let nuevoBoton = botonConfirmar.cloneNode(true);
+  botonConfirmar.parentNode.replaceChild(nuevoBoton, botonConfirmar);
+
+  let modalElemento = document.getElementById("modalConfirmacionBootstrap");
+  let modal = new bootstrap.Modal(modalElemento);
+
+  nuevoBoton.addEventListener("click", function () {
+    modal.hide();
+
+    if (funcionConfirmar) {
+      funcionConfirmar();
+    }
+  });
+
+  modal.show();
 }
 
 function formatearFecha(fecha) {
@@ -151,8 +200,7 @@ function formatearTipoEjercicio(tipo) {
 
 function cargarDatosLogopeda() {
   if (usuarioLogueado == null) {
-    alert("No has iniciado sesión");
-    window.location.href = "../index.html";
+    mostrarAvisoBootstrap("Aviso", "No has iniciado sesión", "warning"); window.location.href = "../index.html";
     return;
   }
 
@@ -178,7 +226,7 @@ function cargarDatosEjercicioEditar(idEjercicio) {
       mostrarPantalla("pantallaEditarEjercicio");
     }
     else {
-      alert("Error al cargar los datos del ejercicio");
+      mostrarAvisoBootstrap("Error", "Error al cargar los datos del ejercicio", "danger");
     }
   });
 }
@@ -191,14 +239,14 @@ function cargarDatosPacienteEditar(idPaciente) {
       mostrarPantalla("pantallaEditarPaciente");
     }
     else {
-      alert("Error al cargar los datos del paciente");
+      mostrarAvisoBootstrap("Error", "Error al cargar los datos del paciente", "danger");
     }
   });
 }
 
 function cargarPacientes() {
   if (idProfesional == null) {
-    alert("No se ha encontrado el profesional que ha iniciado sesión");
+    mostrarAvisoBootstrap("Aviso", "No se ha encontrado el profesional que ha iniciado sesión", "warning");
     return;
   }
 
@@ -208,7 +256,7 @@ function cargarPacientes() {
       pintarTablaPacientes(pacientes);
     }
     else {
-      alert("Error al cargar los pacientes");
+      mostrarAvisoBootstrap("Error", "Error al cargar los pacientes", "danger");
     }
   });
 }
@@ -225,14 +273,14 @@ function cargarEjercicios() {
       pintarTablaEjercicios(ejerciciosActivos);
     }
     else {
-      alert("Error al cargar los ejercicios");
+      mostrarAvisoBootstrap("Error", "Error al cargar los ejercicios", "danger");
     }
   });
 }
 
 function cargarPacientesConFiltro() {
   if (idProfesional == null) {
-    alert("No se ha encontrado el profesional que ha iniciado sesión");
+    mostrarAvisoBootstrap("Aviso", "No se ha encontrado el profesional que ha iniciado sesión", "warning");
     return;
   }
 
@@ -242,7 +290,7 @@ function cargarPacientesConFiltro() {
       filtrarPacientes();
     }
     else {
-      alert("Error al recargar los pacientes");
+      mostrarAvisoBootstrap("Error", "Error al recargar los pacientes", "danger");
     }
   });
 }
@@ -262,7 +310,7 @@ function cargarSesionesPaciente(idPaciente) {
       mostrarPantalla("pantallaSesionesPaciente");
     }
     else {
-      alert("Error al cargar las sesiones del paciente");
+      mostrarAvisoBootstrap("Error", "Error al cargar las sesiones del paciente", "danger");
     }
   });
 }
@@ -270,15 +318,14 @@ function cargarSesionesPaciente(idPaciente) {
 function cargarPantallaProgresoPaciente(idPaciente) {
   rest.get("/api/metricas/paciente/" + idPaciente, function (estadoMetricas, datosMetricas) {
     if (estadoMetricas != 200) {
-      alert("Error al cargar las métricas globales del paciente");
-      return;
+      mostrarAvisoBootstrap("Error", "Error al cargar las métricas globales del paciente", "danger"); return;
     }
 
     metricasPaciente = datosMetricas;
 
     rest.get("/api/metricas/evolucion/" + idPaciente, function (estadoEvolucion, datosEvolucion) {
       if (estadoEvolucion != 200) {
-        alert("Error al cargar la evolución del paciente");
+        mostrarAvisoBootstrap("Error", "Error al cargar la evolución del paciente", "danger");
         return;
       }
 
@@ -286,7 +333,7 @@ function cargarPantallaProgresoPaciente(idPaciente) {
 
       rest.get("/api/resultados/paciente/" + idPaciente, function (estadoResultados, datosResultados) {
         if (estadoResultados != 200) {
-          alert("Error al cargar los resultados históricos del paciente");
+          mostrarAvisoBootstrap("Error", "Error al cargar los resultados históricos del paciente", "danger");
           return;
         }
 
@@ -304,7 +351,7 @@ function cargarPantallaProgresoPaciente(idPaciente) {
 function cargarPantallaEditarSesion(idSesion) {
   rest.get("/api/sesiones/" + idSesion, function (estadoSesion, datosSesion) {
     if (estadoSesion != 200) {
-      alert("Error al cargar la sesión");
+      mostrarAvisoBootstrap("Error", "Error al cargar la sesión", "danger");
       return;
     }
 
@@ -312,7 +359,7 @@ function cargarPantallaEditarSesion(idSesion) {
 
     rest.get("/api/sesiones/" + idSesion + "/ejercicios", function (estadoEjercicios, datosEjercicios) {
       if (estadoEjercicios != 200) {
-        alert("Error al cargar los ejercicios de la sesión");
+        mostrarAvisoBootstrap("Error", "Error al cargar los ejercicios de la sesión", "danger");
         return;
       }
 
@@ -484,6 +531,16 @@ function pintarTablaResultadosSesion(listaResultados) {
     let tiempoRespuestaMedio = Math.round(resultado.suma_tiempo_respuesta / resultado.intentos);
     let duracionHablaMedia = Math.round(resultado.suma_duracion_habla / resultado.intentos);
     let tasaExito = Math.round((resultado.suma_exito / resultado.intentos) * 100);
+    let audioHtml = "No disponible";
+
+    if (resultado.ruta_audio) {
+      audioHtml = `
+        <audio controls style="max-width:180px;">
+          <source src="${resultado.ruta_audio}" type="audio/webm">
+          Tu navegador no permite reproducir este audio.
+        </audio>
+      `;
+    }
 
     let fila = document.createElement("tr");
 
@@ -497,6 +554,7 @@ function pintarTablaResultadosSesion(listaResultados) {
       <td>${tiempoRespuestaMedio}</td>
       <td>${duracionHablaMedia}</td>
       <td>${tasaExito}</td>
+      <td>${audioHtml}</td>
     `;
 
     tabla.appendChild(fila);
@@ -651,20 +709,20 @@ function resetearFiltroGraficaProgreso() {
 }
 
 function eliminarEjercicio(idEjercicio) {
-  let confirmar = confirm("¿Seguro que quieres eliminar este ejercicio?");
-
-  if (!confirmar) {
-    return;
-  }
-
-  rest.delete("/api/ejercicios/" + idEjercicio, function (estado, respuesta) {
-    if (estado == 200) {
-      cargarEjercicios();
+  mostrarConfirmacionBootstrap(
+    "Eliminar ejercicio",
+    "¿Seguro que quieres eliminar este ejercicio?",
+    function () {
+      rest.delete("/api/ejercicios/" + idEjercicio, function (estado, respuesta) {
+        if (estado == 200) {
+          cargarEjercicios();
+        }
+        else {
+          mostrarAvisoBootstrap("Error", "Error al eliminar el ejercicio", "danger");
+        }
+      });
     }
-    else {
-      alert("Error al eliminar el ejercicio");
-    }
-  });
+  );
 }
 
 function reactivarEjercicio(idEjercicio) {
@@ -674,7 +732,7 @@ function reactivarEjercicio(idEjercicio) {
       filtrarPapeleraEjercicios();
     }
     else {
-      alert("Error al reactivar el ejercicio");
+      mostrarAvisoBootstrap("Error", "Error al reactivar el ejercicio", "danger");
     }
   });
 }
@@ -683,28 +741,39 @@ function cambiarEstadoPaciente(idPaciente, activo) {
   let nuevoEstado;
 
   if (activo == 1) {
-    let confirmar = confirm("¿Seguro que quieres desactivar este paciente?");
+    mostrarConfirmacionBootstrap(
+      "Desactivar paciente",
+      "¿Seguro que quieres desactivar este paciente?",
+      function () {
+        nuevoEstado = 0;
 
-    if (!confirmar) {
-      return;
-    }
-
-    nuevoEstado = 0;
+        rest.put("/api/pacientes/" + idPaciente + "/estado", {
+          activo: nuevoEstado
+        }, function (estado, respuesta) {
+          if (estado == 200) {
+            cargarPacientesConFiltro();
+          }
+          else {
+            mostrarAvisoBootstrap("Error", "Error al cambiar el estado del paciente", "danger");
+          }
+        });
+      }
+    );
   }
   else {
     nuevoEstado = 1;
-  }
 
-  rest.put("/api/pacientes/" + idPaciente + "/estado", {
-    activo: nuevoEstado
-  }, function (estado, respuesta) {
-    if (estado == 200) {
-      cargarPacientesConFiltro();
-    }
-    else {
-      alert("Error al cambiar el estado del paciente");
-    }
-  });
+    rest.put("/api/pacientes/" + idPaciente + "/estado", {
+      activo: nuevoEstado
+    }, function (estado, respuesta) {
+      if (estado == 200) {
+        cargarPacientesConFiltro();
+      }
+      else {
+        mostrarAvisoBootstrap("Error", "Error al cambiar el estado del paciente", "danger");
+      }
+    });
+  }
 }
 
 function cambiarVistaPrincipal() {
@@ -754,6 +823,33 @@ function limpiarFormularioPaciente() {
 
 function limpiarFormularioEjercicio() {
   document.getElementById("formCrearEjercicio").reset();
+  document.getElementById("bloqueImagenDenominacion").classList.add("oculto");
+}
+
+function controlarImagenDenominacionCrear() {
+  let tipo = document.getElementById("ej_tipo").value;
+  let bloque = document.getElementById("bloqueImagenDenominacion");
+
+  if (tipo == "denominacion") {
+    bloque.classList.remove("oculto");
+  }
+  else {
+    bloque.classList.add("oculto");
+    document.getElementById("ej_imagen_denominacion").value = "";
+  }
+}
+
+function controlarImagenDenominacionEditar() {
+  let tipo = document.getElementById("edit_ej_tipo").value;
+  let bloque = document.getElementById("bloqueEditarImagenDenominacion");
+
+  if (tipo == "denominacion") {
+    bloque.classList.remove("oculto");
+  }
+  else {
+    bloque.classList.add("oculto");
+    document.getElementById("edit_ej_imagen_denominacion").value = "";
+  }
 }
 
 function restablecerFormularioEditarEjercicio() {
@@ -791,8 +887,8 @@ function obtenerInstruccionSegunTipo(tipo) {
     return "Lee en voz alta la frase mostrada";
   }
 
-  if (tipo == "articulacion_guiada") {
-    return "Repite lentamente la secuencia";
+  if (tipo == "completar_frase") {
+    return "Completa la frase con la palabra que falta";
   }
 
   return "";
@@ -830,7 +926,7 @@ function irPapeleraEjercicios() {
 
 function irEditarPaciente() {
   if (!pacienteSeleccionado) {
-    alert("No se ha seleccionado ningún paciente");
+    mostrarAvisoBootstrap("Aviso", "No se ha seleccionado ningún paciente", "warning");
     return;
   }
 
@@ -839,7 +935,7 @@ function irEditarPaciente() {
 
 function irProgresoPaciente() {
   if (!pacienteSeleccionado) {
-    alert("No se ha seleccionado ningún paciente");
+    mostrarAvisoBootstrap("Aviso", "No se ha seleccionado ningún paciente", "warning");
     return;
   }
 
@@ -848,7 +944,7 @@ function irProgresoPaciente() {
 
 function irSesionesPaciente() {
   if (!pacienteSeleccionado) {
-    alert("No se ha seleccionado ningún paciente");
+    mostrarAvisoBootstrap("Aviso", "No se ha seleccionado ningún paciente", "warning");
     return;
   }
 
@@ -887,7 +983,7 @@ function volverAlMenuLogopeda() {
 
 function volverAlMenuPaciente() {
   if (!pacienteSeleccionado) {
-    alert("No se ha seleccionado ningún paciente");
+    mostrarAvisoBootstrap("Aviso", "No se ha seleccionado ningún paciente", "warning");
     return;
   }
 
@@ -901,7 +997,7 @@ function volverDesdeSesionesPaciente() {
 
 function volverDesdeResultadosSesion() {
   if (!pacienteSeleccionado) {
-    alert("No se ha seleccionado ningún paciente");
+    mostrarAvisoBootstrap("Aviso", "No se ha seleccionado ningún paciente", "warning");
     return;
   }
 
@@ -914,13 +1010,17 @@ function volverDesdeProgresoPaciente() {
 }
 
 function volverDesdeCrearSesion() {
-  prepararPantallaCrearSesion();
-  volverDesdeSesionesPaciente();
+  if (!pacienteSeleccionado) {
+    mostrarAvisoBootstrap("Aviso", "No se ha seleccionado ningún paciente", "warning");
+    return;
+  }
+
+  cargarSesionesPaciente(pacienteSeleccionado.id_paciente);
 }
 
 function volverDesdeEditarSesion() {
   if (!pacienteSeleccionado) {
-    alert("No se ha seleccionado ningún paciente");
+    mostrarAvisoBootstrap("Aviso", "No se ha seleccionado ningún paciente", "warning");
     return;
   }
 
@@ -938,6 +1038,20 @@ function rellenarFormularioEditarEjercicio(ejercicio) {
   document.getElementById("edit_ej_tipo").value = ejercicio.tipo_ejercicio || "";
   document.getElementById("edit_ej_dificultad").value = ejercicio.nivel_dificultad || "";
   document.getElementById("edit_ej_descripcion").value = ejercicio.descripcion || "";
+
+  controlarImagenDenominacionEditar();
+
+  let preview = document.getElementById("previewImagenDenominacion");
+
+  if (ejercicio.imagen_denominacion) {
+    preview.innerHTML = `
+    <p>Imagen actual:</p>
+    <img src="${ejercicio.imagen_denominacion}" alt="Imagen del ejercicio de denominación" style="max-width:180px; border-radius:10px;">
+  `;
+  }
+  else {
+    preview.innerHTML = "";
+  }
 }
 
 function rellenarMenuPaciente(paciente) {
@@ -1040,19 +1154,21 @@ function rellenarPantallaEditarSesion() {
     item.setAttribute("data-id-sesion-ejercicio", ejercicioSesion.id_sesion_ejercicio);
     item.setAttribute("data-tipo-ejercicio", ejercicioSesion.tipo_ejercicio);
     item.style.border = "1px solid #ccc";
-    item.style.padding = "10px";
-    item.style.marginBottom = "10px";
+    item.style.padding = "6px";
+    item.style.marginBottom = "5px";
     item.style.backgroundColor = "#fff";
+    item.style.borderRadius = "8px";
+    item.style.fontSize = "14px";
 
     item.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-        <span>${ejercicioSesion.nombre}</span>
-        <label>
-          Intentos:
-          <input type="number" class="input-max-intentos" value="${ejercicioSesion.max_intentos || 1}" min="1" style="width:60px;">
-        </label>
-      </div>
-    `;
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+      <span style="font-weight:600;">${ejercicioSesion.nombre}</span>
+      <label style="margin:0; font-size:13px; white-space:nowrap;">
+        Intentos:
+        <input type="number" class="input-max-intentos" value="${ejercicioSesion.max_intentos || 1}" min="1" style="width:50px; padding:3px; margin:0; font-size:13px;">
+      </label>
+    </div>
+  `;
 
     listaSesion.appendChild(item);
   });
@@ -1066,19 +1182,21 @@ function rellenarPantallaEditarSesion() {
       let item = document.createElement("li");
       item.setAttribute("data-id-ejercicio", ejercicio.id_ejercicio);
       item.style.border = "1px solid #ccc";
-      item.style.padding = "10px";
-      item.style.marginBottom = "10px";
+      item.style.padding = "6px";
+      item.style.marginBottom = "5px";
       item.style.backgroundColor = "#fff";
+      item.style.borderRadius = "8px";
+      item.style.fontSize = "14px";
 
       item.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-          <span>${ejercicio.nombre}</span>
-          <label>
-            Intentos:
-            <input type="number" class="input-max-intentos" value="1" min="1" style="width:60px;">
-          </label>
-        </div>
-      `;
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+        <span style="font-weight:600;">${ejercicio.nombre}</span>
+        <label style="margin:0; font-size:13px; white-space:nowrap;">
+          Intentos:
+          <input type="number" class="input-max-intentos" value="1" min="1" style="width:50px; padding:3px; margin:0; font-size:13px;">
+        </label>
+      </div>
+    `;
 
       listaBiblioteca.appendChild(item);
     }
@@ -1095,7 +1213,7 @@ function cargarDatosMenuPaciente(idPaciente) {
       mostrarPantalla("pantallaMenuPaciente");
     }
     else {
-      alert("Error al cargar los datos del paciente");
+      mostrarAvisoBootstrap("Error", "Error al cargar los datos del paciente", "danger");
     }
   });
 }
@@ -1108,14 +1226,14 @@ function cargarResultadosSesion(idSesion) {
       mostrarPantalla("pantallaResultadosSesion");
     }
     else {
-      alert("Error al cargar los resultados de la sesión");
+      mostrarAvisoBootstrap("Error", "Error al cargar los resultados de la sesión", "danger");
     }
   });
 }
 
 function cargarDatosEditarProfesional() {
   if (usuarioLogueado == null) {
-    alert("No has iniciado sesión");
+    mostrarAvisoBootstrap("Aviso", "No has iniciado sesión", "warning");
     window.location.href = "../index.html";
     return;
   }
@@ -1150,7 +1268,7 @@ function revisarSesion(idSesion) {
   });
 
   if (!sesion) {
-    alert("No se ha encontrado la sesión");
+    mostrarAvisoBootstrap("Aviso", "No se ha encontrado la sesión", "warning");
     return;
   }
 
@@ -1159,7 +1277,7 @@ function revisarSesion(idSesion) {
   if (sesion.estado == "realizada") {
     rest.put("/api/sesiones/" + idSesion + "/revisar", {}, function (estado, respuesta) {
       if (estado != 200) {
-        alert("Error al marcar la sesión como revisada");
+        mostrarAvisoBootstrap("Error", "Error al marcar la sesión como revisada", "danger");
         return;
       }
 
@@ -1189,7 +1307,8 @@ function agruparResultadosPorEjercicio(listaResultados) {
         suma_precision: 0,
         suma_tiempo_respuesta: 0,
         suma_duracion_habla: 0,
-        suma_exito: 0
+        suma_exito: 0,
+        ruta_audio: resultado.ruta_audio || null
       };
     }
 
@@ -1199,6 +1318,10 @@ function agruparResultadosPorEjercicio(listaResultados) {
     grupos[clave].suma_tiempo_respuesta += parseFloat(resultado.tiempo_respuesta_ms || 0);
     grupos[clave].suma_duracion_habla += parseFloat(resultado.duracion_habla_ms || 0);
     grupos[clave].suma_exito += parseInt(resultado.exito || 0);
+
+    if (resultado.ruta_audio) {
+      grupos[clave].ruta_audio = resultado.ruta_audio;
+    }
   });
 
   let agrupados = Object.values(grupos);
@@ -1212,7 +1335,7 @@ function agruparResultadosPorEjercicio(listaResultados) {
 
 function generarInformeSesion() {
   if (sesionRevisando == null || pacienteSeleccionado == null || usuarioLogueado == null) {
-    alert("No hay datos suficientes para generar el informe");
+    mostrarAvisoBootstrap("Aviso", "No hay datos suficientes para generar el informe", "warning");
     return;
   }
 
@@ -1410,7 +1533,7 @@ function calcularPorcentajeMejoraGlobal() {
 
 function exportarDatosPacienteCSV() {
   if (!resultadosHistoricosPaciente || resultadosHistoricosPaciente.length == 0) {
-    alert("No hay datos para exportar");
+    mostrarAvisoBootstrap("Aviso", "No hay datos para exportar", "warning");
     return;
   }
 
@@ -1449,7 +1572,7 @@ function exportarDatosPacienteCSV() {
 
 function generarInformeProgresoPaciente() {
   if (!pacienteSeleccionado || !usuarioLogueado || !metricasPaciente) {
-    alert("No hay datos suficientes para generar el informe");
+    mostrarAvisoBootstrap("Aviso", "No hay datos suficientes para generar el informe", "warning");
     return;
   }
 
@@ -1566,7 +1689,8 @@ function generarInformeProgresoPaciente() {
 
     doc.setFontSize(11);
     doc.text("Sesión", 20, yTabla);
-    doc.text("Valor", 80, yTabla);
+    doc.text("Fecha", 65, yTabla);
+    doc.text("Valor", 120, yTabla);
     yTabla += 8;
 
     evolucionPaciente.forEach(function (sesion, indice) {
@@ -1583,13 +1707,17 @@ function generarInformeProgresoPaciente() {
         valor = valor.toFixed(2);
       }
 
+      let fechaSesion = formatearFecha(sesion.fecha_hora_inicio);
+
       doc.text("Sesión " + (indice + 1), 20, yTabla);
-      doc.text(String(valor), 80, yTabla);
+      doc.text(fechaSesion, 65, yTabla);
+      doc.text(String(valor), 120, yTabla);
       yTabla += 8;
     });
   });
 
-  doc.save("informe_progreso_paciente.pdf");
+  let nombreArchivo = "Informe de progreso global de " + pacienteSeleccionado.nombre + " " + pacienteSeleccionado.apellidos + ".pdf";
+  doc.save(nombreArchivo);
 }
 
 function prepararPantallaCrearSesion() {
@@ -1610,16 +1738,18 @@ function prepararPantallaCrearSesion() {
     item.setAttribute("data-id-ejercicio", ejercicio.id_ejercicio);
     item.setAttribute("data-tipo-ejercicio", ejercicio.tipo_ejercicio);
     item.style.border = "1px solid #ccc";
-    item.style.padding = "10px";
-    item.style.marginBottom = "10px";
+    item.style.padding = "6px";
+    item.style.marginBottom = "5px";
     item.style.backgroundColor = "#fff";
+    item.style.borderRadius = "8px";
+    item.style.fontSize = "14px";
 
     item.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-        <span>${ejercicio.nombre}</span>
-        <label>
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+        <span style="font-weight:600;">${ejercicio.nombre}</span>
+        <label style="margin:0; font-size:13px; white-space:nowrap;">
           Intentos:
-          <input type="number" class="input-max-intentos" value="1" min="1" style="width:60px;">
+          <input type="number" class="input-max-intentos" value="1" min="1" style="width:50px; padding:3px; margin:0; font-size:13px;">
         </label>
       </div>
     `;
@@ -1700,20 +1830,20 @@ function activarSortableEditarSesion() {
 
 function guardarNuevaSesion() {
   if (!pacienteSeleccionado) {
-    alert("No se ha seleccionado ningún paciente");
+    mostrarAvisoBootstrap("Aviso", "No se ha seleccionado ningún paciente", "warning");
     return;
   }
 
   let idPaciente = pacienteSeleccionado.id_paciente;
   if (!idPaciente) {
-    alert("No se ha seleccionado ningún paciente");
+    mostrarAvisoBootstrap("Aviso", "No se ha seleccionado ningún paciente", "warning");
     return;
   }
 
   let itemsSesion = document.querySelectorAll("#listaEjerciciosSesion li");
 
   if (itemsSesion.length == 0) {
-    alert("Debe añadir al menos un ejercicio a la sesión");
+    mostrarAvisoBootstrap("Aviso", "Debe añadir al menos un ejercicio a la sesión", "warning");
     return;
   }
 
@@ -1730,7 +1860,7 @@ function guardarNuevaSesion() {
 
   rest.post("/api/sesiones", bodySesion, function (estadoSesion, respuestaSesion) {
     if (estadoSesion != 201) {
-      alert("Error al crear la sesión");
+      mostrarAvisoBootstrap("Error", "Error al crear la sesión", "danger");
       return;
     }
 
@@ -1757,14 +1887,14 @@ function guardarNuevaSesion() {
 
         if (estadoEjercicio != 201) {
           error = true;
-          alert("Error al asociar ejercicios a la sesión");
+          mostrarAvisoBootstrap("Error", "Error al asociar ejercicios a la sesión", "danger");
           return;
         }
 
         completadas++;
 
         if (completadas == total) {
-          alert("Sesión creada correctamente");
+          mostrarAvisoBootstrap("Correcto", "Sesión creada correctamente", "success");
           prepararPantallaCrearSesion();
           cargarSesionesPaciente(idPaciente);
         }
@@ -1775,14 +1905,14 @@ function guardarNuevaSesion() {
 
 function guardarEdicionSesion() {
   if (sesionEditando == null) {
-    alert("No se ha cargado ninguna sesión");
+    mostrarAvisoBootstrap("Aviso", "No se ha cargado ninguna sesión", "warning");
     return;
   }
 
   let itemsSesion = document.querySelectorAll("#listaEditarEjerciciosSesion li");
 
   if (itemsSesion.length == 0) {
-    alert("La sesión debe tener al menos un ejercicio");
+    mostrarAvisoBootstrap("Aviso", "La sesión debe tener al menos un ejercicio", "warning");
     return;
   }
 
@@ -1799,7 +1929,7 @@ function guardarEdicionSesion() {
 
   rest.put("/api/sesiones/" + sesionEditando.id_sesion, bodySesion, function (estadoSesion, respuestaSesion) {
     if (estadoSesion != 200) {
-      alert("Error al actualizar la sesión");
+      mostrarAvisoBootstrap("Error", "Error al actualizar la sesión", "danger");
       return;
     }
 
@@ -1821,7 +1951,7 @@ function guardarEdicionSesion() {
 
         if (estadoDelete != 200) {
           error = true;
-          alert("Error al eliminar los ejercicios antiguos de la sesión");
+          mostrarAvisoBootstrap("Error", "Error al eliminar los ejercicios antiguos de la sesión", "danger");
           return;
         }
 
@@ -1856,14 +1986,14 @@ function guardarEdicionSesion() {
 
           if (estadoInsert != 201) {
             errorInsert = true;
-            alert("Error al guardar los ejercicios editados");
+            mostrarAvisoBootstrap("Error", "Error al guardar los ejercicios editados", "danger");
             return;
           }
 
           insertadas++;
 
           if (insertadas == total) {
-            alert("Sesión actualizada correctamente");
+            mostrarAvisoBootstrap("Correcto", "Sesión actualizada correctamente", "success");
             if (pacienteSeleccionado) {
               cargarSesionesPaciente(pacienteSeleccionado.id_paciente);
             }
@@ -1876,7 +2006,7 @@ function guardarEdicionSesion() {
 
 function guardarDatosProfesional() {
   if (!usuarioLogueado || !usuarioLogueado.id_profesional) {
-    alert("No se ha encontrado el profesional que ha iniciado sesión");
+    mostrarAvisoBootstrap("Aviso", "No se ha encontrado el profesional que ha iniciado sesión", "warning");
     return;
   }
 
@@ -1891,7 +2021,7 @@ function guardarDatosProfesional() {
   };
 
   if (!datos.username || !datos.nombre || !datos.apellidos) {
-    alert("Usuario, nombre y apellidos son obligatorios");
+    mostrarAvisoBootstrap("Aviso", "Usuario, nombre y apellidos son obligatorios", "warning");
     return;
   }
 
@@ -1900,7 +2030,7 @@ function guardarDatosProfesional() {
     datos,
     function (estado, respuesta) {
       if (estado != 200) {
-        alert("No se han podido guardar los datos del profesional");
+        mostrarAvisoBootstrap("Error", "No se han podido guardar los datos del profesional", "danger");
         return;
       }
 
@@ -1915,7 +2045,7 @@ function guardarDatosProfesional() {
 
       cargarDatosLogopeda();
 
-      alert("Perfil actualizado correctamente");
+      mostrarAvisoBootstrap("Correcto", "Perfil actualizado correctamente", "success");
       mostrarPantalla("pantallaInicio");
     }
   );
@@ -2006,34 +2136,33 @@ function aplicarEstiloGuardado() {
 
 function cancelarSesionEditando() {
   if (sesionEditando == null) {
-    alert("No se ha cargado ninguna sesión");
+    mostrarAvisoBootstrap("Aviso", "No se ha cargado ninguna sesión", "warning");
     return;
   }
 
   if (sesionEditando.estado == "cancelada") {
-    alert("La sesión ya está cancelada");
+    mostrarAvisoBootstrap("Aviso", "La sesión ya está cancelada", "warning");
     return;
   }
 
-  let confirmar = confirm("¿Seguro que quieres cancelar esta sesión? No se tendrá en cuenta para las métricas.");
+  mostrarConfirmacionBootstrap(
+    "Cancelar sesión",
+    "¿Seguro que quieres cancelar esta sesión? No se tendrá en cuenta para las métricas.",
+    function () {
+      rest.put("/api/sesiones/" + sesionEditando.id_sesion + "/cancelar", {}, function (estado, respuesta) {
+        if (estado != 200) {
+          mostrarAvisoBootstrap("Error", "Error al cancelar la sesión", "danger");
+          return;
+        }
 
-  if (!confirmar) {
-    return;
-  }
+        mostrarAvisoBootstrap("Correcto", "Sesión cancelada correctamente", "success");
 
-  rest.put("/api/sesiones/" + sesionEditando.id_sesion + "/cancelar", {}, function (estado, respuesta) {
-    if (estado != 200) {
-      alert("Error al cancelar la sesión");
-      return;
+        if (pacienteSeleccionado) {
+          cargarSesionesPaciente(pacienteSeleccionado.id_paciente);
+        }
+      });
     }
-
-    alert("Sesión cancelada correctamente");
-
-    if (pacienteSeleccionado) {
-      cargarSesionesPaciente(pacienteSeleccionado.id_paciente);
-    }
-
-  });
+  );
 }
 
 function seleccionarNuevaFotoPerfil() {
@@ -2042,7 +2171,7 @@ function seleccionarNuevaFotoPerfil() {
 
 function guardarFotoPerfilProfesional(archivo) {
   if (!usuarioLogueado || !usuarioLogueado.id_profesional) {
-    alert("No se ha encontrado el profesional que ha iniciado sesión");
+    mostrarAvisoBootstrap("Aviso", "No se ha encontrado el profesional que ha iniciado sesión", "warning");
     return;
   }
 
@@ -2054,7 +2183,7 @@ function guardarFotoPerfilProfesional(archivo) {
     formData,
     function (estado, respuesta) {
       if (estado != 200) {
-        alert("No se ha podido subir la foto de perfil");
+        mostrarAvisoBootstrap("Error", "No se ha podido subir la foto de perfil", "danger");
         return;
       }
 
@@ -2069,7 +2198,7 @@ function guardarFotoPerfilProfesional(archivo) {
         fotoHeader.src = respuesta.foto_perfil;
       }
 
-      alert("Foto de perfil actualizada correctamente");
+      mostrarAvisoBootstrap("Correcto", "Foto de perfil actualizada correctamente", "success");
     }
   );
 }
@@ -2103,7 +2232,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var id_profesional_referencia = idProfesional;
 
     if (!nombre || !apellidos || !sexo || !username || !password || !nivel_afasia || !id_profesional_referencia) {
-      alert("Faltan datos obligatorios");
+      mostrarAvisoBootstrap("Aviso", "Faltan datos obligatorios", "warning");
       return;
     }
 
@@ -2118,7 +2247,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     rest.post("/api/usuarios", bodyUsuario, function (estado, respuestaUsuario) {
       if (estado != 201) {
-        alert("Error al crear el usuario");
+        mostrarAvisoBootstrap("Error", "Error al crear el usuario", "danger");
         return;
       }
 
@@ -2136,11 +2265,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       rest.post("/api/pacientes", bodyPaciente, function (estado, respuestaPaciente) {
         if (estado != 201) {
-          alert("Error al crear el paciente");
+          mostrarAvisoBootstrap("Error", "Error al crear el paciente", "danger");
           return;
         }
 
-        alert("Paciente dado de alta correctamente");
+        mostrarAvisoBootstrap("Correcto", "Paciente dado de alta correctamente", "success");
         limpiarFormularioPaciente();
         cargarPacientes();
         irPantallaPacientes();
@@ -2158,7 +2287,8 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.getElementById("formCrearEjercicio").addEventListener("submit", function (event) {
-    event.preventDefault();
+    -
+      event.preventDefault();
 
     var nombre = document.getElementById("ej_nombre").value.trim();
     var texto_estimulo = document.getElementById("ej_texto_estimulo").value.trim();
@@ -2168,30 +2298,36 @@ document.addEventListener("DOMContentLoaded", function () {
     var descripcion = document.getElementById("ej_descripcion").value.trim();
 
     if (!nombre || !texto_estimulo || !duracion_maxima_seg || !tipo_ejercicio || !nivel_dificultad) {
-      alert("Faltan datos obligatorios");
+      mostrarAvisoBootstrap("Aviso", "Faltan datos obligatorios", "warning");
       return;
     }
 
     var instruccion = obtenerInstruccionSegunTipo(tipo_ejercicio);
 
-    var bodyEjercicio = {
-      nombre: nombre,
-      descripcion: descripcion || null,
-      tipo_ejercicio: tipo_ejercicio,
-      nivel_dificultad: nivel_dificultad,
-      texto_estimulo: texto_estimulo,
-      instruccion: instruccion,
-      duracion_maxima_seg: duracion_maxima_seg,
-      activo: 1
-    };
+    var formData = new FormData();
 
-    rest.post("/api/ejercicios", bodyEjercicio, function (estado, respuesta) {
+    formData.append("nombre", nombre);
+    formData.append("descripcion", descripcion || "");
+    formData.append("tipo_ejercicio", tipo_ejercicio);
+    formData.append("nivel_dificultad", nivel_dificultad);
+    formData.append("texto_estimulo", texto_estimulo);
+    formData.append("instruccion", instruccion);
+    formData.append("duracion_maxima_seg", duracion_maxima_seg);
+    formData.append("activo", 1);
+
+    let imagen = document.getElementById("ej_imagen_denominacion").files[0];
+
+    if (tipo_ejercicio == "denominacion" && imagen) {
+      formData.append("imagen_denominacion", imagen);
+    }
+
+    rest.postForm("/api/ejercicios", formData, function (estado, respuesta) {
       if (estado != 201) {
-        alert("Error al crear el ejercicio");
+        mostrarAvisoBootstrap("Error", "Error al crear el ejercicio", "danger");
         return;
       }
 
-      alert("Ejercicio creado correctamente");
+      mostrarAvisoBootstrap("Correcto", "Ejercicio creado correctamente", "success");
       limpiarFormularioEjercicio();
       cargarEjercicios();
       irBibliotecaEjercicios();
@@ -2210,7 +2346,7 @@ document.addEventListener("DOMContentLoaded", function () {
     event.preventDefault();
 
     if (ejercicioEditando == null) {
-      alert("No se ha cargado ningún ejercicio");
+      mostrarAvisoBootstrap("Aviso", "No se ha cargado ningún ejercicio", "warning");
       return;
     }
 
@@ -2225,30 +2361,40 @@ document.addEventListener("DOMContentLoaded", function () {
     var descripcion = document.getElementById("edit_ej_descripcion").value.trim();
 
     if (!idEjercicio || !nombre || !texto_estimulo || !duracion_maxima_seg || !tipo_ejercicio || !nivel_dificultad) {
-      alert("Faltan datos obligatorios");
+      mostrarAvisoBootstrap("Aviso", "Faltan datos obligatorios", "warning");
       return;
     }
 
     var instruccion = obtenerInstruccionSegunTipo(tipo_ejercicio);
 
-    var bodyEjercicio = {
-      nombre: nombre,
-      descripcion: descripcion || null,
-      tipo_ejercicio: tipo_ejercicio,
-      nivel_dificultad: nivel_dificultad,
-      texto_estimulo: texto_estimulo,
-      instruccion: instruccion,
-      duracion_maxima_seg: duracion_maxima_seg,
-      activo: 1
-    };
+    var formData = new FormData();
 
-    rest.put("/api/ejercicios/" + idEjercicio, bodyEjercicio, function (estado, respuesta) {
+    formData.append("nombre", nombre);
+    formData.append("descripcion", descripcion || "");
+    formData.append("tipo_ejercicio", tipo_ejercicio);
+    formData.append("nivel_dificultad", nivel_dificultad);
+    formData.append("texto_estimulo", texto_estimulo);
+    formData.append("instruccion", instruccion);
+    formData.append("duracion_maxima_seg", duracion_maxima_seg);
+    formData.append("activo", 1);
+
+    if (ejercicioEditando.imagen_denominacion) {
+      formData.append("imagen_denominacion", ejercicioEditando.imagen_denominacion);
+    }
+
+    let nuevaImagen = document.getElementById("edit_ej_imagen_denominacion").files[0];
+
+    if (tipo_ejercicio == "denominacion" && nuevaImagen) {
+      formData.append("imagen_denominacion", nuevaImagen);
+    }
+
+    rest.putForm("/api/ejercicios/" + idEjercicio, formData, function (estado, respuesta) {
       if (estado != 200) {
-        alert("Error al actualizar el ejercicio");
+        mostrarAvisoBootstrap("Error", "Error al actualizar el ejercicio", "danger");
         return;
       }
 
-      alert("Ejercicio actualizado correctamente");
+      mostrarAvisoBootstrap("Correcto", "Ejercicio actualizado correctamente", "success");
       cargarEjercicios();
       irBibliotecaEjercicios();
     });
@@ -2266,7 +2412,7 @@ document.addEventListener("DOMContentLoaded", function () {
     event.preventDefault();
 
     if (pacienteEditando == null) {
-      alert("No se ha cargado ningún paciente para editar");
+      mostrarAvisoBootstrap("Aviso", "No se ha cargado ningún paciente para editar", "warning");
       return;
     }
 
@@ -2282,7 +2428,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var observaciones = document.getElementById("edit_observaciones_paciente").value.trim();
 
     if (!username || !password || !nombre || !apellidos || !sexo || !nivel_afasia) {
-      alert("Faltan datos obligatorios");
+      mostrarAvisoBootstrap("Aviso", "Faltan datos obligatorios", "warning");
       return;
     }
 
@@ -2297,7 +2443,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     rest.put("/api/usuarios/" + pacienteEditando.id_usuario, bodyUsuario, function (estadoUsuario, respuestaUsuario) {
       if (estadoUsuario != 200) {
-        alert("Error al actualizar los datos de acceso del paciente");
+        mostrarAvisoBootstrap("Error", "Error al actualizar los datos de acceso del paciente", "danger");
         return;
       }
 
@@ -2315,11 +2461,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       rest.put("/api/pacientes/" + pacienteEditando.id_paciente, bodyPaciente, function (estadoPaciente, respuestaPaciente) {
         if (estadoPaciente != 200) {
-          alert("Error al actualizar los datos clínicos del paciente");
+          mostrarAvisoBootstrap("Error", "Error al actualizar los datos clínicos del paciente", "danger");
           return;
         }
 
-        alert("Paciente actualizado correctamente");
+        mostrarAvisoBootstrap("Correcto", "Paciente actualizado correctamente", "success");
         cargarPacientes();
         volverAlMenuPaciente();
       });

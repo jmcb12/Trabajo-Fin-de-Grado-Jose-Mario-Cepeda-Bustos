@@ -52,17 +52,23 @@ exports.crearResultado = function (req, resp) {
     var duracion_habla_ms = parseInt(req.body.duracion_habla_ms);
     var exito = req.body.exito;
     var observaciones = req.body.observaciones;
+    var ruta_audio = null;
+
+    if (req.file) {
+        ruta_audio = "/media/audiosPacientes/" + req.file.filename;
+    }
 
     if (
         isNaN(id_sesion_ejercicio) ||
         isNaN(numero_intento) ||
         !respuesta_esperada ||
-        !respuesta_obtenida ||
+        respuesta_obtenida === undefined ||
         isNaN(precision_porcentaje) ||
         isNaN(wer) ||
         isNaN(tiempo_respuesta_ms) ||
         isNaN(duracion_habla_ms) ||
         exito === undefined
+
     ) {
         console.log("Los datos introducidos no son válidos");
         return resp.status(400).json("Los datos introducidos no son válidos");
@@ -70,13 +76,13 @@ exports.crearResultado = function (req, resp) {
 
     var sql = `
         INSERT INTO resultados_ejercicio
-        (id_sesion_ejercicio, numero_intento, respuesta_esperada, respuesta_obtenida, precision_porcentaje, wer, tiempo_respuesta_ms, duracion_habla_ms, exito, observaciones)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (id_sesion_ejercicio, numero_intento, respuesta_esperada, respuesta_obtenida, precision_porcentaje, wer, tiempo_respuesta_ms, duracion_habla_ms, exito, observaciones, ruta_audio)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     conexion.query(
         sql,
-        [id_sesion_ejercicio, numero_intento, respuesta_esperada, respuesta_obtenida, precision_porcentaje, wer, tiempo_respuesta_ms, duracion_habla_ms, exito, observaciones || null],
+        [id_sesion_ejercicio, numero_intento, respuesta_esperada, respuesta_obtenida || "", precision_porcentaje, wer, tiempo_respuesta_ms, duracion_habla_ms, exito, observaciones || null, ruta_audio],
         function (err, resultado) {
             if (err) {
                 console.log("Ha ocurrido un error con el servidor", err);
@@ -206,7 +212,8 @@ exports.obtenerResultadosPorSesion = function (req, resp) {
             re.duracion_habla_ms,
             re.exito,
             re.fecha_registro,
-            re.observaciones
+            re.observaciones,
+            re.ruta_audio
         FROM sesion_ejercicios se
         JOIN resultados_ejercicio re ON se.id_sesion_ejercicio = re.id_sesion_ejercicio
         JOIN ejercicios e ON se.id_ejercicio = e.id_ejercicio
@@ -256,7 +263,8 @@ exports.obtenerResultadosPorPaciente = function (req, resp) {
             re.duracion_habla_ms,
             re.exito,
             re.fecha_registro,
-            re.observaciones
+            re.observaciones,
+            re.ruta_audio
         FROM sesiones s
         JOIN sesion_ejercicios se ON s.id_sesion = se.id_sesion
         JOIN resultados_ejercicio re ON se.id_sesion_ejercicio = re.id_sesion_ejercicio
@@ -308,7 +316,8 @@ exports.obtenerResultadosPorEjercicio = function (req, resp) {
             re.duracion_habla_ms,
             re.exito,
             re.fecha_registro,
-            re.observaciones
+            re.observaciones,
+            re.ruta_audio
         FROM sesion_ejercicios se
         JOIN resultados_ejercicio re ON se.id_sesion_ejercicio = re.id_sesion_ejercicio
         JOIN ejercicios e ON se.id_ejercicio = e.id_ejercicio
