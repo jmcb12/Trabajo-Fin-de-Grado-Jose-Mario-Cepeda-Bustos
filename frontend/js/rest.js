@@ -1,5 +1,20 @@
 (function () {
 
+    function obtenerTokenJWT() {
+        var tokenLogopeda = sessionStorage.getItem("tokenJWT");
+        var tokenPaciente = localStorage.getItem("tokenJWTPaciente");
+
+        if (tokenLogopeda) {
+            return tokenLogopeda;
+        }
+
+        if (tokenPaciente) {
+            return tokenPaciente;
+        }
+
+        return null;
+    }
+
     function rest(method, url, data, callback) {
         method = method.toUpperCase();
 
@@ -10,7 +25,13 @@
 
         var xhr = new XMLHttpRequest();
 
-        xhr.open(method, "http://localhost:3000" + url, true);
+        xhr.open(method, "https://localhost:3000" + url, true);
+
+        var token = obtenerTokenJWT();
+
+        if (token) {
+            xhr.setRequestHeader("Authorization", "Bearer " + token);
+        }
 
         if (data) {
             xhr.setRequestHeader("Content-Type", "application/json");
@@ -53,7 +74,13 @@
     rest.postForm = function (url, formData, callback) {
         var xhr = new XMLHttpRequest();
 
-        xhr.open("POST", "http://localhost:3000" + url, true);
+        xhr.open("POST", "https://localhost:3000" + url, true);
+
+        var token = obtenerTokenJWT();
+
+        if (token) {
+            xhr.setRequestHeader("Authorization", "Bearer " + token);
+        }
 
         xhr.onload = function () {
             var respuesta = xhr.responseText;
@@ -79,7 +106,13 @@
     rest.putForm = function (url, formData, callback) {
         var xhr = new XMLHttpRequest();
 
-        xhr.open("PUT", "http://localhost:3000" + url, true);
+        xhr.open("PUT", "https://localhost:3000" + url, true);
+
+        var token = obtenerTokenJWT();
+
+        if (token) {
+            xhr.setRequestHeader("Authorization", "Bearer " + token);
+        }
 
         xhr.onload = function () {
             var respuesta = xhr.responseText;

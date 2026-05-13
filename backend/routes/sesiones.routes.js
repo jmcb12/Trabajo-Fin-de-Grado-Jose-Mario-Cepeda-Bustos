@@ -1,19 +1,21 @@
 var express = require("express");
 var router = express.Router();
 var controller = require("../controllers/sesiones.controller");
+const authJWT = require("../middleware/authJWT");
+const requireRole = require("../middleware/requireRole");
 
-router.get("/", controller.obtenerSesiones);
-router.get("/paciente/:idPaciente", controller.obtenerSesionesPorPaciente);
-router.get("/profesional/:idProfesional", controller.obtenerSesionesPorProfesional);
-router.get("/:id/ejercicios", controller.obtenerEjerciciosDeSesion);
-router.get("/:id", controller.obtenerSesionPorId);
+router.get("/", authJWT, requireRole("logopeda", "profesional"), controller.obtenerSesiones);
+router.get("/paciente/:idPaciente", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerSesionesPorPaciente);
+router.get("/profesional/:idProfesional", authJWT, requireRole("logopeda", "profesional"), controller.obtenerSesionesPorProfesional);
+router.get("/:id/ejercicios", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerEjerciciosDeSesion);
+router.get("/:id", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerSesionPorId);
 
-router.post("/", controller.crearSesion);
-router.post("/:id/ejercicios", controller.asociarEjercicioASesion);
+router.post("/", authJWT, requireRole("logopeda", "profesional"), controller.crearSesion);
+router.post("/:id/ejercicios", authJWT, requireRole("logopeda", "profesional"), controller.asociarEjercicioASesion);
 
-router.put("/:id", controller.actualizarSesion);
-router.put("/:id/finalizar", controller.finalizarSesion);
-router.put("/:id/cancelar", controller.cancelarSesion);
-router.put("/:id/revisar", controller.marcarSesionRevisada);
+router.put("/:id", authJWT, requireRole("logopeda", "profesional"), controller.actualizarSesion);
+router.put("/:id/finalizar", authJWT, requireRole("paciente"), controller.finalizarSesion);
+router.put("/:id/cancelar", authJWT, requireRole("logopeda", "profesional"), controller.cancelarSesion);
+router.put("/:id/revisar", authJWT, requireRole("logopeda", "profesional"), controller.marcarSesionRevisada);
 
 module.exports = router;

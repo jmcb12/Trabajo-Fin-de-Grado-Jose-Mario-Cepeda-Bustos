@@ -25,8 +25,11 @@
   "homepage": "https://github.com/jmcb12/Trabajo-Fin-de-Grado#readme",
   "dependencies": {
     "cordova": "^13.0.0",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "selfsigned": "^5.5.0"
   }
 }

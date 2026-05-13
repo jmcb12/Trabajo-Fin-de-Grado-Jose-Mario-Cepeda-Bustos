@@ -4,6 +4,9 @@ var controller = require("../controllers/ejercicios.controller");
 var multer = require("multer");
 var path = require("path");
 
+const authJWT = require("../middleware/authJWT");
+const requireRole = require("../middleware/requireRole");
+
 var almacenamientoImagenesDenominacion = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, path.join(__dirname, "../../media/imagenesDenominacion"));
@@ -18,16 +21,20 @@ var subirImagenDenominacion = multer({
     storage: almacenamientoImagenesDenominacion
 });
 
-router.get("/", controller.obtenerEjercicios);
-router.get("/tipo/:tipo", controller.obtenerEjerciciosPorTipo);
-router.get("/dificultad/:nivel", controller.obtenerEjerciciosPorDificultad);
-router.get("/:id", controller.obtenerEjercicioPorId);
+router.get("/", authJWT, requireRole("logopeda", "profesional"), controller.obtenerEjercicios);
 
-router.post("/", subirImagenDenominacion.single("imagen_denominacion"), controller.crearEjercicio);
+router.get("/tipo/:tipo", authJWT, requireRole("logopeda", "profesional"), controller.obtenerEjerciciosPorTipo);
 
-router.put("/:id", subirImagenDenominacion.single("imagen_denominacion"), controller.actualizarEjercicio);
-router.put("/:id/reactivar", controller.reactivarEjercicio);
+router.get("/dificultad/:nivel", authJWT, requireRole("logopeda", "profesional"), controller.obtenerEjerciciosPorDificultad);
 
-router.delete("/:id", controller.eliminarEjercicio);
+router.get("/:id", authJWT, requireRole("logopeda", "profesional"), controller.obtenerEjercicioPorId);
+
+router.post("/", authJWT, requireRole("logopeda", "profesional"), subirImagenDenominacion.single("imagen_denominacion"), controller.crearEjercicio);
+
+router.put("/:id", authJWT, requireRole("logopeda", "profesional"), subirImagenDenominacion.single("imagen_denominacion"), controller.actualizarEjercicio);
+
+router.put("/:id/reactivar", authJWT, requireRole("logopeda", "profesional"), controller.reactivarEjercicio);
+
+router.delete("/:id", authJWT, requireRole("logopeda", "profesional"), controller.eliminarEjercicio);
 
 module.exports = router;

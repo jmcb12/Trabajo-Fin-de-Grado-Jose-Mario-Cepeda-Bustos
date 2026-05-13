@@ -28,6 +28,7 @@ if (usuarioLogueado != null) {
 
 
 window.onload = function () {
+  aplicarEstiloPacienteGuardado();
   prepararCierreSesionOculto();
 
   usuarioLogueado = JSON.parse(localStorage.getItem("usuarioPaciente"));
@@ -63,15 +64,29 @@ function iniciarSesionPaciente(event) {
       return;
     }
 
-    if (datos.rol != "paciente") {
+    if (!datos || !datos.usuario || !datos.token) {
+      mostrarAvisoPaciente("Error", "Respuesta de login incorrecta", "danger");
+      return;
+    }
+
+    let usuario = datos.usuario;
+
+    let rolUsuario = "";
+
+    if (usuario.rol) {
+      rolUsuario = usuario.rol.trim().toLowerCase();
+    }
+
+    if (rolUsuario != "paciente") {
       mostrarAvisoPaciente("Aviso", "Este acceso es solo para pacientes", "warning");
       return;
     }
 
-    usuarioLogueado = datos;
-    idPaciente = datos.id_paciente;
+    usuarioLogueado = usuario;
+    idPaciente = usuario.id_paciente;
 
-    localStorage.setItem("usuarioPaciente", JSON.stringify(datos));
+    localStorage.setItem("usuarioPaciente", JSON.stringify(usuarioLogueado));
+    localStorage.setItem("tokenJWTPaciente", datos.token);
 
     cargarDatosPaciente();
   });
@@ -86,6 +101,35 @@ function mostrarPantalla(idPantalla) {
   });
 
   document.getElementById(idPantalla).classList.remove("oculto");
+}
+
+function aplicarEstiloPaciente(estilo) {
+  localStorage.setItem("estiloAccesibilidadPaciente", estilo);
+
+  document.body.classList.remove("accesibilidad-normal");
+  document.body.classList.remove("accesibilidad-alto-contraste");
+  document.body.classList.remove("accesibilidad-letra-grande");
+
+  if (estilo == "alto-contraste") {
+    document.body.classList.add("accesibilidad-alto-contraste");
+  }
+  else if (estilo == "letra-grande") {
+    document.body.classList.add("accesibilidad-letra-grande");
+  }
+  else {
+    document.body.classList.add("accesibilidad-normal");
+  }
+}
+
+
+function aplicarEstiloPacienteGuardado() {
+  let estiloGuardado = localStorage.getItem("estiloAccesibilidadPaciente");
+
+  if (!estiloGuardado) {
+    estiloGuardado = "normal";
+  }
+
+  aplicarEstiloPaciente(estiloGuardado);
 }
 
 
@@ -299,10 +343,6 @@ function debeMostrarBotonEscuchar(ejercicio) {
   }
 
   if (ejercicio.tipo_ejercicio == "repeticion_frase") {
-    return true;
-  }
-
-  if (ejercicio.tipo_ejercicio == "articulacion_guiada") {
     return true;
   }
 
@@ -547,7 +587,7 @@ function siguienteEjercicio() {
 
 
 function guardarResultadoEjercicio(ejercicio) {
-  let respuestaEsperada = ejercicio.texto_estimulo;
+  let respuestaEsperada = ejercicio.respuesta_esperada || ejercicio.texto_estimulo;
   let precision = calcularPrecision(respuestaEsperada, respuestaObtenida);
   let wer = calcularWER(respuestaEsperada, respuestaObtenida);
 
@@ -829,6 +869,8 @@ function cerrarSesionPaciente() {
   sesionesPaciente = [];
   sesionPendiente = null;
   ejerciciosSesion = [];
+
+  localStorage.removeItem("tokenJWTPaciente");
 
   mostrarPantalla("pantalla-login-paciente");
 }

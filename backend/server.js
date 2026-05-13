@@ -2,6 +2,11 @@ var express = require("express");
 var path = require("path");
 var app = express();
 
+const http = require("http");
+const https = require("https");
+const fs = require("fs");
+const config = require("./config/env");
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../frontend")));
 app.use("/media", express.static(path.join(__dirname, "../media")));
@@ -35,8 +40,21 @@ conexion.connect(function (err) {
         process.exit();
     } else {
         console.log("Base de datos conectada correctamente");
-        app.listen(3000, function () {
-            console.log("Servidor iniciado correctamente en el puerto 3000");
-        });
+
+        if (config.httpsActivo) {
+            var opcionesHTTPS = {
+                key: fs.readFileSync(config.rutaClaveHTTPS),
+                cert: fs.readFileSync(config.rutaCertificadoHTTPS)
+            };
+
+            https.createServer(opcionesHTTPS, app).listen(config.puerto, "0.0.0.0", function () {
+                console.log("Servidor HTTPS iniciado en https://0.0.0.0:" + config.puerto);
+            });
+        }
+        else {
+            http.createServer(app).listen(config.puerto, "0.0.0.0", function () {
+                console.log("Servidor HTTP iniciado en http://0.0.0.0:" + config.puerto);
+            });
+        }
     }
 });

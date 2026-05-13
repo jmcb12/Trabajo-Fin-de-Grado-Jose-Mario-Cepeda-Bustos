@@ -1,17 +1,18 @@
 var express = require("express");
 var router = express.Router();
 var controller = require("../controllers/pacientes.controller");
+const authJWT = require("../middleware/authJWT");
+const requireRole = require("../middleware/requireRole");
 
-router.get("/", controller.obtenerPacientes);
-router.get("/:id/sesiones", controller.obtenerSesionesDePaciente);
-router.get("/:id/resultados", controller.obtenerResultadosDePaciente);
-router.get("/:id/metricas", controller.obtenerMetricasDePaciente);
-router.get("/:id", controller.obtenerPacientePorId);
+router.get("/", authJWT, requireRole("logopeda", "profesional"), controller.obtenerPacientes);
+router.get("/:id/sesiones", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerSesionesDePaciente);
+router.get("/:id/resultados", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerResultadosDePaciente);
+router.get("/:id/metricas", authJWT, requireRole("logopeda", "profesional"), controller.obtenerMetricasDePaciente);
+router.get("/:id", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerPacientePorId);
 
-router.post("/", controller.crearPaciente);
+router.post("/", authJWT, requireRole("logopeda", "profesional"), controller.crearPaciente);
 
-router.put("/:id/estado", controller.cambiarEstadoPaciente);
-
-router.put("/:id", controller.actualizarPaciente);
+router.put("/:id/estado", authJWT, requireRole("logopeda", "profesional"), controller.cambiarEstadoPaciente);
+router.put("/:id", authJWT, requireRole("logopeda", "profesional"), controller.actualizarPaciente);
 
 module.exports = router;

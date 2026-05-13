@@ -246,6 +246,12 @@
             <p>5. Pulsa “Continuar” o repite el ejercicio si fuera necesario</p>
             <p>6. Completa los ejercicios hasta finalizar la sesión</p>
 
+            <button onclick="mostrarPantalla('pantalla-estilos')">
+                CAMBIAR ESTILO VISUAL
+            </button>
+
+            <br><br>
+
             <button onclick="volverMenuPrincipal()">
                 VOLVER
             </button>
@@ -274,6 +280,34 @@
             <p id="textoError"></p>
 
             <button onclick="volverMenuPrincipal()">
+                VOLVER
+            </button>
+        </section>
+
+        <section id="pantalla-estilos" class="pantalla oculto">
+            <h2>Estilos</h2>
+
+            <p>Elige cómo quieres ver la aplicación.</p>
+
+            <button class="btn-estilo-paciente boton-estilo-normal" onclick="aplicarEstiloPaciente('normal')">
+                NORMAL
+            </button>
+
+            <br><br>
+
+            <button class="btn-estilo-paciente boton-estilo-alto" onclick="aplicarEstiloPaciente('alto-contraste')">
+                ALTO CONTRASTE
+            </button>
+
+            <br><br>
+
+            <button class="btn-estilo-paciente boton-estilo-grande" onclick="aplicarEstiloPaciente('letra-grande')">
+                LETRAS GRANDES
+            </button>
+
+            <br><br>
+
+            <button onclick="mostrarPantalla('pantalla-ayuda')">
                 VOLVER
             </button>
         </section>

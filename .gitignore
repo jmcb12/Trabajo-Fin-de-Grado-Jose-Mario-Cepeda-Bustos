@@ -19,3 +19,5 @@ Thumbs.db
 
 # Carpeta de uploads generados, si no quieres subir fotos de perfil reales
 # media/fotosPerfil/
+
+.env

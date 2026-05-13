@@ -271,6 +271,7 @@ exports.obtenerEjerciciosDeSesion = function (req, resp) {
             e.tipo_ejercicio,
             e.nivel_dificultad,
             e.texto_estimulo,
+            e.respuesta_esperada,
             e.instruccion,
             e.duracion_maxima_seg,
             e.imagen_denominacion,

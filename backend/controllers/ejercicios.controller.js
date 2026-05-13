@@ -47,6 +47,7 @@ exports.crearEjercicio = function (req, resp) {
     var tipo_ejercicio = req.body.tipo_ejercicio;
     var nivel_dificultad = req.body.nivel_dificultad;
     var texto_estimulo = req.body.texto_estimulo;
+    var respuesta_esperada = req.body.respuesta_esperada;
     var instruccion = req.body.instruccion;
     var duracion_maxima_seg = req.body.duracion_maxima_seg;
     var activo = req.body.activo;
@@ -56,16 +57,16 @@ exports.crearEjercicio = function (req, resp) {
         imagen_denominacion = "/media/imagenesDenominacion/" + req.file.filename;
     }
 
-    if (nombre && descripcion && tipo_ejercicio && nivel_dificultad && texto_estimulo && instruccion && duracion_maxima_seg && activo !== undefined) {
+    if (nombre && descripcion && tipo_ejercicio && nivel_dificultad && texto_estimulo && respuesta_esperada && instruccion && duracion_maxima_seg && activo !== undefined) {
         var sql = `
             INSERT INTO ejercicios
-            (nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, instruccion, duracion_maxima_seg, activo, imagen_denominacion)
+            (nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, respuesta_esperada, instruccion, duracion_maxima_seg, activo)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         conexion.query(
             sql,
-            [nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, instruccion, duracion_maxima_seg, activo, imagen_denominacion],
+            [nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, respuesta_esperada, instruccion, duracion_maxima_seg, activo],
             function (err, resultado) {
                 if (err) {
                     console.log("Ha ocurrido un error con el servidor", err);
@@ -90,6 +91,7 @@ exports.actualizarEjercicio = function (req, resp) {
     var tipo_ejercicio = req.body.tipo_ejercicio;
     var nivel_dificultad = req.body.nivel_dificultad;
     var texto_estimulo = req.body.texto_estimulo;
+    var respuesta_esperada = req.body.respuesta_esperada;
     var instruccion = req.body.instruccion;
     var duracion_maxima_seg = req.body.duracion_maxima_seg;
     var activo = req.body.activo;
@@ -104,7 +106,7 @@ exports.actualizarEjercicio = function (req, resp) {
         return resp.status(400).json("Identificador de ejercicio no válido");
     }
 
-    if (nombre && descripcion && tipo_ejercicio && nivel_dificultad && texto_estimulo && instruccion && duracion_maxima_seg && activo !== undefined) {
+    if (nombre && descripcion && tipo_ejercicio && nivel_dificultad && texto_estimulo && respuesta_esperada && instruccion && duracion_maxima_seg && activo !== undefined) {
         var sql = `
             UPDATE ejercicios SET
                 nombre = ?,
@@ -112,16 +114,16 @@ exports.actualizarEjercicio = function (req, resp) {
                 tipo_ejercicio = ?,
                 nivel_dificultad = ?,
                 texto_estimulo = ?,
+                respuesta_esperada = ?,
                 instruccion = ?,
                 duracion_maxima_seg = ?,
-                activo = ?,
-                imagen_denominacion = ?
+                activo = ?
             WHERE id_ejercicio = ?
         `;
 
         conexion.query(
             sql,
-            [nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, instruccion, duracion_maxima_seg, activo, imagen_denominacion, id_ejercicio],
+            [nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, respuesta_esperada, instruccion, duracion_maxima_seg, activo, id_ejercicio],
             function (err, resultado) {
                 if (err) {
                     console.log("Ha ocurrido un error con el servidor", err);

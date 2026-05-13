@@ -1,5 +1,7 @@
 var conexion = require("../database/conexion");
 
+const passwordSeguro = require("../security/password");
+
 exports.obtenerUsuarios = function (req, resp) {
     var sql = `
         SELECT nombre, apellidos, username, rol, activo, fecha_creacion, ultima_conexion
@@ -57,13 +59,16 @@ exports.crearUsuario = function (req, resp) {
     var activo = req.body.activo;
 
     if (nombre && apellidos && username && password && rol && activo !== undefined) {
+
+        var passwordProcesada = passwordSeguro.crearPasswordSeguro(password);
+
         var sql = `
             INSERT INTO usuarios
-            (nombre, apellidos, username, password, rol, activo, fecha_creacion, ultima_conexion)
-            VALUES (?, ?, ?, ?, ?, ?, NOW(), NULL)
+            (nombre, apellidos, username, password, password_hash, password_salt, rol, activo)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        conexion.query(sql, [nombre, apellidos, username, password, rol, activo], function (err, resultado) {
+        conexion.query(sql, [nombre, apellidos, username, "", passwordProcesada.hash, passwordProcesada.salt, rol, activo], function (err, resultado) {
             if (err) {
                 console.log("Error en la inserción de datos en la BDD", err);
                 resp.status(500).json("Ha ocurrido un error a la hora de insertar los datos");

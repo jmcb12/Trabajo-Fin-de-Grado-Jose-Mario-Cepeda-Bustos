@@ -235,31 +235,6 @@ canvas {
     max-width: 100%;
 }
 
-.accesibilidad-alto-contraste {
-    background: #000 !important;
-    color: #fff !important;
-}
-
-.accesibilidad-alto-contraste .pantalla,
-.accesibilidad-alto-contraste fieldset,
-.accesibilidad-alto-contraste #menuPerfil {
-    background: #111 !important;
-    color: #fff !important;
-    border-color: #fff !important;
-}
-
-.accesibilidad-alto-contraste h1,
-.accesibilidad-alto-contraste h2,
-.accesibilidad-alto-contraste h3,
-.accesibilidad-alto-contraste p,
-.accesibilidad-alto-contraste label,
-.accesibilidad-alto-contraste legend {
-    color: #fff !important;
-}
-
-.accesibilidad-letra-grande {
-    font-size: 1.2rem;
-}
 
 .foto-perfil-header {
     width: 28px;
@@ -385,4 +360,408 @@ table button[onclick*="reactivar"] {
 table button[onclick*="reactivar"]:hover {
     background-color: #16a34a;
     color: white;
+}
+
+
+.accesibilidad-modo-noche {
+    background: #0f172a !important;
+    color: #e5e7eb !important;
+}
+
+.accesibilidad-modo-noche #headerLogopeda {
+    background: linear-gradient(135deg, #020617, #1e3a8a) !important;
+}
+
+.accesibilidad-modo-noche .pantalla,
+.accesibilidad-modo-noche fieldset,
+.accesibilidad-modo-noche .card,
+.accesibilidad-modo-noche #menuPerfil,
+.accesibilidad-modo-noche #footerLogopeda .container-fluid {
+    background: #1e293b !important;
+    color: #e5e7eb !important;
+    border-color: #334155 !important;
+}
+
+.accesibilidad-modo-noche h1,
+.accesibilidad-modo-noche h2,
+.accesibilidad-modo-noche h3,
+.accesibilidad-modo-noche h4,
+.accesibilidad-modo-noche h5,
+.accesibilidad-modo-noche h6,
+.accesibilidad-modo-noche label,
+.accesibilidad-modo-noche legend {
+    color: #f8fafc !important;
+}
+
+.accesibilidad-modo-noche p,
+.accesibilidad-modo-noche span,
+.accesibilidad-modo-noche .text-muted {
+    color: #cbd5e1 !important;
+}
+
+.accesibilidad-modo-noche input,
+.accesibilidad-modo-noche select,
+.accesibilidad-modo-noche textarea {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+}
+
+.accesibilidad-modo-noche input::placeholder,
+.accesibilidad-modo-noche textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+.accesibilidad-modo-noche table {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+.accesibilidad-modo-noche th {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+}
+
+.accesibilidad-modo-noche td {
+    background-color: #1e293b !important;
+    color: #e5e7eb !important;
+    border-color: #334155 !important;
+}
+
+.accesibilidad-modo-noche tbody tr:hover {
+    background-color: #334155 !important;
+}
+
+.accesibilidad-modo-noche table button {
+    background-color: #0f172a;
+    color: #93c5fd;
+    border-color: #3b82f6;
+}
+
+.accesibilidad-modo-noche table button:hover {
+    background-color: #2563eb;
+    color: white;
+}
+
+.accesibilidad-modo-noche .modal-content {
+    background-color: #1e293b;
+    color: #f8fafc;
+}
+
+.accesibilidad-modo-noche .modal-header,
+.accesibilidad-modo-noche .modal-footer {
+    border-color: #334155;
+}
+
+.accesibilidad-modo-noche .lista-drag-ejercicios {
+    background-color: #1e293b !important;
+    border-color: #94a3b8 !important;
+}
+
+.accesibilidad-modo-noche .lista-drag-ejercicios li {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    border: 2px solid #94a3b8 !important;
+}
+
+.accesibilidad-modo-noche .lista-drag-ejercicios li span,
+.accesibilidad-modo-noche .lista-drag-ejercicios li label {
+    color: #ffffff !important;
+}
+
+.accesibilidad-modo-noche .lista-drag-ejercicios input[type="number"],
+.accesibilidad-modo-noche .lista-drag-ejercicios .input-max-intentos {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #bfdbfe !important;
+}
+
+/* Modo alto contraste */
+.accesibilidad-alto-contraste {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste #headerLogopeda {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-bottom: 4px solid #ffffff;
+}
+
+.accesibilidad-alto-contraste .logo-app,
+.accesibilidad-alto-contraste .subtitulo-app {
+    color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .pantalla,
+.accesibilidad-alto-contraste fieldset,
+.accesibilidad-alto-contraste .card,
+.accesibilidad-alto-contraste #menuPerfil,
+.accesibilidad-alto-contraste #footerLogopeda .container-fluid {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 3px solid #ffffff !important;
+    box-shadow: none !important;
+}
+
+.accesibilidad-alto-contraste h1,
+.accesibilidad-alto-contraste h2,
+.accesibilidad-alto-contraste h3,
+.accesibilidad-alto-contraste h4,
+.accesibilidad-alto-contraste h5,
+.accesibilidad-alto-contraste h6 {
+    color: #ffffff !important;
+    background-color: #000000 !important;
+    border-bottom: 2px solid #ffffff;
+    padding-bottom: 0.25rem;
+}
+
+.accesibilidad-alto-contraste p,
+.accesibilidad-alto-contraste span,
+.accesibilidad-alto-contraste label,
+.accesibilidad-alto-contraste legend,
+.accesibilidad-alto-contraste .text-muted {
+    color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste a {
+    color: #ffff00 !important;
+    text-decoration: underline;
+}
+
+.accesibilidad-alto-contraste a:hover {
+    color: #ffffff !important;
+    background-color: #000000 !important;
+}
+
+.accesibilidad-alto-contraste input,
+.accesibilidad-alto-contraste select,
+.accesibilidad-alto-contraste textarea {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 3px solid #ffffff !important;
+}
+
+.accesibilidad-alto-contraste input:focus,
+.accesibilidad-alto-contraste select:focus,
+.accesibilidad-alto-contraste textarea:focus,
+.accesibilidad-alto-contraste button:focus,
+.accesibilidad-alto-contraste .btn:focus {
+    outline: 4px solid #ffff00 !important;
+    outline-offset: 3px;
+    box-shadow: none !important;
+}
+
+.accesibilidad-alto-contraste table {
+    background-color: #000000 !important;
+    border: 3px solid #ffffff !important;
+}
+
+.accesibilidad-alto-contraste th {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+.accesibilidad-alto-contraste td {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+.accesibilidad-alto-contraste tbody tr:hover td {
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste button,
+.accesibilidad-alto-contraste .btn {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+    border: 3px solid #ffffff !important;
+    font-weight: bold;
+}
+
+.accesibilidad-alto-contraste button:hover,
+.accesibilidad-alto-contraste .btn:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border-color: #ffff00 !important;
+}
+
+.accesibilidad-alto-contraste .btn-danger,
+.accesibilidad-alto-contraste .btn-outline-danger {
+    background-color: #b91c1c !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .btn-success,
+.accesibilidad-alto-contraste .btn-outline-success {
+    background-color: #166534 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .modal-content {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 3px solid #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .modal-header,
+.accesibilidad-alto-contraste .modal-footer {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .progress {
+    background-color: #ffffff !important;
+    border: 3px solid #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .progress-bar {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+}
+
+.accesibilidad-alto-contraste .text-bg-light,
+.accesibilidad-alto-contraste .badge {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+.accesibilidad-alto-contraste .btn,
+.accesibilidad-alto-contraste button {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+    font-weight: bold;
+}
+
+.accesibilidad-alto-contraste .btn *,
+.accesibilidad-alto-contraste button * {
+    color: #000000 !important;
+}
+
+.accesibilidad-alto-contraste .btn-danger,
+.accesibilidad-alto-contraste .btn-outline-danger {
+    background-color: #b91c1c !important;
+    color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .btn-danger *,
+.accesibilidad-alto-contraste .btn-outline-danger * {
+    color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .lista-drag-ejercicios,
+.accesibilidad-alto-contraste .lista-drag-ejercicios li {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .lista-drag-ejercicios li *,
+.accesibilidad-alto-contraste .lista-drag-ejercicios label,
+.accesibilidad-alto-contraste .lista-drag-ejercicios span {
+    color: #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .input-max-intentos {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .lista-drag-ejercicios input[type="number"],
+.accesibilidad-alto-contraste .lista-drag-ejercicios .input-max-intentos {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+.accesibilidad-alto-contraste .lista-drag-ejercicios input[type="number"] * {
+    color: #000000 !important;
+}
+
+
+/* Modo letra grande */
+.accesibilidad-letra-grande {
+    font-size: 1.25rem;
+}
+
+.accesibilidad-letra-grande .pantalla {
+    font-size: 1.15rem;
+}
+
+.accesibilidad-letra-grande h1 {
+    font-size: clamp(2.2rem, 4vw, 3rem);
+}
+
+.accesibilidad-letra-grande h2 {
+    font-size: 1.8rem;
+}
+
+.accesibilidad-letra-grande h3 {
+    font-size: 1.45rem;
+}
+
+.accesibilidad-letra-grande h4,
+.accesibilidad-letra-grande h5,
+.accesibilidad-letra-grande h6 {
+    font-size: 1.3rem;
+}
+
+.accesibilidad-letra-grande p,
+.accesibilidad-letra-grande label,
+.accesibilidad-letra-grande legend,
+.accesibilidad-letra-grande span,
+.accesibilidad-letra-grande td,
+.accesibilidad-letra-grande th {
+    font-size: 1.15rem;
+}
+
+.accesibilidad-letra-grande input,
+.accesibilidad-letra-grande select,
+.accesibilidad-letra-grande textarea {
+    font-size: 1.15rem;
+    padding: 0.8rem 0.9rem;
+}
+
+.accesibilidad-letra-grande button,
+.accesibilidad-letra-grande .btn {
+    font-size: 1.1rem;
+    padding: 0.65rem 1rem;
+}
+
+.accesibilidad-letra-grande .logo-app {
+    font-size: 2rem;
+}
+
+.accesibilidad-letra-grande .subtitulo-app {
+    font-size: 1.15rem;
+}
+
+.accesibilidad-letra-grande table button {
+    font-size: 1rem;
+    padding: 0.55rem 0.85rem;
+}
+
+.accesibilidad-letra-grande .modal-title {
+    font-size: 1.45rem;
+}
+
+.accesibilidad-letra-grande .modal-body,
+.accesibilidad-letra-grande .modal-body p {
+    font-size: 1.15rem;
+}
+
+.accesibilidad-letra-grande .lista-drag-ejercicios li {
+    font-size: 1.05rem;
+}
+
+.accesibilidad-letra-grande .input-max-intentos {
+    font-size: 1rem;
 }

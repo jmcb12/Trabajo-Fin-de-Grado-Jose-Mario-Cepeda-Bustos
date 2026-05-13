@@ -47,15 +47,26 @@ function iniciarSesionLogopeda(event) {
   }, function (estado, datos) {
 
     if (estado != 200) {
-      mostrarAvisoBootstrap("Error", "Usuario o contraseña incorrectos", "danger"); return;
+      mostrarAvisoBootstrap("Error", "Usuario o contraseña incorrectos", "danger");
+      return;
     }
 
-    if (datos.rol != "logopeda" && datos.rol != "profesional") {
-      mostrarAvisoBootstrap("Aviso", "Este acceso es solo para profesionales", "warning"); return;
+    if (!datos || !datos.usuario || !datos.token) {
+      mostrarAvisoBootstrap("Error", "Respuesta de login incorrecta", "danger");
+      return;
     }
 
-    usuarioLogueado = datos;
-    idProfesional = datos.id_profesional;
+    let usuario = datos.usuario;
+
+    if (usuario.rol != "logopeda" && usuario.rol != "profesional") {
+      mostrarAvisoBootstrap("Error", "Este acceso es solo para profesionales", "danger");
+      return;
+    }
+
+    sessionStorage.setItem("tokenJWT", datos.token);
+
+    usuarioLogueado = usuario;
+    idProfesional = usuario.id_profesional;
 
     cargarDatosLogopeda();
     cargarPacientes();
@@ -814,6 +825,8 @@ function cerrarSesion() {
   sesionesPaciente = [];
   resultadosSesion = [];
 
+  sessionStorage.removeItem("tokenJWT");
+
   mostrarPantalla("pantallaLoginLogopeda");
 }
 
@@ -1034,6 +1047,7 @@ function volverDesdeAccesibilidad() {
 function rellenarFormularioEditarEjercicio(ejercicio) {
   document.getElementById("edit_ej_nombre").value = ejercicio.nombre || "";
   document.getElementById("edit_ej_texto_estimulo").value = ejercicio.texto_estimulo || "";
+  document.getElementById("edit_ej_respuesta_esperada").value = ejercicio.respuesta_esperada || ejercicio.texto_estimulo || "";
   document.getElementById("edit_ej_duracion").value = ejercicio.duracion_maxima_seg || "";
   document.getElementById("edit_ej_tipo").value = ejercicio.tipo_ejercicio || "";
   document.getElementById("edit_ej_dificultad").value = ejercicio.nivel_dificultad || "";
@@ -1181,6 +1195,7 @@ function rellenarPantallaEditarSesion() {
     if (!idsEnSesion.includes(ejercicio.id_ejercicio)) {
       let item = document.createElement("li");
       item.setAttribute("data-id-ejercicio", ejercicio.id_ejercicio);
+      item.setAttribute("data-tipo-ejercicio", ejercicio.tipo_ejercicio);
       item.style.border = "1px solid #ccc";
       item.style.padding = "6px";
       item.style.marginBottom = "5px";
@@ -1500,13 +1515,16 @@ function actualizarImagenDemoAccesibilidad(estilo) {
   }
 
   if (estilo == "alto-contraste") {
-    imagen.src = "img/accesibilidad-demo-contraste.png";
+    imagen.src = "/media/previsualizacionEstilos/modo_alto_contraste.png";
   }
   else if (estilo == "letra-grande") {
-    imagen.src = "img/accesibilidad-demo-letra-grande.png";
+    imagen.src = "/media/previsualizacionEstilos/modo_letras_grandes.png";
+  }
+  else if (estilo == "modo-noche") {
+    imagen.src = "/media/previsualizacionEstilos/modo_noche.png";
   }
   else {
-    imagen.src = "img/accesibilidad-demo-normal.png";
+    imagen.src = "/media/previsualizacionEstilos/modo_normal.png";
   }
 }
 
@@ -2034,12 +2052,18 @@ function guardarDatosProfesional() {
         return;
       }
 
-      usuarioLogueado.username = respuesta.username;
-      usuarioLogueado.nombre = respuesta.nombre;
-      usuarioLogueado.apellidos = respuesta.apellidos;
-      usuarioLogueado.telefono = respuesta.telefono;
-      usuarioLogueado.centro_trabajo = respuesta.centro_trabajo;
-      usuarioLogueado.foto_perfil = respuesta.foto_perfil;
+      usuarioLogueado.username = datos.username;
+      usuarioLogueado.nombre = datos.nombre;
+      usuarioLogueado.apellidos = datos.apellidos;
+      usuarioLogueado.telefono = datos.telefono;
+      usuarioLogueado.centro_trabajo = datos.centro_trabajo;
+
+      if (respuesta && respuesta.foto_perfil) {
+        usuarioLogueado.foto_perfil = respuesta.foto_perfil;
+      }
+      else if (!usuarioLogueado.foto_perfil) {
+        usuarioLogueado.foto_perfil = "/media/fotosPerfil/default.png";
+      }
 
       sessionStorage.setItem("usuarioLogueado", JSON.stringify(usuarioLogueado));
 
@@ -2098,12 +2122,16 @@ function aplicarEstiloAccesibilidad() {
   document.body.classList.remove("accesibilidad-normal");
   document.body.classList.remove("accesibilidad-alto-contraste");
   document.body.classList.remove("accesibilidad-letra-grande");
+  document.body.classList.remove("accesibilidad-modo-noche");
 
   if (estilo == "alto-contraste") {
     document.body.classList.add("accesibilidad-alto-contraste");
   }
   else if (estilo == "letra-grande") {
     document.body.classList.add("accesibilidad-letra-grande");
+  }
+  else if (estilo == "modo-noche") {
+    document.body.classList.add("accesibilidad-modo-noche");
   }
   else {
     document.body.classList.add("accesibilidad-normal");
@@ -2122,12 +2150,16 @@ function aplicarEstiloGuardado() {
   document.body.classList.remove("accesibilidad-normal");
   document.body.classList.remove("accesibilidad-alto-contraste");
   document.body.classList.remove("accesibilidad-letra-grande");
+  document.body.classList.remove("accesibilidad-modo-noche");
 
   if (estiloGuardado == "alto-contraste") {
     document.body.classList.add("accesibilidad-alto-contraste");
   }
   else if (estiloGuardado == "letra-grande") {
     document.body.classList.add("accesibilidad-letra-grande");
+  }
+  else if (estiloGuardado == "modo-noche") {
+    document.body.classList.add("accesibilidad-modo-noche");
   }
   else {
     document.body.classList.add("accesibilidad-normal");
@@ -2292,12 +2324,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var nombre = document.getElementById("ej_nombre").value.trim();
     var texto_estimulo = document.getElementById("ej_texto_estimulo").value.trim();
+    var respuesta_esperada = document.getElementById("ej_respuesta_esperada").value.trim();
     var duracion_maxima_seg = parseInt(document.getElementById("ej_duracion").value);
     var tipo_ejercicio = document.getElementById("ej_tipo").value;
     var nivel_dificultad = document.getElementById("ej_dificultad").value;
     var descripcion = document.getElementById("ej_descripcion").value.trim();
 
-    if (!nombre || !texto_estimulo || !duracion_maxima_seg || !tipo_ejercicio || !nivel_dificultad) {
+    if (!nombre || !texto_estimulo || !respuesta_esperada || !duracion_maxima_seg || !tipo_ejercicio || !nivel_dificultad) {
       mostrarAvisoBootstrap("Aviso", "Faltan datos obligatorios", "warning");
       return;
     }
@@ -2311,6 +2344,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("tipo_ejercicio", tipo_ejercicio);
     formData.append("nivel_dificultad", nivel_dificultad);
     formData.append("texto_estimulo", texto_estimulo);
+    formData.append("respuesta_esperada", respuesta_esperada);
     formData.append("instruccion", instruccion);
     formData.append("duracion_maxima_seg", duracion_maxima_seg);
     formData.append("activo", 1);
@@ -2355,12 +2389,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var nombre = document.getElementById("edit_ej_nombre").value.trim();
     var texto_estimulo = document.getElementById("edit_ej_texto_estimulo").value.trim();
+    var respuesta_esperada = document.getElementById("edit_ej_respuesta_esperada").value.trim();
     var duracion_maxima_seg = parseInt(document.getElementById("edit_ej_duracion").value);
     var tipo_ejercicio = document.getElementById("edit_ej_tipo").value;
     var nivel_dificultad = document.getElementById("edit_ej_dificultad").value;
     var descripcion = document.getElementById("edit_ej_descripcion").value.trim();
 
-    if (!idEjercicio || !nombre || !texto_estimulo || !duracion_maxima_seg || !tipo_ejercicio || !nivel_dificultad) {
+    if (!idEjercicio || !nombre || !texto_estimulo || !respuesta_esperada || !duracion_maxima_seg || !tipo_ejercicio || !nivel_dificultad) {
       mostrarAvisoBootstrap("Aviso", "Faltan datos obligatorios", "warning");
       return;
     }
@@ -2374,6 +2409,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("tipo_ejercicio", tipo_ejercicio);
     formData.append("nivel_dificultad", nivel_dificultad);
     formData.append("texto_estimulo", texto_estimulo);
+    formData.append("respuesta_esperada", respuesta_esperada);
     formData.append("instruccion", instruccion);
     formData.append("duracion_maxima_seg", duracion_maxima_seg);
     formData.append("activo", 1);

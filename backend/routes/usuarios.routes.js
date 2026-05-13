@@ -1,14 +1,16 @@
 var express = require("express");
 var router = express.Router();
 var controller = require("../controllers/usuarios.controller");
+const authJWT = require("../middleware/authJWT");
+const requireRole = require("../middleware/requireRole");
 
-router.get("/", controller.obtenerUsuarios);
-router.get("/:id", controller.obtenerUsuarioPorId);
+router.get("/", authJWT, requireRole("logopeda", "profesional"), controller.obtenerUsuarios);
+router.get("/:id", authJWT, requireRole("logopeda", "profesional"), controller.obtenerUsuarioPorId);
 
-router.post("/", controller.crearUsuario);
+router.post("/", authJWT, requireRole("logopeda", "profesional"), controller.crearUsuario);
 
-router.put("/:id", controller.actualizarUsuario);
+router.put("/:id", authJWT, requireRole("logopeda", "profesional"), controller.actualizarUsuario);
 
-router.delete("/:id", controller.eliminarUsuario);
+router.delete("/:id", authJWT, requireRole("logopeda", "profesional"), controller.eliminarUsuario);
 
 module.exports = router;

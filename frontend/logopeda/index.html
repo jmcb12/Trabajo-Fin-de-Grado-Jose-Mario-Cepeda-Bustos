@@ -277,6 +277,9 @@
       <label for="ej_texto_estimulo">Texto estímulo</label>
       <input type="text" id="ej_texto_estimulo">
 
+      <label for="ej_respuesta_esperada">Respuesta esperada</label>
+      <input type="text" id="ej_respuesta_esperada">
+
       <label for="ej_duracion">Duración máxima (seg)</label>
       <input type="number" id="ej_duracion" min="1">
 
@@ -340,6 +343,9 @@
 
       <label for="edit_ej_texto_estimulo">Texto estímulo</label>
       <input type="text" id="edit_ej_texto_estimulo">
+
+      <label for="edit_ej_respuesta_esperada">Respuesta esperada</label>
+      <input type="text" id="edit_ej_respuesta_esperada">
 
       <label for="edit_ej_duracion">Duración máxima (seg)</label>
       <input type="number" id="edit_ej_duracion" min="1">
@@ -833,11 +839,19 @@
       <div style="flex:1;">
         <p>Seleccione un estilo de visualización de la plataforma</p>
 
-        <select id="selectorAccesibilidad" onchange="aplicarEstiloAccesibilidad()">
+        <select id="selectorAccesibilidad" onchange="actualizarImagenDemoAccesibilidad(this.value)">
           <option value="normal">Normal</option>
           <option value="alto-contraste">Alto contraste</option>
           <option value="letra-grande">Letras grandes</option>
+          <option value="modo-noche">Modo noche</option>
         </select>
+
+        <br><br>
+
+        <button type="button" class="btn btn-primary" onclick="aplicarEstiloAccesibilidad()">
+          <i class="bi bi-check-circle"></i>
+          Aplicar estilo
+        </button>
 
         <br><br><br>
 
@@ -918,8 +932,9 @@
       </div>
 
       <div style="flex:1; text-align:center;">
-        <img id="imagenDemoAccesibilidad" src="img/accesibilidad-demo-normal.png"
-          alt="Vista previa del estilo de la plataforma" style="max-width:300px; border:1px solid #ccc;">
+        <img id="imagenDemoAccesibilidad" src="/media/previsualizacionEstilos/modo_normal.png"
+          alt="Vista previa del estilo de la plataforma"
+          style="width:100%; max-width:520px; border:1px solid #ccc; border-radius:12px;">
       </div>
     </div>
 

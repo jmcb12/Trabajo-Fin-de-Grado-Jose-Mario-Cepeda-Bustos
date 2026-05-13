@@ -4,6 +4,8 @@ var controller = require("../controllers/resultados.controller");
 var multer = require("multer");
 var path = require("path");
 var fs = require("fs");
+const authJWT = require("../middleware/authJWT");
+const requireRole = require("../middleware/requireRole");
 
 var carpetaAudiosPacientes = path.join(__dirname, "../../media/audiosPacientes");
 
