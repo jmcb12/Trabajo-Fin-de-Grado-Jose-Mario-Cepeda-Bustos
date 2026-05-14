@@ -58,6 +58,27 @@ main {
     box-shadow: var(--sombra-suave);
 }
 
+.barra-progreso-ejercicio {
+    width: 100%;
+    max-width: 260px;
+    height: 18px;
+    border: 1px solid #9aa4b2;
+    margin: 10px auto 25px auto;
+    background-color: white;
+    overflow: hidden;
+}
+
+.barra-progreso-ejercicio-relleno {
+    height: 100%;
+    width: 0%;
+    background-color: #2f8fa3;
+    transition: width 0.3s ease;
+}
+
+button i {
+    margin-right: 8px;
+}
+
 h2,
 h3 {
     color: #111827;
@@ -430,3 +451,5 @@ footer {
 .accesibilidad-letra-grande #respuestaDetectada {
     font-size: 2.2rem;
 }
+
+

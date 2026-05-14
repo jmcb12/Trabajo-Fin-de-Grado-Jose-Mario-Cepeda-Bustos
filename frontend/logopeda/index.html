@@ -537,8 +537,12 @@
       <label for="edit_username_paciente">Nombre de usuario</label>
       <input type="text" id="edit_username_paciente">
 
-      <label for="edit_password_paciente">Contraseña</label>
-      <input type="text" id="edit_password_paciente">
+      <label for="edit_password_paciente">Nueva contraseña</label>
+      <input type="password" id="edit_password_paciente" placeholder="Dejar vacío para no cambiar la contraseña">
+
+      <small>
+        Si no desea modificar la contraseña actual del paciente, deje este campo vacío.
+      </small>
 
       <h2>Datos personales</h2>
 
@@ -632,6 +636,11 @@
     <button type="button" class="btn btn-primary" onclick="irCrearSesion()">
       <i class="bi bi-plus-circle"></i> Crear sesión</button>
 
+    <button type="button" onclick="recargarSesionesPaciente()" class="btn btn-outline-primary">
+      <i class="bi bi-arrow-clockwise"></i>
+      Recargar sesiones
+    </button>
+
     <br><br><br>
 
     <button type="button" class="btn btn-outline-secondary" onclick="volverDesdeSesionesPaciente()">
@@ -645,15 +654,15 @@
       <table class="table table-hover align-middle">
         <thead>
           <tr>
+            <th>Nº</th>
             <th>Ejercicio</th>
-            <th>Nombre del ejercicio</th>
-            <th>Tipo de ejercicio</th>
-            <th>Intentos</th>
+            <th>Tipo</th>
+            <th>Int.</th>
             <th>WER</th>
-            <th>Precisión</th>
-            <th>Tiempo de respuesta (ms)</th>
-            <th>Duración del habla (ms)</th>
-            <th>Tasa de éxito (%)</th>
+            <th>Prec.</th>
+            <th>Resp. ms</th>
+            <th>Habla ms</th>
+            <th>Éxito %</th>
             <th>Audio</th>
           </tr>
         </thead>

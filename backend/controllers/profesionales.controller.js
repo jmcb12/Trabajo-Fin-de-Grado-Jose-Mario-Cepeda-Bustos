@@ -1,6 +1,8 @@
 var path = require("path");
 var fs = require("fs");
 var multer = require("multer");
+var conexion = require("../database/conexion");
+const passwordSeguro = require("../security/password");
 
 var carpetaFotosPerfil = path.join(__dirname, "../../media/fotosPerfil");
 
@@ -137,6 +139,12 @@ exports.crearProfesional = function (req, resp) {
 
 exports.actualizarProfesional = function (req, resp) {
     var id = parseInt(req.params.id);
+
+    var username = req.body.username;
+    var password = req.body.password;
+    var nombre = req.body.nombre;
+    var apellidos = req.body.apellidos;
+
     var centro_trabajo = req.body.centro_trabajo;
     var telefono = req.body.telefono || null;
     var foto_perfil = req.body.foto_perfil || null;
@@ -146,33 +154,95 @@ exports.actualizarProfesional = function (req, resp) {
         return resp.status(400).json("Identificador de profesional no válido");
     }
 
-    if (centro_trabajo) {
-        var sql = `
+    if (!username || !nombre || !apellidos || !centro_trabajo) {
+        console.log("Error en los datos");
+        return resp.status(400).json("Error en los datos");
+    }
+
+    var sqlBuscarUsuario = `
+        SELECT id_usuario
+        FROM profesionales
+        WHERE id_profesional = ?
+    `;
+
+    conexion.query(sqlBuscarUsuario, [id], function (errBuscar, resultadoBuscar) {
+        if (errBuscar) {
+            console.log("Ha ocurrido un error con el servidor", errBuscar);
+            return resp.status(500).json("Ha ocurrido un error con el servidor");
+        }
+
+        if (resultadoBuscar.length == 0) {
+            console.log("No se ha encontrado ningún profesional con ese identificador");
+            return resp.status(404).json("No se ha encontrado ningún profesional con ese identificador");
+        }
+
+        var id_usuario = resultadoBuscar[0].id_usuario;
+
+        var sqlProfesional = `
             UPDATE profesionales
             SET centro_trabajo = ?, telefono = ?, foto_perfil = ?
             WHERE id_profesional = ?
         `;
 
-        conexion.query(sql, [centro_trabajo, telefono, foto_perfil, id], function (err, resultado) {
-            if (err) {
-                console.log("Ha ocurrido un error con el servidor", err);
-                resp.status(500).json("Ha ocurrido un error con el servidor");
+        conexion.query(sqlProfesional, [centro_trabajo, telefono, foto_perfil, id], function (errProfesional, resultadoProfesional) {
+            if (errProfesional) {
+                console.log("Ha ocurrido un error con el servidor", errProfesional);
+                return resp.status(500).json("Ha ocurrido un error con el servidor");
+            }
+
+            var sqlUsuario;
+            var parametrosUsuario;
+
+            if (password && password.trim() !== "") {
+                var passwordHash = passwordSeguro.crearPasswordSeguro(password);
+
+                sqlUsuario = `
+                    UPDATE usuarios
+                    SET username = ?,
+                        password_hash = ?,
+                        nombre = ?,
+                        apellidos = ?
+                    WHERE id_usuario = ?
+                `;
+
+                parametrosUsuario = [
+                    username,
+                    passwordHash,
+                    nombre,
+                    apellidos,
+                    id_usuario
+                ];
             }
             else {
-                if (resultado.affectedRows != 0) {
-                    resp.status(200).json(resultado);
-                }
-                else {
-                    console.log("No se ha encontrado ningún profesional con ese identificador");
-                    resp.status(404).json("No se ha encontrado ningún profesional con ese identificador");
-                }
+                sqlUsuario = `
+                    UPDATE usuarios
+                    SET username = ?,
+                        nombre = ?,
+                        apellidos = ?
+                    WHERE id_usuario = ?
+                `;
+
+                parametrosUsuario = [
+                    username,
+                    nombre,
+                    apellidos,
+                    id_usuario
+                ];
             }
+
+            conexion.query(sqlUsuario, parametrosUsuario, function (errUsuario, resultadoUsuario) {
+                if (errUsuario) {
+                    console.log("Ha ocurrido un error al actualizar el usuario del profesional", errUsuario);
+                    return resp.status(500).json("Ha ocurrido un error al actualizar el usuario del profesional");
+                }
+
+                resp.status(200).json({
+                    mensaje: "Profesional actualizado correctamente",
+                    foto_perfil: foto_perfil
+                });
+            });
         });
-    }
-    else {
-        console.log("Error en los datos");
-        resp.status(400).json("Error en los datos");
-    }
+    });
 };
 
 exports.eliminarProfesional = function (req, resp) {

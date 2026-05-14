@@ -277,6 +277,20 @@ function obtenerEjercicioActual() {
   return ejerciciosSesion[ejercicioActual];
 }
 
+function actualizarBarraProgresoEjercicio() {
+  let barra = document.getElementById("barraProgresoEjercicio");
+
+  if (!barra || !ejerciciosSesion || ejerciciosSesion.length == 0) {
+    return;
+  }
+
+  let numeroEjercicioActual = ejercicioActual + 1;
+  let totalEjercicios = ejerciciosSesion.length;
+
+  let porcentaje = (numeroEjercicioActual / totalEjercicios) * 100;
+
+  barra.style.width = porcentaje + "%";
+}
 
 function pintarEjercicioActual() {
   if (ejercicioActual >= ejerciciosSesion.length) {
@@ -292,6 +306,8 @@ function pintarEjercicioActual() {
   document.getElementById("contadorEjercicio").textContent =
     "Ejercicio " + (ejercicioActual + 1) + "/" + ejerciciosSesion.length;
 
+  actualizarBarraProgresoEjercicio();
+
   document.getElementById("contadorIntento").textContent =
     "Intento " + intentoActual + "/" + ejercicio.max_intentos;
 
@@ -302,18 +318,15 @@ function pintarEjercicioActual() {
 
   if (debeMostrarBotonEscuchar(ejercicio)) {
     document.getElementById("btnEscucharOtraVez").classList.remove("oculto");
-
-    setTimeout(function () {
-      escucharEstimulo();
-    }, 2000);
   }
   else {
     document.getElementById("btnEscucharOtraVez").classList.add("oculto");
   }
 
   mostrarPantalla("pantalla-ejercicio");
-}
 
+  leerInstruccionEjercicio(ejercicio);
+}
 
 function pintarContenidoEjercicio(idContenedor, ejercicio) {
   let contenedor = document.getElementById(idContenedor);
@@ -336,7 +349,6 @@ function pintarContenidoEjercicio(idContenedor, ejercicio) {
   }
 }
 
-
 function debeMostrarBotonEscuchar(ejercicio) {
   if (ejercicio.tipo_ejercicio == "repeticion_palabra") {
     return true;
@@ -349,6 +361,34 @@ function debeMostrarBotonEscuchar(ejercicio) {
   return false;
 }
 
+function leerTextoPaciente(texto, callback) {
+  if (!texto) {
+    if (callback) {
+      callback();
+    }
+    return;
+  }
+
+  if ("speechSynthesis" in window) {
+    let mensaje = new SpeechSynthesisUtterance(texto);
+    mensaje.lang = "es-ES";
+    mensaje.rate = 0.7;
+
+    mensaje.onend = function () {
+      if (callback) {
+        callback();
+      }
+    };
+
+    speechSynthesis.cancel();
+    speechSynthesis.speak(mensaje);
+  }
+  else {
+    if (callback) {
+      callback();
+    }
+  }
+}
 
 function escucharEstimulo() {
   let ejercicio = obtenerEjercicioActual();
@@ -357,16 +397,20 @@ function escucharEstimulo() {
     return;
   }
 
-  if ("speechSynthesis" in window) {
-    let mensaje = new SpeechSynthesisUtterance(ejercicio.texto_estimulo);
-    mensaje.lang = "es-ES";
-    mensaje.rate = 0.8;
-
-    speechSynthesis.cancel();
-    speechSynthesis.speak(mensaje);
-  }
+  leerTextoPaciente(ejercicio.texto_estimulo, null);
 }
 
+function leerInstruccionEjercicio(ejercicio) {
+  if (ejercicio == null) {
+    return;
+  }
+
+  leerTextoPaciente(ejercicio.instruccion, function () {
+    if (debeMostrarBotonEscuchar(ejercicio)) {
+      escucharEstimulo();
+    }
+  });
+}
 
 function iniciarGrabacion() {
   let ejercicio = obtenerEjercicioActual();

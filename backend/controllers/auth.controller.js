@@ -17,9 +17,7 @@ exports.iniciarSesion = function (req, resp) {
             u.nombre,
             u.apellidos,
             u.username,
-            u.password,
             u.password_hash,
-            u.password_salt,
             u.rol,
             u.activo,
             u.fecha_creacion,
@@ -53,18 +51,10 @@ exports.iniciarSesion = function (req, resp) {
             return resp.status(403).json({ mensaje: "Usuario desactivado" });
         }
 
-        var passwordCorrecta = false;
-
-        if (usuarioEncontrado.password_hash && usuarioEncontrado.password_salt) {
-            passwordCorrecta = passwordSeguro.compararPassword(
-                password,
-                usuarioEncontrado.password_hash,
-                usuarioEncontrado.password_salt
-            );
-        }
-        else {
-            passwordCorrecta = usuarioEncontrado.password == password;
-        }
+        var passwordCorrecta = passwordSeguro.compararPassword(
+            password,
+            usuarioEncontrado.password_hash
+        );
 
         if (!passwordCorrecta) {
             console.log("Los datos no son correctos");

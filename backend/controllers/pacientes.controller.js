@@ -53,7 +53,6 @@ exports.obtenerPacientePorId = function (req, resp) {
             p.observaciones,
             p.activo,
             u.username,
-            u.password,
             u.nombre,
             u.apellidos
         FROM pacientes p

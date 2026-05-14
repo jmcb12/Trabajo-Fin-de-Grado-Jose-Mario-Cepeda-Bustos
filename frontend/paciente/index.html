@@ -43,6 +43,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-box-arrow-in-right"></i>
                             Entrar
                         </button>
                     </form>
@@ -58,18 +59,21 @@
             <p id="textoSesionPendiente">Cargando sesiones...</p>
 
             <button id="btnEmpezarSesion" onclick="abrirMenuSesion()" class="oculto">
+                <i class="bi bi-play-circle"></i>
                 EMPEZAR SESIÓN
             </button>
 
             <br><br>
 
             <button onclick="abrirProgreso()">
+                <i class="bi bi-graph-up-arrow"></i>
                 VER MI PROGRESO
             </button>
 
             <br><br>
 
             <button onclick="mostrarPantalla('pantalla-ayuda')">
+                <i class="bi bi-question-circle"></i>
                 AYUDA
             </button>
         </section>
@@ -86,12 +90,14 @@
             <p>- NO DUDES EN REPETIR SI ES NECESARIO</p>
 
             <button onclick="comenzarSesion()">
+                <i class="bi bi-play-fill"></i>
                 COMENZAR SESIÓN
             </button>
 
             <br><br>
 
             <button onclick="volverMenuPrincipal()">
+                <i class="bi bi-arrow-left"></i>
                 VOLVER
             </button>
         </section>
@@ -101,17 +107,23 @@
             <p id="contadorEjercicio">Ejercicio 1/1</p>
             <p id="contadorIntento">Intento 1/1</p>
 
+            <div class="barra-progreso-ejercicio">
+                <div id="barraProgresoEjercicio" class="barra-progreso-ejercicio-relleno"></div>
+            </div>
+
             <p id="instruccionEjercicio"></p>
 
             <div id="contenidoEjercicio"></div>
 
             <button id="btnEscucharOtraVez" onclick="escucharEstimulo()" class="oculto">
+                <i class="bi bi-volume-up"></i>
                 ESCUCHAR OTRA VEZ
             </button>
 
             <br><br>
 
             <button onclick="iniciarGrabacion()">
+                <i class="bi bi-mic-fill"></i>
                 PULSA PARA HABLAR
             </button>
         </section>
@@ -127,6 +139,7 @@
             <p id="tiempoRestante">Tiempo restante: 0 s</p>
 
             <button onclick="terminarGrabacion()">
+                <i class="bi bi-stop-circle"></i>
                 TERMINAR
             </button>
         </section>
@@ -140,12 +153,14 @@
             <h3 id="intentosRestantesDetectado">Intentos restantes: 0</h3>
 
             <button onclick="continuarEjercicio()">
+                <i class="bi bi-arrow-right-circle"></i>
                 CONTINUAR
             </button>
 
             <br><br>
 
             <button id="btnRepetirDetectado" onclick="repetirEjercicioConRespuesta()">
+                <i class="bi bi-arrow-clockwise"></i>
                 REPETIR
             </button>
         </section>
@@ -159,12 +174,14 @@
             <h3 id="intentosRestantesNoDetectado">Intentos restantes: 0</h3>
 
             <button onclick="repetirEjercicioSinRespuesta()">
+                <i class="bi bi-arrow-clockwise"></i>
                 REPETIR
             </button>
 
             <br><br>
 
             <button onclick="saltarEjercicio()">
+                <i class="bi bi-skip-forward-circle"></i>
                 SALTAR EJERCICIO
             </button>
         </section>
@@ -180,6 +197,7 @@
             <p>¡¡A por el siguiente!!</p>
 
             <button onclick="siguienteEjercicio()">
+                <i class="bi bi-arrow-right-circle"></i>
                 SIGUIENTE EJERCICIO
             </button>
         </section>
@@ -193,12 +211,14 @@
             <p>Tu logopeda podrá revisar los resultados.</p>
 
             <button onclick="mostrarResumenSesion()">
+                <i class="bi bi-list-check"></i>
                 VER RESUMEN
             </button>
 
             <br><br>
 
             <button onclick="volverMenuPrincipal()">
+                <i class="bi bi-house-door"></i>
                 VOLVER AL INICIO
             </button>
         </section>
@@ -212,6 +232,7 @@
             <p id="resumenDuracionSesion">Duración de la sesión: 0 min</p>
 
             <button onclick="volverMenuPrincipal()">
+                <i class="bi bi-house-door"></i>
                 VOLVER AL INICIO
             </button>
         </section>
@@ -231,6 +252,7 @@
             <h3>¡¡Sigue así!!</h3>
 
             <button onclick="volverMenuPrincipal()">
+                <i class="bi bi-house-door"></i>
                 VOLVER AL INICIO
             </button>
         </section>
@@ -247,12 +269,14 @@
             <p>6. Completa los ejercicios hasta finalizar la sesión</p>
 
             <button onclick="mostrarPantalla('pantalla-estilos')">
+                <i class="bi bi-palette"></i>
                 CAMBIAR ESTILO VISUAL
             </button>
 
             <br><br>
 
             <button onclick="volverMenuPrincipal()">
+                <i class="bi bi-arrow-left"></i>
                 VOLVER
             </button>
         </section>
@@ -280,6 +304,7 @@
             <p id="textoError"></p>
 
             <button onclick="volverMenuPrincipal()">
+                <i class="bi bi-arrow-left"></i>
                 VOLVER
             </button>
         </section>
@@ -290,24 +315,28 @@
             <p>Elige cómo quieres ver la aplicación.</p>
 
             <button class="btn-estilo-paciente boton-estilo-normal" onclick="aplicarEstiloPaciente('normal')">
+                <i class="bi bi-brightness-high"></i>
                 NORMAL
             </button>
 
             <br><br>
 
             <button class="btn-estilo-paciente boton-estilo-alto" onclick="aplicarEstiloPaciente('alto-contraste')">
+                <i class="bi bi-circle-half"></i>
                 ALTO CONTRASTE
             </button>
 
             <br><br>
 
             <button class="btn-estilo-paciente boton-estilo-grande" onclick="aplicarEstiloPaciente('letra-grande')">
+                <i class="bi bi-fonts"></i>
                 LETRAS GRANDES
             </button>
 
             <br><br>
 
             <button onclick="mostrarPantalla('pantalla-ayuda')">
+                <i class="bi bi-arrow-left"></i>
                 VOLVER
             </button>
         </section>

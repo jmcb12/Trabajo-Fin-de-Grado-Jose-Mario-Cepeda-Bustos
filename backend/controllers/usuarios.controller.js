@@ -4,7 +4,7 @@ const passwordSeguro = require("../security/password");
 
 exports.obtenerUsuarios = function (req, resp) {
     var sql = `
-        SELECT nombre, apellidos, username, rol, activo, fecha_creacion, ultima_conexion
+        SELECT id_usuario, nombre, apellidos, username, rol, activo, fecha_creacion, ultima_conexion
         FROM usuarios
     `;
 
@@ -60,15 +60,15 @@ exports.crearUsuario = function (req, resp) {
 
     if (nombre && apellidos && username && password && rol && activo !== undefined) {
 
-        var passwordProcesada = passwordSeguro.crearPasswordSeguro(password);
+        var passwordHash = passwordSeguro.crearPasswordSeguro(password);
 
         var sql = `
             INSERT INTO usuarios
-            (nombre, apellidos, username, password, password_hash, password_salt, rol, activo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (nombre, apellidos, username, password_hash, rol, activo)
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
 
-        conexion.query(sql, [nombre, apellidos, username, "", passwordProcesada.hash, passwordProcesada.salt, rol, activo], function (err, resultado) {
+        conexion.query(sql, [nombre, apellidos, username, passwordHash, rol, activo], function (err, resultado) {
             if (err) {
                 console.log("Error en la inserción de datos en la BDD", err);
                 resp.status(500).json("Ha ocurrido un error a la hora de insertar los datos");
@@ -101,19 +101,42 @@ exports.actualizarUsuario = function (req, resp) {
         return resp.status(400).json("Identificador de usuario no válido");
     }
 
-    if (nombre && apellidos && username && password && rol && activo !== undefined) {
-        var sql = `
-            UPDATE usuarios
-            SET nombre = ?,
-                apellidos = ?,
-                username = ?,
-                password = ?,
-                rol = ?,
-                activo = ?
-            WHERE id_usuario = ?
-        `;
+    if (nombre && apellidos && username && rol && activo !== undefined) {
 
-        conexion.query(sql, [nombre, apellidos, username, password, rol, activo, id], function (err, resultado) {
+        var sql;
+        var parametros;
+
+        if (password && password.trim() !== "") {
+            var passwordHash = passwordSeguro.crearPasswordSeguro(password);
+
+            sql = `
+                UPDATE usuarios
+                SET nombre = ?,
+                    apellidos = ?,
+                    username = ?,
+                    password_hash = ?,
+                    rol = ?,
+                    activo = ?
+                WHERE id_usuario = ?
+            `;
+
+            parametros = [nombre, apellidos, username, passwordHash, rol, activo, id];
+        }
+        else {
+            sql = `
+                UPDATE usuarios
+                SET nombre = ?,
+                    apellidos = ?,
+                    username = ?,
+                    rol = ?,
+                    activo = ?
+                WHERE id_usuario = ?
+            `;
+
+            parametros = [nombre, apellidos, username, rol, activo, id];
+        }
+
+        conexion.query(sql, parametros, function (err, resultado) {
             if (err) {
                 console.log("Ha ocurrido un error con el servidor", err);
                 resp.status(500).json("Ha ocurrido un error con el servidor");

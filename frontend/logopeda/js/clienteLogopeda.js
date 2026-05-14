@@ -1101,7 +1101,9 @@ function rellenarMenuPaciente(paciente) {
 
 function rellenarFormularioEditarPaciente(paciente) {
   document.getElementById("edit_username_paciente").value = paciente.username || "";
-  document.getElementById("edit_password_paciente").value = paciente.password || "";
+
+  document.getElementById("edit_password_paciente").value = "";
+
   document.getElementById("edit_nombre_paciente").value = paciente.nombre || "";
   document.getElementById("edit_apellidos_paciente").value = paciente.apellidos || "";
   document.getElementById("edit_fecha_nacimiento_paciente").value = formatearFechaInput(paciente.fecha_nacimiento);
@@ -1297,13 +1299,22 @@ function revisarSesion(idSesion) {
       }
 
       sesionRevisando.estado = "revisada";
+
       cargarResultadosSesion(idSesion);
-      cargarSesionesPaciente(sesion.id_paciente);
     });
   }
   else {
     cargarResultadosSesion(idSesion);
   }
+}
+
+function recargarSesionesPaciente() {
+  if (!pacienteSeleccionado) {
+    mostrarAvisoBootstrap("Aviso", "No se ha seleccionado ningún paciente", "warning");
+    return;
+  }
+
+  cargarSesionesPaciente(pacienteSeleccionado.id_paciente);
 }
 
 function agruparResultadosPorEjercicio(listaResultados) {
@@ -1360,31 +1371,51 @@ function generarInformeSesion() {
   let y = 20;
 
   doc.setFontSize(18);
-  doc.text("Informe de la sesión", 14, y);
+  doc.setFont(undefined, "bold");
+  doc.text("Informe de la sesión", 105, y, { align: "center" });
+
+  y += 6;
+  doc.setDrawColor(80, 80, 80);
+  doc.line(14, y, 196, y);
+
+  y += 12;
+
+  doc.setFontSize(12);
+  doc.setFont(undefined, "bold");
+  doc.text("Datos generales", 14, y);
+
+  y += 8;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(11);
+
+  doc.text("Fecha de generación: " + formatearFecha(new Date()), 14, y);
+  y += 7;
+
+  doc.text("Paciente: " + pacienteSeleccionado.nombre + " " + pacienteSeleccionado.apellidos, 14, y);
+  y += 7;
+
+  doc.text("Profesional: " + usuarioLogueado.nombre + " " + usuarioLogueado.apellidos, 14, y);
+  y += 7;
+
+  doc.text("Sesión: " + sesionRevisando.id_sesion, 14, y);
+  doc.text("Estado: " + sesionRevisando.estado, 110, y);
+  y += 7;
+
+  doc.text("Fecha de creación: " + formatearFecha(sesionRevisando.fecha_hora_inicio), 14, y);
+  y += 10;
+
+  doc.setDrawColor(200, 200, 200);
+  doc.line(14, y, 196, y);
+
   y += 10;
 
   doc.setFontSize(12);
-  doc.text("Fecha de generación: " + formatearFecha(new Date()), 14, y);
-  y += 10;
+  doc.setFont(undefined, "bold");
+  doc.text("Resultados de los ejercicios", 14, y);
 
-  doc.text("Paciente: " + pacienteSeleccionado.nombre + " " + pacienteSeleccionado.apellidos, 14, y);
   y += 8;
-
-  doc.text("Profesional: " + usuarioLogueado.nombre + " " + usuarioLogueado.apellidos, 14, y);
-  y += 8;
-
-  doc.text("Sesión: " + sesionRevisando.id_sesion, 14, y);
-  y += 8;
-
-  doc.text("Fecha de creación: " + formatearFecha(sesionRevisando.fecha_hora_inicio), 14, y);
-  y += 8;
-
-  doc.text("Estado: " + sesionRevisando.estado, 14, y);
-  y += 12;
-
-  doc.setFontSize(11);
-  doc.text("Resultados:", 14, y);
-  y += 8;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(10);
 
   let resultadosAgrupados = agruparResultadosPorEjercicio(resultadosSesion);
 
@@ -1395,28 +1426,57 @@ function generarInformeSesion() {
     let duracionHablaMedia = (resultado.suma_duracion_habla / resultado.intentos).toFixed(2);
     let tasaExito = ((resultado.suma_exito / resultado.intentos) * 100).toFixed(2);
 
-    if (y > 270) {
+    if (y > 260) {
       doc.addPage();
       y = 20;
+
+      doc.setFontSize(12);
+      doc.setFont(undefined, "bold");
+      doc.text("Resultados de los ejercicios", 14, y);
+
+      y += 10;
+      doc.setFont(undefined, "normal");
     }
 
-    doc.text(
-      resultado.orden + ". " +
-      resultado.nombre_ejercicio +
-      " | Tipo: " + formatearTipoEjercicio(resultado.tipo_ejercicio) +
-      " | Intentos: " + resultado.intentos +
-      " | WER: " + werMedio +
-      " | Precisión: " + precisionMedia +
-      " | Tiempo respuesta: " + tiempoRespuestaMedio +
-      " | Duración habla: " + duracionHablaMedia +
-      " | Tasa éxito: " + tasaExito + "%",
-      14,
-      y,
-      { maxWidth: 180 }
-    );
+    doc.setFont(undefined, "bold");
+    doc.setFontSize(11);
+    doc.text(resultado.orden + ". " + resultado.nombre_ejercicio, 14, y);
+    y += 6;
 
-    y += 14;
+    doc.setFont(undefined, "normal");
+    doc.setFontSize(10);
+
+    doc.text("Tipo: " + formatearTipoEjercicio(resultado.tipo_ejercicio), 18, y);
+    doc.text("Intentos: " + resultado.intentos, 115, y);
+    y += 6;
+
+    doc.text("WER medio: " + werMedio, 18, y);
+    doc.text("Precisión media: " + precisionMedia + "%", 115, y);
+    y += 6;
+
+    doc.text("Tiempo respuesta medio: " + tiempoRespuestaMedio + " ms", 18, y);
+    doc.text("Duración habla media: " + duracionHablaMedia + " ms", 115, y);
+    y += 6;
+
+    doc.text("Tasa de éxito: " + tasaExito + "%", 18, y);
+    y += 6;
+
+    doc.setDrawColor(220, 220, 220);
+    doc.line(14, y, 196, y);
+    y += 8;
   });
+
+
+  let totalPaginas = doc.internal.getNumberOfPages();
+
+  for (let i = 1; i <= totalPaginas; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(120, 120, 120);
+    doc.text("SpeakMe Rehab · TFG · Jose Mario Cepeda Bustos", 14, 290);
+    doc.text("Página " + i + " de " + totalPaginas, 196, 290, { align: "right" });
+    doc.setTextColor(0, 0, 0);
+  }
 
   doc.save("informe_sesion_" + sesionRevisando.id_sesion + ".pdf");
 }
@@ -1600,12 +1660,25 @@ function generarInformeProgresoPaciente() {
   let y = 20;
 
   doc.setFontSize(18);
-  doc.text("Informe de progreso del paciente", 14, y);
-  y += 10;
+  doc.setFont(undefined, "bold");
+  doc.text("Informe de progreso del paciente", 105, y, { align: "center" });
+
+  y += 6;
+  doc.setDrawColor(80, 80, 80);
+  doc.line(14, y, 196, y);
+
+  y += 12;
 
   doc.setFontSize(12);
-  doc.text("Fecha de generación: " + formatearFecha(new Date()), 14, y);
+  doc.setFont(undefined, "bold");
+  doc.text("Datos generales", 14, y);
+
   y += 8;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(11);
+
+  doc.text("Fecha de generación: " + formatearFecha(new Date()), 14, y);
+  y += 7;
 
   doc.text("Paciente: " + pacienteSeleccionado.nombre + " " + pacienteSeleccionado.apellidos, 14, y);
   y += 8;
@@ -1616,8 +1689,18 @@ function generarInformeProgresoPaciente() {
   doc.text("Progreso global: " + Math.round(calcularPorcentajeMejoraGlobal()) + "%", 14, y);
   y += 12;
 
-  doc.text("Métricas globales:", 14, y);
+  doc.setDrawColor(200, 200, 200);
+  doc.line(14, y, 196, y);
+
+  y += 10;
+
+  doc.setFontSize(12);
+  doc.setFont(undefined, "bold");
+  doc.text("Métricas globales", 14, y);
+
   y += 8;
+  doc.setFont(undefined, "normal");
+  doc.setFontSize(11);
 
   doc.text("Precisión: " + (metricasPaciente.precision_media || 0).toFixed(2), 14, y);
   y += 8;
@@ -1702,14 +1785,34 @@ function generarInformeProgresoPaciente() {
     let yTabla = 135;
 
     doc.setFontSize(12);
-    doc.text("Valores medios por sesión:", 14, yTabla);
-    yTabla += 10;
-
-    doc.setFontSize(11);
-    doc.text("Sesión", 20, yTabla);
-    doc.text("Fecha", 65, yTabla);
-    doc.text("Valor", 120, yTabla);
+    doc.setFont(undefined, "bold");
+    doc.text("Valores medios por sesión", 14, yTabla);
     yTabla += 8;
+
+    let xTabla = 14;
+    let anchoTabla = 180;
+    let altoFila = 8;
+
+    let anchoSesion = 50;
+    let anchoFecha = 65;
+    let anchoValor = 65;
+
+    doc.setFillColor(230, 236, 245);
+    doc.setDrawColor(180, 190, 205);
+    doc.rect(xTabla, yTabla, anchoTabla, altoFila, "FD");
+
+    doc.setFontSize(10);
+    doc.setFont(undefined, "bold");
+    doc.setTextColor(20, 45, 90);
+
+    doc.text("Sesión", xTabla + 5, yTabla + 5.5);
+    doc.text("Fecha", xTabla + anchoSesion + 5, yTabla + 5.5);
+    doc.text("Valor", xTabla + anchoSesion + anchoFecha + 5, yTabla + 5.5);
+
+    yTabla += altoFila;
+
+    doc.setFont(undefined, "normal");
+    doc.setTextColor(0, 0, 0);
 
     evolucionPaciente.forEach(function (sesion, indice) {
       let valor = parseFloat(sesion[grafica.campo] || 0);
@@ -1727,12 +1830,66 @@ function generarInformeProgresoPaciente() {
 
       let fechaSesion = formatearFecha(sesion.fecha_hora_inicio);
 
-      doc.text("Sesión " + (indice + 1), 20, yTabla);
-      doc.text(fechaSesion, 65, yTabla);
-      doc.text(String(valor), 120, yTabla);
-      yTabla += 8;
+      if (yTabla > 275) {
+        doc.addPage();
+
+        yTabla = 25;
+
+        doc.setFontSize(12);
+        doc.setFont(undefined, "bold");
+        doc.text(grafica.titulo + " - continuación", 14, yTabla);
+        yTabla += 10;
+
+        doc.setFillColor(230, 236, 245);
+        doc.setDrawColor(180, 190, 205);
+        doc.rect(xTabla, yTabla, anchoTabla, altoFila, "FD");
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, "bold");
+        doc.setTextColor(20, 45, 90);
+
+        doc.text("Sesión", xTabla + 5, yTabla + 5.5);
+        doc.text("Fecha", xTabla + anchoSesion + 5, yTabla + 5.5);
+        doc.text("Valor", xTabla + anchoSesion + anchoFecha + 5, yTabla + 5.5);
+
+        yTabla += altoFila;
+
+        doc.setFont(undefined, "normal");
+        doc.setTextColor(0, 0, 0);
+      }
+
+      if (indice % 2 == 0) {
+        doc.setFillColor(248, 249, 252);
+      }
+      else {
+        doc.setFillColor(255, 255, 255);
+      }
+
+      doc.setDrawColor(220, 220, 220);
+      doc.rect(xTabla, yTabla, anchoTabla, altoFila, "FD");
+
+      doc.setFontSize(10);
+      doc.text("Sesión " + (indice + 1), xTabla + 5, yTabla + 5.5);
+      doc.text(fechaSesion, xTabla + anchoSesion + 5, yTabla + 5.5);
+      doc.text(String(valor), xTabla + anchoSesion + anchoFecha + 5, yTabla + 5.5);
+
+      yTabla += altoFila;
     });
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFont(undefined, "normal");
   });
+
+  let totalPaginas = doc.internal.getNumberOfPages();
+
+  for (let i = 1; i <= totalPaginas; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(120, 120, 120);
+    doc.text("SpeakMe Rehab · TFG · Jose Mario Cepeda Bustos", 14, 290);
+    doc.text("Página " + i + " de " + totalPaginas, 196, 290, { align: "right" });
+    doc.setTextColor(0, 0, 0);
+  }
 
   let nombreArchivo = "Informe de progreso global de " + pacienteSeleccionado.nombre + " " + pacienteSeleccionado.apellidos + ".pdf";
   doc.save(nombreArchivo);
@@ -2463,7 +2620,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var fecha_inicio_tratamiento = document.getElementById("edit_fecha_inicio_paciente").value;
     var observaciones = document.getElementById("edit_observaciones_paciente").value.trim();
 
-    if (!username || !password || !nombre || !apellidos || !sexo || !nivel_afasia) {
+    if (!username || !nombre || !apellidos || !sexo || !nivel_afasia) {
       mostrarAvisoBootstrap("Aviso", "Faltan datos obligatorios", "warning");
       return;
     }
