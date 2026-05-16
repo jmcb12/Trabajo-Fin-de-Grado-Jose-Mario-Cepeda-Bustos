@@ -23,10 +23,6 @@ var subirImagenDenominacion = multer({
 
 router.get("/", authJWT, requireRole("logopeda", "profesional"), controller.obtenerEjercicios);
 
-router.get("/tipo/:tipo", authJWT, requireRole("logopeda", "profesional"), controller.obtenerEjerciciosPorTipo);
-
-router.get("/dificultad/:nivel", authJWT, requireRole("logopeda", "profesional"), controller.obtenerEjerciciosPorDificultad);
-
 router.get("/:id", authJWT, requireRole("logopeda", "profesional"), controller.obtenerEjercicioPorId);
 
 router.post("/", authJWT, requireRole("logopeda", "profesional"), subirImagenDenominacion.single("imagen_denominacion"), controller.crearEjercicio);

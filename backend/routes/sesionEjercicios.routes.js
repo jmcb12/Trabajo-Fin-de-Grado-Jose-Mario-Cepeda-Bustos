@@ -4,7 +4,6 @@ var controller = require("../controllers/sesionEjercicios.controller");
 const authJWT = require("../middleware/authJWT");
 const requireRole = require("../middleware/requireRole");
 
-router.get("/:id", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerSesionEjercicioPorId);
 
 router.put("/:id", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.actualizarSesionEjercicio);
 

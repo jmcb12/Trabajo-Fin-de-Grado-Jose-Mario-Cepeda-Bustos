@@ -291,13 +291,13 @@ canvas {
 }
 
 .lista-drag-ejercicios {
-    min-height: 300px;
-    max-height: 420px;
+    height: 300px;
     overflow-y: auto;
     overflow-x: hidden;
     border: 1px solid #999;
     padding: 10px;
     list-style: none;
+    box-sizing: border-box;
 }
 
 .lista-drag-ejercicios li {
@@ -313,6 +313,27 @@ table button {
     font-size: 0.9rem;
     font-weight: 650;
     transition: all 0.15s ease-in-out;
+}
+
+.contenedor-tabla-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+    overflow-x: auto;
+    margin-top: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.contenedor-tabla-scroll table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.contenedor-tabla-scroll thead th {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 2;
 }
 
 table button:hover {

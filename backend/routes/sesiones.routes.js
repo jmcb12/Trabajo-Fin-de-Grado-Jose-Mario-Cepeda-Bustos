@@ -4,9 +4,7 @@ var controller = require("../controllers/sesiones.controller");
 const authJWT = require("../middleware/authJWT");
 const requireRole = require("../middleware/requireRole");
 
-router.get("/", authJWT, requireRole("logopeda", "profesional"), controller.obtenerSesiones);
 router.get("/paciente/:idPaciente", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerSesionesPorPaciente);
-router.get("/profesional/:idProfesional", authJWT, requireRole("logopeda", "profesional"), controller.obtenerSesionesPorProfesional);
 router.get("/:id/ejercicios", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerEjerciciosDeSesion);
 router.get("/:id", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerSesionPorId);
 

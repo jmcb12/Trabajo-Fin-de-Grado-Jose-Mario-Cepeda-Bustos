@@ -4,7 +4,8 @@ module.exports = {
     puerto: process.env.PUERTO || 3000,
 
     claveJWT: process.env.CLAVE_JWT || "clave_temporal_desarrollo",
-    caducidadJWT: process.env.CADUCIDAD_JWT || "8h",
+    caducidadJWTLogopeda: process.env.CADUCIDAD_JWT_LOGOPEDA || "12h",
+    caducidadJWTPaciente: process.env.CADUCIDAD_JWT_PACIENTE || "30d",
 
     claveMaestraAES: process.env.CLAVE_MAESTRA_AES || "",
 

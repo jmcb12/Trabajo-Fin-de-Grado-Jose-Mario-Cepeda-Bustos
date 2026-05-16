@@ -4,10 +4,7 @@ var controller = require("../controllers/pacientes.controller");
 const authJWT = require("../middleware/authJWT");
 const requireRole = require("../middleware/requireRole");
 
-router.get("/", authJWT, requireRole("logopeda", "profesional"), controller.obtenerPacientes);
 router.get("/:id/sesiones", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerSesionesDePaciente);
-router.get("/:id/resultados", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerResultadosDePaciente);
-router.get("/:id/metricas", authJWT, requireRole("logopeda", "profesional"), controller.obtenerMetricasDePaciente);
 router.get("/:id", authJWT, requireRole("logopeda", "profesional", "paciente"), controller.obtenerPacientePorId);
 
 router.post("/", authJWT, requireRole("logopeda", "profesional"), controller.crearPaciente);

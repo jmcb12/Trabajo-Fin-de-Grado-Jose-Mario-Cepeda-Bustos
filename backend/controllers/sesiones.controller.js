@@ -1,18 +1,6 @@
 var conexion = require("../database/conexion");
+const cryptoAES = require("../security/cryptoAES");
 
-exports.obtenerSesiones = function (req, resp) {
-    var sql = "SELECT * FROM sesiones";
-
-    conexion.query(sql, function (err, sesiones) {
-        if (err) {
-            console.log("Ha ocurrido un error en el servidor", err);
-            resp.status(500).json("Ha ocurrido un error en el servidor");
-        }
-        else {
-            resp.status(200).json(sesiones);
-        }
-    });
-};
 
 exports.obtenerSesionPorId = function (req, resp) {
     var id = parseInt(req.params.id);
@@ -31,6 +19,8 @@ exports.obtenerSesionPorId = function (req, resp) {
         }
         else {
             if (sesion.length != 0) {
+                sesion[0].observaciones = cryptoAES.descifrarTexto(sesion[0].observaciones);
+
                 resp.status(200).json(sesion[0]);
             }
             else {
@@ -59,6 +49,8 @@ exports.crearSesion = function (req, resp) {
         observaciones !== undefined &&
         estados_validos.includes(estado)
     ) {
+        var observacionesCifradas = cryptoAES.cifrarTexto(observaciones || null);
+
         var sql = `
             INSERT INTO sesiones
             (id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin, estado, observaciones)
@@ -67,7 +59,7 @@ exports.crearSesion = function (req, resp) {
 
         conexion.query(
             sql,
-            [id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin || null, estado, observaciones || null],
+            [id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin || null, estado, observacionesCifradas],
             function (err, resultado) {
                 if (err) {
                     console.log("Ha ocurrido un error con el servidor", err);
@@ -109,6 +101,9 @@ exports.actualizarSesion = function (req, resp) {
         observaciones !== undefined &&
         estados_validos.includes(estado)
     ) {
+
+        var observacionesCifradas = cryptoAES.cifrarTexto(observaciones || null);
+
         var sql = `
             UPDATE sesiones SET
                 id_paciente = ?,
@@ -122,7 +117,7 @@ exports.actualizarSesion = function (req, resp) {
 
         conexion.query(
             sql,
-            [id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin || null, estado, observaciones || null, id_sesion],
+            [id_paciente, id_profesional, fecha_hora_inicio, fecha_hora_fin || null, estado, observacionesCifradas, id_sesion],
             function (err, resultado) {
                 if (err) {
                     console.log("Ha ocurrido un error con el servidor", err);
@@ -217,38 +212,15 @@ exports.obtenerSesionesPorPaciente = function (req, resp) {
         }
         else {
             if (sesiones.length != 0) {
+                sesiones.forEach(function (sesion) {
+                    sesion.observaciones = cryptoAES.descifrarTexto(sesion.observaciones);
+                });
+
                 resp.status(200).json(sesiones);
             }
             else {
                 console.log("No se han encontrado sesiones asociadas a ese paciente");
                 resp.status(404).json("No se han encontrado sesiones asociadas a ese paciente");
-            }
-        }
-    });
-};
-
-exports.obtenerSesionesPorProfesional = function (req, resp) {
-    var idProfesional = parseInt(req.params.idProfesional);
-
-    if (isNaN(idProfesional)) {
-        console.log("Identificador de profesional no válido");
-        return resp.status(400).json("Identificador de profesional no válido");
-    }
-
-    var sql = "SELECT * FROM sesiones WHERE id_profesional = ?";
-
-    conexion.query(sql, [idProfesional], function (err, sesiones) {
-        if (err) {
-            console.log("Ha ocurrido un error con el servidor", err);
-            resp.status(500).json("Ha ocurrido un error en el servidor");
-        }
-        else {
-            if (sesiones.length != 0) {
-                resp.status(200).json(sesiones);
-            }
-            else {
-                console.log("No se han encontrado sesiones asociadas a ese profesional");
-                resp.status(404).json("No se han encontrado sesiones asociadas a ese profesional");
             }
         }
     });

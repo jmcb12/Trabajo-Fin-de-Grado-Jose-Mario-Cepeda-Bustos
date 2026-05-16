@@ -174,51 +174,6 @@ exports.eliminarEjercicio = function (req, resp) {
     });
 };
 
-exports.obtenerEjerciciosPorTipo = function (req, resp) {
-    var tipo = req.params.tipo;
-    var tipos_validos = ["repeticion_palabra", "repeticion_frase", "denominacion", "lectura", "completar_frase"];
-    if (tipos_validos.includes(tipo)) {
-        var sql = "SELECT * FROM ejercicios WHERE tipo_ejercicio = ?";
-
-        conexion.query(sql, [tipo], function (err, ejercicios) {
-            if (err) {
-                console.log("Ha ocurrido un error en el servidor", err);
-                resp.status(500).json("Ha ocurrido un error en el servidor");
-            }
-            else {
-                resp.status(200).json(ejercicios);
-            }
-        });
-    }
-    else {
-        console.log("La opción de tipo no es válida");
-        resp.status(400).json("El valor del tipo no es válido");
-    }
-};
-
-exports.obtenerEjerciciosPorDificultad = function (req, resp) {
-    var nivel = req.params.nivel;
-    var niveles_validos = ["bajo", "medio", "alto"];
-
-    if (niveles_validos.includes(nivel)) {
-        var sql = "SELECT * FROM ejercicios WHERE nivel_dificultad = ?";
-
-        conexion.query(sql, [nivel], function (err, ejercicios) {
-            if (err) {
-                console.log("Ha ocurrido un error en el servidor", err);
-                resp.status(500).json("Ha ocurrido un error en el servidor");
-            }
-            else {
-                resp.status(200).json(ejercicios);
-            }
-        });
-    }
-    else {
-        console.log("La opción de nivel no es válida");
-        resp.status(400).json("El valor del nivel no es válido");
-    }
-};
-
 exports.reactivarEjercicio = function (req, resp) {
     var id_ejercicio = parseInt(req.params.id);
 

@@ -163,19 +163,21 @@
 
       <br><br>
 
-      <table border="1">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Tipo</th>
-            <th>Dificultad</th>
-            <th>Duración (s)</th>
-            <th>Editar</th>
-            <th>Eliminar</th>
-          </tr>
-        </thead>
-        <tbody id="tablaEjercicios"></tbody>
-      </table>
+      <div class="contenedor-tabla-scroll">
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Dificultad</th>
+              <th>Duración (s)</th>
+              <th>Editar</th>
+              <th>Eliminar</th>
+            </tr>
+          </thead>
+          <tbody id="tablaEjercicios"></tbody>
+        </table>
+      </div>
 
       <br><br>
 
@@ -274,11 +276,19 @@
       <label for="ej_nombre">Nombre</label>
       <input type="text" id="ej_nombre">
 
-      <label for="ej_texto_estimulo">Texto estímulo</label>
+      <label for="ej_texto_estimulo">Contenido que verá o escuchará el paciente</label>
+      <small>
+        Texto, palabra o frase que se mostrará o reproducirá durante el ejercicio.
+      </small>
       <input type="text" id="ej_texto_estimulo">
 
-      <label for="ej_respuesta_esperada">Respuesta esperada</label>
+
+      <label for="ej_respuesta_esperada">Respuesta correcta esperada</label>
+      <small>
+        Respuesta que se usará para comparar con lo que diga el paciente.
+      </small>
       <input type="text" id="ej_respuesta_esperada">
+
 
       <label for="ej_duracion">Duración máxima (seg)</label>
       <input type="number" id="ej_duracion" min="1">
@@ -341,11 +351,21 @@
       <label for="edit_ej_nombre">Nombre</label>
       <input type="text" id="edit_ej_nombre">
 
-      <label for="edit_ej_texto_estimulo">Texto estímulo</label>
+      <label for="edit_ej_texto_estimulo">Contenido que verá o escuchará el paciente</label>
+      <small>
+        Texto, palabra o frase que se mostrará o reproducirá durante el ejercicio.
+      </small>
       <input type="text" id="edit_ej_texto_estimulo">
 
-      <label for="edit_ej_respuesta_esperada">Respuesta esperada</label>
+
+
+      <label for="edit_ej_respuesta_esperada">Respuesta correcta esperada</label>
+      <small>
+        Respuesta que se usará para comparar con lo que diga el paciente.
+      </small>
       <input type="text" id="edit_ej_respuesta_esperada">
+
+
 
       <label for="edit_ej_duracion">Duración máxima (seg)</label>
       <input type="number" id="edit_ej_duracion" min="1">
@@ -418,18 +438,20 @@
 
     <br><br>
 
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Tipo</th>
-          <th>Dificultad</th>
-          <th>Duración (s)</th>
-          <th>Restablecer</th>
-        </tr>
-      </thead>
-      <tbody id="tablaPapeleraEjercicios"></tbody>
-    </table>
+    <div class="contenedor-tabla-scroll">
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Dificultad</th>
+            <th>Duración (s)</th>
+            <th>Restablecer</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPapeleraEjercicios"></tbody>
+      </table>
+    </div>
 
     <br><br>
 
@@ -618,18 +640,20 @@
 
     <br><br>
 
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Fecha de creación</th>
-          <th>Estado</th>
-          <th>Fecha de realización</th>
-          <th>Número de ejercicios</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody id="tablaSesionesPaciente"></tbody>
-    </table>
+    <div class="contenedor-tabla-scroll">
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Fecha realización</th>
+            <th>Ejercicios</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tablaSesionesPaciente"></tbody>
+      </table>
+    </div>
 
     <br><br>
 
@@ -650,6 +674,20 @@
   <div id="pantallaResultadosSesion" class="pantalla oculto">
     <h1>Resultados de la sesión</h1>
 
+    <h2>Resumen de la sesión</h2>
+
+    <div id="resumenResultadosSesion" class="resumen-metricas-sesion">
+      <p><strong>Precisión media:</strong> <span id="resumenPrecisionSesion"></span></p>
+      <p><strong>Tasa de éxito:</strong> <span id="resumenExitoSesion"></span></p>
+      <p><strong>Intentos totales:</strong> <span id="resumenIntentosSesion"></span></p>
+      <p><strong>Intentos medios por ejercicio:</strong> <span id="resumenIntentosMediosSesion"></span></p>
+      <p><strong>WER medio:</strong> <span id="resumenWerSesion"></span></p>
+      <p><strong>Tiempo medio de respuesta:</strong> <span id="resumenTiempoSesion"></span></p>
+      <p><strong>Duración media del habla:</strong> <span id="resumenDuracionSesion"></span></p>
+    </div>
+
+    <h2>Detalle por ejercicio</h2>
+
     <div class="table-responsive">
       <table class="table table-hover align-middle">
         <thead>
@@ -659,7 +697,7 @@
             <th>Tipo</th>
             <th>Int.</th>
             <th>WER</th>
-            <th>Prec.</th>
+            <th>Coinc.</th>
             <th>Resp. ms</th>
             <th>Habla ms</th>
             <th>Éxito %</th>
@@ -687,11 +725,11 @@
     <div>
       <h2>Métricas globales</h2>
 
-      <p><strong>Precisión:</strong> <span id="metricaPrecision"></span></p>
+      <p><strong>Coincidencia media:</strong> <span id="metricaPrecision"></span></p>
       <p><strong>WER (Word Error Rate):</strong> <span id="metricaWer"></span></p>
       <p><strong>Tasa de éxito de ejercicios (%):</strong> <span id="metricaExito"></span></p>
       <p><strong>Promedio de intentos por ejercicio:</strong> <span id="metricaIntentos"></span></p>
-      <p><strong>Tiempo de respuesta medio (ms):</strong> <span id="metricaTiempoRespuesta"></span></p>
+      <p><strong>Tiempo medio de resolución (ms):</strong> <span id="metricaTiempoRespuesta"></span></p>
       <p><strong>Duración del habla:</strong> <span id="metricaDuracionHabla"></span></p>
     </div>
 
@@ -722,10 +760,11 @@
       <label for="filtroGraficaProgreso">Filtrar métrica:</label>
       <select id="filtroGraficaProgreso" onchange="actualizarGraficaProgreso()">
         <option value="todas">Todas</option>
-        <option value="precision">Precisión</option>
+        <option value="precision">Coincidencia</option>
         <option value="wer">WER</option>
         <option value="exito">Éxito</option>
-        <option value="tiempo_respuesta">Tiempo de respuesta</option>
+        <option value="intentos">Intentos medios</option>
+        <option value="tiempo_respuesta">Tiempo de resolución</option>
         <option value="duracion_habla">Duración del habla</option>
       </select>
 

@@ -4,6 +4,7 @@ var controller = require("../controllers/resultados.controller");
 var multer = require("multer");
 var path = require("path");
 var fs = require("fs");
+
 const authJWT = require("../middleware/authJWT");
 const requireRole = require("../middleware/requireRole");
 
@@ -33,16 +34,9 @@ var subirAudioPaciente = multer({
     storage: almacenamientoAudiosPacientes
 });
 
-router.get("/", controller.obtenerResultados);
-router.get("/sesion/:idSesion", controller.obtenerResultadosPorSesion);
-router.get("/paciente/:idPaciente", controller.obtenerResultadosPorPaciente);
-router.get("/ejercicio/:idEjercicio", controller.obtenerResultadosPorEjercicio);
-router.get("/:id", controller.obtenerResultadoPorId);
+router.get("/sesion/:idSesion", authJWT, requireRole("logopeda", "profesional"), controller.obtenerResultadosPorSesion);
+router.get("/paciente/:idPaciente", authJWT, requireRole("logopeda", "profesional"), controller.obtenerResultadosPorPaciente);
 
-router.post("/", subirAudioPaciente.single("audio_paciente"), controller.crearResultado);
-
-router.put("/:id", controller.actualizarResultado);
-
-router.delete("/:id", controller.eliminarResultado);
+router.post("/", authJWT, requireRole("paciente"), subirAudioPaciente.single("audio_paciente"), controller.crearResultado);
 
 module.exports = router;

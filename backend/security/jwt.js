@@ -10,8 +10,17 @@ function generarToken(usuario) {
         id_paciente: usuario.id_paciente || null
     };
 
+    let caducidadToken;
+
+    if (usuario.rol == "paciente") {
+        caducidadToken = config.caducidadJWTPaciente;
+    }
+    else {
+        caducidadToken = config.caducidadJWTLogopeda;
+    }
+
     return jwt.sign(datosToken, config.claveJWT, {
-        expiresIn: config.caducidadJWT
+        expiresIn: caducidadToken
     });
 }
 

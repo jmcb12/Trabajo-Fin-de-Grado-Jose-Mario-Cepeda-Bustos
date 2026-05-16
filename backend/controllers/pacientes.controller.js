@@ -1,35 +1,5 @@
 var conexion = require("../database/conexion");
-
-exports.obtenerPacientes = function (req, resp) {
-    var sql = `
-        SELECT 
-            p.id_paciente,
-            p.id_usuario,
-            p.id_profesional_referencia,
-            u.nombre,
-            u.apellidos,
-            u.username,
-            p.fecha_nacimiento,
-            p.sexo,
-            p.diagnostico_principal,
-            p.nivel_afasia,
-            p.fecha_inicio_tratamiento,
-            p.observaciones,
-            p.activo
-        FROM pacientes p
-        JOIN usuarios u ON p.id_usuario = u.id_usuario
-    `;
-
-    conexion.query(sql, function (err, pacientes) {
-        if (err) {
-            console.log("Error en el servidor al realizar la consulta", err);
-            resp.status(500).json("Error en el servidor al realizar la consulta");
-        }
-        else {
-            resp.status(200).json(pacientes);
-        }
-    });
-};
+const cryptoAES = require("../security/cryptoAES");
 
 
 exports.obtenerPacientePorId = function (req, resp) {
@@ -67,6 +37,9 @@ exports.obtenerPacientePorId = function (req, resp) {
         }
         else {
             if (paciente.length != 0) {
+                paciente[0].diagnostico_principal = cryptoAES.descifrarTexto(paciente[0].diagnostico_principal);
+                paciente[0].observaciones = cryptoAES.descifrarTexto(paciente[0].observaciones);
+
                 resp.status(200).json(paciente[0]);
             }
             else {
@@ -96,6 +69,10 @@ exports.crearPaciente = function (req, resp) {
         nivel_afasia &&
         activo !== undefined
     ) {
+
+        var diagnosticoCifrado = cryptoAES.cifrarTexto(diagnostico_principal || null);
+        var observacionesCifradas = cryptoAES.cifrarTexto(observaciones || null);
+
         var sql = `
             INSERT INTO pacientes
             (id_usuario, id_profesional_referencia, fecha_nacimiento, sexo, diagnostico_principal, nivel_afasia, fecha_inicio_tratamiento, observaciones, activo)
@@ -109,10 +86,10 @@ exports.crearPaciente = function (req, resp) {
                 id_profesional_referencia,
                 fecha_nacimiento || null,
                 sexo,
-                diagnostico_principal || null,
+                diagnosticoCifrado,
                 nivel_afasia,
                 fecha_inicio_tratamiento || null,
-                observaciones || null,
+                observacionesCifradas,
                 activo
             ],
             function (err, resultado) {
@@ -149,6 +126,10 @@ exports.actualizarPaciente = function (req, resp) {
     }
 
     if (nivel_afasia && sexo && activo !== undefined) {
+
+        var diagnosticoCifrado = cryptoAES.cifrarTexto(diagnostico_principal || null);
+        var observacionesCifradas = cryptoAES.cifrarTexto(observaciones || null);
+
         var sql = `
             UPDATE pacientes SET
                 fecha_nacimiento = ?,
@@ -166,10 +147,10 @@ exports.actualizarPaciente = function (req, resp) {
             [
                 fecha_nacimiento || null,
                 sexo,
-                diagnostico_principal || null,
+                diagnosticoCifrado,
                 nivel_afasia,
                 fecha_inicio_tratamiento || null,
-                observaciones || null,
+                observacionesCifradas,
                 activo,
                 id_paciente
             ],
@@ -236,98 +217,14 @@ exports.obtenerSesionesDePaciente = function (req, resp) {
         }
         else {
             if (sesiones.length != 0) {
+                sesiones.forEach(function (sesion) {
+                    sesion.observaciones = cryptoAES.descifrarTexto(sesion.observaciones);
+                });
+
                 resp.status(200).json(sesiones);
             }
             else {
-                console.log("No se han encontrado sesiones asociadas a ese paciente");
-                resp.status(404).json("No se han encontrado sesiones asociadas a ese paciente");
-            }
-        }
-    });
-};
-
-
-exports.obtenerResultadosDePaciente = function (req, resp) {
-    var id_paciente = parseInt(req.params.id);
-
-    if (isNaN(id_paciente)) {
-        console.log("Identificador de paciente no válido");
-        return resp.status(400).json("Identificador de paciente no válido");
-    }
-
-    var sql = `
-        SELECT
-            re.id_resultado,
-            s.id_sesion,
-            e.nombre AS nombre_ejercicio,
-            re.numero_intento,
-            re.respuesta_esperada,
-            re.respuesta_obtenida,
-            re.precision_porcentaje,
-            re.wer,
-            re.tiempo_respuesta_ms,
-            re.duracion_habla_ms,
-            re.exito,
-            re.fecha_registro
-        FROM sesiones s
-        JOIN sesion_ejercicios se ON s.id_sesion = se.id_sesion
-        JOIN resultados_ejercicio re ON se.id_sesion_ejercicio = re.id_sesion_ejercicio
-        JOIN ejercicios e ON se.id_ejercicio = e.id_ejercicio
-        WHERE s.id_paciente = ?
-        ORDER BY re.fecha_registro DESC
-    `;
-
-    conexion.query(sql, [id_paciente], function (err, resultados) {
-        if (err) {
-            console.log("Ha ocurrido un error con el servidor", err);
-            resp.status(500).json("Ha ocurrido un error con el servidor");
-        }
-        else {
-            if (resultados.length != 0) {
-                resp.status(200).json(resultados);
-            }
-            else {
-                console.log("No se han encontrado resultados asociados a ese paciente");
-                resp.status(404).json("No se han encontrado resultados asociados a ese paciente");
-            }
-        }
-    });
-};
-
-
-exports.obtenerMetricasDePaciente = function (req, resp) {
-    var id_paciente = parseInt(req.params.id);
-
-    if (isNaN(id_paciente)) {
-        console.log("Identificador de paciente no válido");
-        return resp.status(400).json("Identificador de paciente no válido");
-    }
-
-    var sql = `
-        SELECT
-            AVG(re.precision_porcentaje) AS precision_media,
-            AVG(re.wer) AS wer_medio,
-            AVG(re.tiempo_respuesta_ms) AS tiempo_respuesta_medio,
-            AVG(re.duracion_habla_ms) AS duracion_habla_media,
-            AVG(re.exito) * 100 AS tasa_exito
-        FROM sesiones s
-        JOIN sesion_ejercicios se ON s.id_sesion = se.id_sesion
-        JOIN resultados_ejercicio re ON se.id_sesion_ejercicio = re.id_sesion_ejercicio
-        WHERE s.id_paciente = ?
-    `;
-
-    conexion.query(sql, [id_paciente], function (err, metricas) {
-        if (err) {
-            console.log("Ha ocurrido un error con el servidor", err);
-            resp.status(500).json("Ha ocurrido un error con el servidor");
-        }
-        else {
-            if (metricas.length != 0 && metricas[0].precision_media != null) {
-                resp.status(200).json(metricas[0]);
-            }
-            else {
-                console.log("No se han encontrado métricas asociadas a ese paciente");
-                resp.status(404).json("No se han encontrado métricas asociadas a ese paciente");
+                resp.status(200).json([]);
             }
         }
     });

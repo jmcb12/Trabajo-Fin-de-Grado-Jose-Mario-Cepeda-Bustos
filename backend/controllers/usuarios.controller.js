@@ -2,54 +2,6 @@ var conexion = require("../database/conexion");
 
 const passwordSeguro = require("../security/password");
 
-exports.obtenerUsuarios = function (req, resp) {
-    var sql = `
-        SELECT id_usuario, nombre, apellidos, username, rol, activo, fecha_creacion, ultima_conexion
-        FROM usuarios
-    `;
-
-    conexion.query(sql, function (err, usuarios) {
-        if (err) {
-            console.log("Error al obtener los usuarios", err);
-            resp.status(500).json("Error al realizar la consulta en el servidor");
-        }
-        else {
-            resp.status(200).json(usuarios);
-        }
-    });
-};
-
-exports.obtenerUsuarioPorId = function (req, resp) {
-    var id = parseInt(req.params.id);
-
-    if (isNaN(id)) {
-        console.log("Identificador de usuario no válido");
-        return resp.status(400).json("Identificador de usuario no válido");
-    }
-
-    var sql = `
-        SELECT id_usuario, nombre, apellidos, username, rol, activo, fecha_creacion, ultima_conexion
-        FROM usuarios
-        WHERE id_usuario = ?
-    `;
-
-    conexion.query(sql, [id], function (err, usuario) {
-        if (err) {
-            console.log("Error al realizar la consulta en el servidor", err);
-            resp.status(500).json("Error al realizar la consulta en el servidor");
-        }
-        else {
-            if (usuario.length != 0) {
-                resp.status(200).json(usuario[0]);
-            }
-            else {
-                console.log("Usuario no encontrado");
-                resp.status(404).json("No se ha encontrado ningún usuario con ese identificador");
-            }
-        }
-    });
-};
-
 exports.crearUsuario = function (req, resp) {
     var nombre = req.body.nombre;
     var apellidos = req.body.apellidos;
@@ -157,28 +109,3 @@ exports.actualizarUsuario = function (req, resp) {
     }
 };
 
-exports.eliminarUsuario = function (req, resp) {
-    var id = parseInt(req.params.id);
-
-    if (isNaN(id)) {
-        console.log("Identificador de usuario no válido");
-        return resp.status(400).json("Identificador de usuario no válido");
-    }
-
-    var sql = "UPDATE usuarios SET activo = 0 WHERE id_usuario = ?";
-
-    conexion.query(sql, [id], function (err, resultado) {
-        if (err) {
-            console.log("Ha ocurrido un error en el servidor", err);
-            resp.status(500).json("Ha ocurrido un error en el servidor");
-        }
-        else {
-            if (resultado.affectedRows != 0) {
-                resp.status(200).json(resultado);
-            } else {
-                console.log("No se ha encontrado ningún usuario con ese identificador");
-                resp.status(404).json("No se ha encontrado ningún usuario con ese identificador");
-            }
-        }
-    });
-};

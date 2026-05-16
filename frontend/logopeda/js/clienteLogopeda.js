@@ -494,6 +494,19 @@ function pintarTablaSesionesPaciente(listaSesiones) {
 
   tabla.innerHTML = "";
 
+  if (!listaSesiones || listaSesiones.length == 0) {
+    let fila = document.createElement("tr");
+
+    fila.innerHTML = `
+    <td colspan="5" style="text-align:center; padding:20px;">
+      No se han encontrado sesiones asociadas a este paciente.
+    </td>
+  `;
+
+    tabla.appendChild(fila);
+    return;
+  }
+
   listaSesiones.forEach(function (sesion) {
     let fila = document.createElement("tr");
 
@@ -1135,13 +1148,8 @@ function rellenarMetricasGlobalesPaciente() {
     Math.round(metricasPaciente.duracion_habla_media || 0);
 
   document.getElementById("metricaIntentos").textContent =
-    (metricasPaciente.numero_intentos || 0);
+    (metricasPaciente.intentos_medios || 0).toFixed(2);
 
-  document.getElementById("metricaTiempoRespuesta").textContent =
-    (metricasPaciente.tiempo_respuesta_medio || 0);
-
-  document.getElementById("metricaDuracionHabla").textContent =
-    (metricasPaciente.duracion_habla_media || 0);
 
   let porcentajeMejora = calcularPorcentajeMejoraGlobal();
   document.getElementById("textoProgresoGlobal").textContent =
@@ -1239,6 +1247,7 @@ function cargarResultadosSesion(idSesion) {
   rest.get("/api/resultados/sesion/" + idSesion, function (estado, datos) {
     if (estado == 200) {
       resultadosSesion = datos;
+      pintarResumenSesion(resultadosSesion);
       pintarTablaResultadosSesion(resultadosSesion);
       mostrarPantalla("pantallaResultadosSesion");
     }
@@ -1359,6 +1368,79 @@ function agruparResultadosPorEjercicio(listaResultados) {
   return agrupados;
 }
 
+function calcularResumenSesion(listaResultados) {
+  if (!listaResultados || listaResultados.length == 0) {
+    return null;
+  }
+
+  let resultadosAgrupados = agruparResultadosPorEjercicio(listaResultados);
+
+  let sumaPrecision = 0;
+  let sumaWer = 0;
+  let sumaTiempo = 0;
+  let sumaDuracion = 0;
+  let sumaExito = 0;
+  let intentosTotales = 0;
+
+  resultadosAgrupados.forEach(function (resultado) {
+    let precisionMediaEjercicio = resultado.suma_precision / resultado.intentos;
+    let werMedioEjercicio = resultado.suma_wer / resultado.intentos;
+    let tiempoMedioEjercicio = resultado.suma_tiempo_respuesta / resultado.intentos;
+    let duracionMediaEjercicio = resultado.suma_duracion_habla / resultado.intentos;
+    let exitoMedioEjercicio = resultado.suma_exito / resultado.intentos;
+
+    sumaPrecision += precisionMediaEjercicio;
+    sumaWer += werMedioEjercicio;
+    sumaTiempo += tiempoMedioEjercicio;
+    sumaDuracion += duracionMediaEjercicio;
+    sumaExito += exitoMedioEjercicio;
+
+    intentosTotales += resultado.intentos;
+  });
+
+  let numeroEjercicios = resultadosAgrupados.length;
+
+  return {
+    precision_media: sumaPrecision / numeroEjercicios,
+    wer_medio: sumaWer / numeroEjercicios,
+    tiempo_respuesta_medio: sumaTiempo / numeroEjercicios,
+    duracion_habla_media: sumaDuracion / numeroEjercicios,
+    tasa_exito: (sumaExito / numeroEjercicios) * 100,
+    intentos_totales: intentosTotales,
+    intentos_medios: intentosTotales / numeroEjercicios,
+    numero_ejercicios: numeroEjercicios
+  };
+}
+
+function pintarResumenSesion(listaResultados) {
+  let resumen = calcularResumenSesion(listaResultados);
+
+  if (!resumen) {
+    return;
+  }
+
+  document.getElementById("resumenPrecisionSesion").textContent =
+    resumen.precision_media.toFixed(2) + " %";
+
+  document.getElementById("resumenExitoSesion").textContent =
+    Math.round(resumen.tasa_exito) + " %";
+
+  document.getElementById("resumenIntentosSesion").textContent =
+    resumen.intentos_totales;
+
+  document.getElementById("resumenIntentosMediosSesion").textContent =
+    resumen.intentos_medios.toFixed(2);
+
+  document.getElementById("resumenWerSesion").textContent =
+    resumen.wer_medio.toFixed(2);
+
+  document.getElementById("resumenTiempoSesion").textContent =
+    Math.round(resumen.tiempo_respuesta_medio) + " ms";
+
+  document.getElementById("resumenDuracionSesion").textContent =
+    Math.round(resumen.duracion_habla_media) + " ms";
+}
+
 function generarInformeSesion() {
   if (sesionRevisando == null || pacienteSeleccionado == null || usuarioLogueado == null) {
     mostrarAvisoBootstrap("Aviso", "No hay datos suficientes para generar el informe", "warning");
@@ -1409,9 +1491,42 @@ function generarInformeSesion() {
 
   y += 10;
 
+  let resumenSesion = calcularResumenSesion(resultadosSesion);
+
+  if (resumenSesion) {
+    doc.setFontSize(12);
+    doc.setFont(undefined, "bold");
+    doc.text("Resumen de la sesión", 14, y);
+
+    y += 8;
+    doc.setFont(undefined, "normal");
+    doc.setFontSize(10);
+
+    doc.text("Coincidencia media: " + resumenSesion.precision_media.toFixed(2) + " %", 14, y);
+    doc.text("Tasa de éxito: " + Math.round(resumenSesion.tasa_exito) + " %", 110, y);
+    y += 7;
+
+    doc.text("Intentos totales: " + resumenSesion.intentos_totales, 14, y);
+    doc.text("Intentos medios por ejercicio: " + resumenSesion.intentos_medios.toFixed(2), 110, y);
+    y += 7;
+
+    doc.text("WER medio: " + resumenSesion.wer_medio.toFixed(2), 14, y);
+    doc.text("Tiempo medio de resolución: " + Math.round(resumenSesion.tiempo_respuesta_medio) + " ms", 110, y);
+    y += 7;
+
+    doc.text("Duración media habla: " + Math.round(resumenSesion.duracion_habla_media) + " ms", 14, y);
+    y += 10;
+
+    doc.setDrawColor(200, 200, 200);
+    doc.line(14, y, 196, y);
+
+    y += 10;
+  }
+
+
   doc.setFontSize(12);
   doc.setFont(undefined, "bold");
-  doc.text("Resultados de los ejercicios", 14, y);
+  doc.text("Detalle por ejercicio", 14, y);
 
   y += 8;
   doc.setFont(undefined, "normal");
@@ -1432,7 +1547,7 @@ function generarInformeSesion() {
 
       doc.setFontSize(12);
       doc.setFont(undefined, "bold");
-      doc.text("Resultados de los ejercicios", 14, y);
+      doc.text("Detalle por ejercicio", 14, y);
 
       y += 10;
       doc.setFont(undefined, "normal");
@@ -1451,10 +1566,10 @@ function generarInformeSesion() {
     y += 6;
 
     doc.text("WER medio: " + werMedio, 18, y);
-    doc.text("Precisión media: " + precisionMedia + "%", 115, y);
+    doc.text("Coincidencia media: " + precisionMedia + "%", 115, y);
     y += 6;
 
-    doc.text("Tiempo respuesta medio: " + tiempoRespuestaMedio + " ms", 18, y);
+    doc.text("Tiempo medio de resolución: " + tiempoRespuestaMedio + " ms", 18, y);
     doc.text("Duración habla media: " + duracionHablaMedia + " ms", 115, y);
     y += 6;
 
@@ -1514,9 +1629,18 @@ function actualizarGraficaProgreso() {
     });
   }
 
+  if (filtro == "todas" || filtro == "intentos") {
+    datasets.push({
+      label: "Intentos medios",
+      data: evolucionPaciente.map(function (s) { return parseFloat(s.intentos_medios || 0); }),
+      borderWidth: 2,
+      fill: false
+    });
+  }
+
   if (filtro == "todas" || filtro == "precision") {
     datasets.push({
-      label: "Precisión",
+      label: "Coincidencia",
       data: evolucionPaciente.map(function (s) { return parseFloat(s.precision_media || 0); }),
       borderWidth: 2,
       fill: false
@@ -1525,7 +1649,7 @@ function actualizarGraficaProgreso() {
 
   if (filtro == "todas" || filtro == "tiempo_respuesta") {
     datasets.push({
-      label: "Tiempo respuesta",
+      label: "Tiempo resolución",
       data: evolucionPaciente.map(function (s) { return parseFloat(s.tiempo_respuesta_medio || 0); }),
       borderWidth: 2,
       fill: false
@@ -1616,7 +1740,7 @@ function exportarDatosPacienteCSV() {
   }
 
   let lineas = [];
-  lineas.push("fecha_sesion,id_sesion,nombre_ejercicio,tipo_ejercicio,intento,wer,precision,tiempo_respuesta,duracion_habla,exito");
+  lineas.push("fecha_sesion,id_sesion,nombre_ejercicio,tipo_ejercicio,intento,wer,coincidencia,tiempo_resolucion,duracion_habla,exito");
 
   resultadosHistoricosPaciente.forEach(function (r) {
     let fechaSesion = r.fecha_registro ? formatearFecha(r.fecha_registro) : "";
@@ -1702,15 +1826,15 @@ function generarInformeProgresoPaciente() {
   doc.setFont(undefined, "normal");
   doc.setFontSize(11);
 
-  doc.text("Precisión: " + (metricasPaciente.precision_media || 0).toFixed(2), 14, y);
+  doc.text("Coincidencia media: " + (metricasPaciente.precision_media || 0).toFixed(2), 14, y);
   y += 8;
   doc.text("WER: " + (metricasPaciente.wer_medio || 0).toFixed(2), 14, y);
   y += 8;
   doc.text("Tasa de éxito: " + Math.round(metricasPaciente.tasa_exito || 0), 14, y);
   y += 8;
-  doc.text("Número de intentos: " + (metricasPaciente.numero_intentos || 0), 14, y);
+  doc.text("Intentos medios por ejercicio: " + (metricasPaciente.intentos_medios || 0).toFixed(2), 14, y);
   y += 8;
-  doc.text("Tiempo de respuesta medio: " + Math.round(metricasPaciente.tiempo_respuesta_medio || 0), 14, y);
+  doc.text("Tiempo medio de resolución: " + Math.round(metricasPaciente.tiempo_respuesta_medio || 0), 14, y);
   y += 8;
   doc.text("Duración del habla media: " + Math.round(metricasPaciente.duracion_habla_media || 0), 14, y);
   y += 12;
@@ -1767,10 +1891,11 @@ function generarInformeProgresoPaciente() {
   }
 
   let graficas = [
-    { titulo: "Precisión", campo: "precision_media" },
+    { titulo: "Coincidencia", campo: "precision_media" },
     { titulo: "WER", campo: "wer_medio" },
     { titulo: "Éxito", campo: "tasa_exito" },
-    { titulo: "Tiempo de respuesta", campo: "tiempo_respuesta_medio" },
+    { titulo: "Intentos medios", campo: "intentos_medios" },
+    { titulo: "Tiempo de resolución", campo: "tiempo_respuesta_medio" },
     { titulo: "Duración del habla", campo: "duracion_habla_media" }
   ];
 
