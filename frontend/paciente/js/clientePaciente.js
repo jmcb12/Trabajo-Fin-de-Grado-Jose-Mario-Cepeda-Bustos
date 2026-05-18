@@ -60,7 +60,19 @@ function iniciarSesionPaciente(event) {
   }, function (estado, datos) {
 
     if (estado != 200) {
-      mostrarAvisoPaciente("Error", "Usuario o contraseña incorrectos", "danger");
+      if (estado == 403) {
+        mostrarAvisoPaciente("Error", "Usuario desactivado. Contacte con su logopeda.", "danger");
+      }
+      else if (estado == 401) {
+        mostrarAvisoPaciente("Error", "Usuario o contraseña incorrectos", "danger");
+      }
+      else if (estado == 400) {
+        mostrarAvisoPaciente("Aviso", "Introduce usuario y contraseña", "warning");
+      }
+      else {
+        mostrarAvisoPaciente("Error", "Ha ocurrido un error con el servidor", "danger");
+      }
+
       return;
     }
 
@@ -100,7 +112,18 @@ function mostrarPantalla(idPantalla) {
     pantalla.classList.add("oculto");
   });
 
-  document.getElementById(idPantalla).classList.remove("oculto");
+  let pantallaActiva = document.getElementById(idPantalla);
+
+  if (pantallaActiva) {
+    pantallaActiva.classList.remove("oculto");
+
+    let titulo = pantallaActiva.querySelector("h1, h2, h3");
+
+    if (titulo) {
+      titulo.setAttribute("tabindex", "-1");
+      titulo.focus();
+    }
+  }
 }
 
 function aplicarEstiloPaciente(estilo) {
@@ -233,6 +256,12 @@ function pintarMenuPrincipal() {
 
 
 function volverMenuPrincipal() {
+  sesionPendiente = null;
+  ejerciciosSesion = [];
+  ejercicioActual = 0;
+  intentoActual = 1;
+  respuestaObtenida = "";
+
   cargarSesionesPaciente();
   mostrarPantalla("pantalla-menu");
 }
@@ -279,8 +308,9 @@ function obtenerEjercicioActual() {
 
 function actualizarBarraProgresoEjercicio() {
   let barra = document.getElementById("barraProgresoEjercicio");
+  let contenedorBarra = document.querySelector(".barra-progreso-ejercicio");
 
-  if (!barra || !ejerciciosSesion || ejerciciosSesion.length == 0) {
+  if (!barra || !contenedorBarra || !ejerciciosSesion || ejerciciosSesion.length == 0) {
     return;
   }
 
@@ -290,6 +320,7 @@ function actualizarBarraProgresoEjercicio() {
   let porcentaje = (numeroEjercicioActual / totalEjercicios) * 100;
 
   barra.style.width = porcentaje + "%";
+  contenedorBarra.setAttribute("aria-valuenow", Math.round(porcentaje));
 }
 
 function pintarEjercicioActual() {
@@ -846,14 +877,17 @@ function abrirProgreso() {
   rest.get("/api/metricas/paciente/" + idPaciente, function (estado, datos) {
     let progreso = 0;
 
-    if (estado == 200 && datos.precision_media != null) {
-      progreso = Math.round(datos.precision_media);
+    if (estado == 200 && datos) {
+      let precision = parseFloat(datos.precision_media || 0);
+      let exito = parseFloat(datos.tasa_exito || 0);
+
+      progreso = Math.round((0.5 * precision) + (0.5 * exito));
     }
 
     document.getElementById("barraProgresoPaciente").value = progreso;
 
     document.getElementById("textoProgresoGlobal").textContent =
-      progreso + "% mejorado";
+      progreso + "% de progreso global";
 
     mostrarPantalla("pantalla-progreso");
   });

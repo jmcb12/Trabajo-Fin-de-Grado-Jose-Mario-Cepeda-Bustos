@@ -63,7 +63,7 @@ function iniciarSesionLogopeda(event) {
       return;
     }
 
-    sessionStorage.setItem("tokenJWT", datos.token);
+    sessionStorage.setItem("tokenJWTLogopeda", datos.token);
 
     usuarioLogueado = usuario;
     idProfesional = usuario.id_profesional;
@@ -83,11 +83,17 @@ function mostrarPantalla(idPantalla) {
     pantalla.classList.add("oculto");
   });
 
-  document.getElementById(idPantalla).classList.remove("oculto");
+  let pantallaActiva = document.getElementById(idPantalla);
 
-  let menuPerfil = document.getElementById("menuPerfil");
-  if (menuPerfil) {
-    menuPerfil.classList.add("oculto");
+  if (pantallaActiva) {
+    pantallaActiva.classList.remove("oculto");
+
+    let titulo = pantallaActiva.querySelector("h1, h2, h3");
+
+    if (titulo) {
+      titulo.setAttribute("tabindex", "-1");
+      titulo.focus();
+    }
   }
 }
 
@@ -559,7 +565,10 @@ function pintarTablaResultadosSesion(listaResultados) {
 
     if (resultado.ruta_audio) {
       audioHtml = `
-        <audio controls style="max-width:180px;">
+        <audio 
+          controls 
+          style="max-width:180px;"
+          aria-label="Audio del intento ${resultado.numero_intento} del ejercicio ${resultado.nombre_ejercicio}">
           <source src="${resultado.ruta_audio}" type="audio/webm">
           Tu navegador no permite reproducir este audio.
         </audio>
@@ -838,7 +847,7 @@ function cerrarSesion() {
   sesionesPaciente = [];
   resultadosSesion = [];
 
-  sessionStorage.removeItem("tokenJWT");
+  sessionStorage.removeItem("tokenJWTLogopeda");
 
   mostrarPantalla("pantallaLoginLogopeda");
 }

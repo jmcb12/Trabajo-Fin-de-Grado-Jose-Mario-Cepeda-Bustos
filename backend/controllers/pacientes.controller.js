@@ -245,9 +245,16 @@ exports.cambiarEstadoPaciente = function (req, resp) {
         return resp.status(400).json("Falta el estado del paciente");
     }
 
-    var consulta = "UPDATE pacientes SET activo = ? WHERE id_paciente = ?";
+    var consulta = `
+        UPDATE pacientes p
+        JOIN usuarios u ON p.id_usuario = u.id_usuario
+        SET 
+            p.activo = ?,
+            u.activo = ?
+        WHERE p.id_paciente = ?
+    `;
 
-    conexion.query(consulta, [activo, id_paciente], function (err, resultado) {
+    conexion.query(consulta, [activo, activo, id_paciente], function (err, resultado) {
         if (err) {
             console.log("Ha ocurrido un error con el servidor", err);
             resp.status(500).json("Ha ocurrido un error con el servidor");

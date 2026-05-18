@@ -60,13 +60,24 @@ exports.crearEjercicio = function (req, resp) {
     if (nombre && descripcion && tipo_ejercicio && nivel_dificultad && texto_estimulo && respuesta_esperada && instruccion && duracion_maxima_seg && activo !== undefined) {
         var sql = `
             INSERT INTO ejercicios
-            (nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, respuesta_esperada, instruccion, duracion_maxima_seg, activo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (
+                nombre, 
+                descripcion, 
+                tipo_ejercicio, 
+                nivel_dificultad, 
+                texto_estimulo, 
+                respuesta_esperada, 
+                instruccion, 
+                duracion_maxima_seg, 
+                activo,
+                imagen_denominacion
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         conexion.query(
             sql,
-            [nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, respuesta_esperada, instruccion, duracion_maxima_seg, activo],
+            [nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, respuesta_esperada, instruccion, duracion_maxima_seg, activo, imagen_denominacion],
             function (err, resultado) {
                 if (err) {
                     console.log("Ha ocurrido un error con el servidor", err);
@@ -117,13 +128,14 @@ exports.actualizarEjercicio = function (req, resp) {
                 respuesta_esperada = ?,
                 instruccion = ?,
                 duracion_maxima_seg = ?,
-                activo = ?
+                activo = ?,
+                imagen_denominacion = ?
             WHERE id_ejercicio = ?
         `;
 
         conexion.query(
             sql,
-            [nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, respuesta_esperada, instruccion, duracion_maxima_seg, activo, id_ejercicio],
+            [nombre, descripcion, tipo_ejercicio, nivel_dificultad, texto_estimulo, respuesta_esperada, instruccion, duracion_maxima_seg, activo, imagen_denominacion, id_ejercicio],
             function (err, resultado) {
                 if (err) {
                     console.log("Ha ocurrido un error con el servidor", err);

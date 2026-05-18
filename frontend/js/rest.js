@@ -1,15 +1,14 @@
 (function () {
 
     function obtenerTokenJWT() {
-        var tokenLogopeda = sessionStorage.getItem("tokenJWT");
-        var tokenPaciente = localStorage.getItem("tokenJWTPaciente");
+        var rutaActual = window.location.pathname;
 
-        if (tokenLogopeda) {
-            return tokenLogopeda;
+        if (rutaActual.includes("/logopeda/")) {
+            return sessionStorage.getItem("tokenJWTLogopeda");
         }
 
-        if (tokenPaciente) {
-            return tokenPaciente;
+        if (rutaActual.includes("/paciente/")) {
+            return localStorage.getItem("tokenJWTPaciente");
         }
 
         return null;
@@ -25,7 +24,7 @@
 
         var xhr = new XMLHttpRequest();
 
-        xhr.open(method, "https://localhost:3000" + url, true);
+        xhr.open(method, url, true);
 
         var token = obtenerTokenJWT();
 
@@ -74,7 +73,7 @@
     rest.postForm = function (url, formData, callback) {
         var xhr = new XMLHttpRequest();
 
-        xhr.open("POST", "https://localhost:3000" + url, true);
+        xhr.open("POST", url, true);
 
         var token = obtenerTokenJWT();
 
@@ -106,7 +105,7 @@
     rest.putForm = function (url, formData, callback) {
         var xhr = new XMLHttpRequest();
 
-        xhr.open("PUT", "https://localhost:3000" + url, true);
+        xhr.open("PUT", url, true);
 
         var token = obtenerTokenJWT();
 

@@ -40,7 +40,7 @@
       <div class="card-body p-4">
 
         <div class="text-center mb-4">
-          <i class="bi bi-person-circle fs-1 text-primary"></i>
+          <i aria-hidden="true" class="bi bi-person-circle fs-1 text-primary"></i>
           <h2 class="mt-2">Acceso profesional</h2>
           <p class="text-muted">Introduce tus credenciales para acceder al panel del logopeda</p>
         </div>
@@ -81,15 +81,15 @@
 
         <div id="menuPerfil" class="oculto shadow rounded bg-white p-2">
           <button type="button" class="btn btn-light w-100 text-start" onclick="irEditarPerfil()">
-            <i class="bi bi-pencil-square"></i>
+            <i aria-hidden="true" class="bi bi-pencil-square"></i>
             Editar perfil
           </button>
           <button type="button" class="btn btn-light w-100 text-start" onclick="irAccesibilidad()">
-            <i class="bi bi-universal-access"></i>
+            <i aria-hidden="true" class="bi bi-universal-access"></i>
             Accesibilidad
           </button>
           <button type="button" class="btn btn-light w-100 text-start text-danger" onclick="cerrarSesion()">
-            <i class="bi bi-box-arrow-right"></i>
+            <i aria-hidden="true" class="bi bi-box-arrow-right"></i>
             Cerrar sesión
           </button>
         </div>
@@ -98,15 +98,16 @@
 
     <br>
 
-    <div id="tabsPrincipal" class="btn-group" role="group">
+    <div id="tabsPrincipal" class="btn-group" role="group" aria-label="Navegación principal del panel del profesional">
       <button type="button" id="tabPacientes" class="btn btn-outline-primary"
         onclick="mostrarVistaPrincipal('pacientes')">
-        <i class="bi bi-people"></i>
+        <i aria-hidden="true" class="bi bi-people"></i>
         Pacientes
       </button>
+
       <button type="button" id="tabEjercicios" class="btn btn-outline-primary"
         onclick="mostrarVistaPrincipal('ejercicios')">
-        <i class="bi bi-journal-medical"></i>
+        <i aria-hidden="true" class="bi bi-journal-medical"></i>
         Ejercicios
       </button>
     </div>
@@ -123,14 +124,15 @@
       <br><br>
 
       <table border="1">
+        <caption class="visually-hidden">Lista de pacientes</caption>
         <thead>
           <tr>
-            <th>Nombre</th>
-            <th>Apellidos</th>
-            <th>Diagnóstico</th>
-            <th>Última conexión</th>
-            <th>Estado</th>
-            <th>Seleccionar</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellidos</th>
+            <th scope="col">Diagnóstico</th>
+            <th scope="col">Última conexión</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Seleccionar</th>
           </tr>
         </thead>
         <tbody id="tablaPacientes"></tbody>
@@ -139,11 +141,11 @@
       <br><br>
 
       <button type="button" class="btn btn-outline-secondary" onclick="cargarPacientesConFiltro()">
-        <i class="bi bi-arrow-clockwise"></i>
+        <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
         Recargar tabla
       </button>
       <button type="button" class="btn btn-primary" onclick="mostrarPantalla('pantallaAltaPaciente')">
-        <i class="bi bi-person-plus"></i>
+        <i aria-hidden="true" class="bi bi-person-plus"></i>
         Crear paciente
       </button>
 
@@ -165,14 +167,15 @@
 
       <div class="contenedor-tabla-scroll">
         <table border="1">
+          <caption class="visually-hidden">Biblioteca de ejercicios</caption>
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Tipo</th>
-              <th>Dificultad</th>
-              <th>Duración (s)</th>
-              <th>Editar</th>
-              <th>Eliminar</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Dificultad</th>
+              <th scope="col">Duración (s)</th>
+              <th scope="col">Editar</th>
+              <th scope="col">Eliminar</th>
             </tr>
           </thead>
           <tbody id="tablaEjercicios"></tbody>
@@ -182,11 +185,11 @@
       <br><br>
 
       <button type="button" class="btn btn-primary" onclick="irCrearEjercicio()">
-        <i class="bi bi-plus-circle"></i>
+        <i aria-hidden="true" class="bi bi-plus-circle"></i>
         Crear ejercicio
       </button>
       <button type="button" class="btn btn-outline-danger" onclick="irPapeleraEjercicios()">
-        <i class="bi bi-trash"></i>
+        <i aria-hidden="true" class="bi bi-trash"></i>
         Papelera
       </button>
 
@@ -251,17 +254,17 @@
       </fieldset>
 
       <button type="button" id="btnCancelarPaciente" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i>
+        <i aria-hidden="true" class="bi bi-arrow-left"></i>
         Cancelar
       </button>
 
       <button type="button" id="btnLimpiarPaciente" class="btn btn-outline-primary">
-        <i class="bi bi-eraser"></i>
+        <i aria-hidden="true" class="bi bi-eraser"></i>
         Limpiar
       </button>
 
       <button type="submit" class="btn btn-primary">
-        <i class="bi bi-check-circle"></i>
+        <i aria-hidden="true" class="bi bi-check-circle"></i>
         Dar de alta paciente
       </button>
     </form>
@@ -326,17 +329,17 @@
       <br><br>
 
       <button type="button" id="btnVaciarEjercicio" class="btn btn-outline-primary">
-        <i class="bi bi-eraser"></i>
+        <i aria-hidden="true" class="bi bi-eraser"></i>
         Vaciar
       </button>
 
       <button type="submit" class="btn btn-primary">
-        <i class="bi bi-check-circle"></i>
+        <i aria-hidden="true" class="bi bi-check-circle"></i>
         Enviar
       </button>
 
       <button type="button" id="btnVolverCrearEjercicio" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i>
+        <i aria-hidden="true" class="bi bi-arrow-left"></i>
         Volver
       </button>
     </form>
@@ -405,17 +408,17 @@
       <br><br>
 
       <button type="button" id="btnRestablecerEjercicio" class="btn btn-outline-primary">
-        <i class="bi bi-arrow-counterclockwise"></i>
+        <i aria-hidden="true" class="bi bi-arrow-counterclockwise"></i>
         Restablecer
       </button>
 
       <button type="submit" class="btn btn-primary">
-        <i class="bi bi-check-circle"></i>
+        <i aria-hidden="true" class="bi bi-check-circle"></i>
         Enviar
       </button>
 
       <button type="button" id="btnVolverEditarEjercicio" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i>
+        <i aria-hidden="true" class="bi bi-arrow-left"></i>
         Volver
       </button>
     </form>
@@ -440,13 +443,14 @@
 
     <div class="contenedor-tabla-scroll">
       <table border="1">
+        <caption class="visually-hidden">Papelera de ejercicios</caption>
         <thead>
           <tr>
-            <th>Nombre</th>
-            <th>Tipo</th>
-            <th>Dificultad</th>
-            <th>Duración (s)</th>
-            <th>Restablecer</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Dificultad</th>
+            <th scope="col">Duración (s)</th>
+            <th scope="col">Restablecer</th>
           </tr>
         </thead>
         <tbody id="tablaPapeleraEjercicios"></tbody>
@@ -456,7 +460,7 @@
     <br><br>
 
     <button type="button" class="btn btn-outline-secondary" onclick="volverDesdePapeleraEjercicios()">
-      <i class="bi bi-arrow-left"></i>
+      <i aria-hidden="true" class="bi bi-arrow-left"></i>
       Volver
     </button>
   </div>
@@ -472,7 +476,7 @@
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body">
             <h2 class="h5 mb-3">
-              <i class="bi bi-person-vcard"></i>
+              <i aria-hidden="true" class="bi bi-person-vcard"></i>
               Datos del paciente
             </h2>
 
@@ -515,23 +519,23 @@
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body">
             <h2 class="h5 mb-3">
-              <i class="bi bi-grid-1x2"></i>
+              <i aria-hidden="true" class="bi bi-grid-1x2"></i>
               Accesos rápidos
             </h2>
 
             <div class="d-grid gap-2">
               <button type="button" class="btn btn-primary" onclick="irEditarPaciente()">
-                <i class="bi bi-pencil-square"></i>
+                <i aria-hidden="true" class="bi bi-pencil-square"></i>
                 Editar datos
               </button>
 
               <button type="button" class="btn btn-outline-primary" onclick="irProgresoPaciente()">
-                <i class="bi bi-graph-up-arrow"></i>
+                <i aria-hidden="true" class="bi bi-graph-up-arrow"></i>
                 Progreso y métricas
               </button>
 
               <button type="button" class="btn btn-outline-primary" onclick="irSesionesPaciente()">
-                <i class="bi bi-calendar-check"></i>
+                <i aria-hidden="true" class="bi bi-calendar-check"></i>
                 Sesiones
               </button>
             </div>
@@ -542,7 +546,7 @@
 
     <div class="mt-4">
       <button type="button" class="btn btn-outline-secondary" onclick="volverAlMenuLogopeda()">
-        <i class="bi bi-arrow-left"></i>
+        <i aria-hidden="true" class="bi bi-arrow-left"></i>
         Volver
       </button>
     </div>
@@ -606,17 +610,17 @@
       <br><br>
 
       <button type="button" id="btnRestaurarPaciente" class="btn btn-outline-primary">
-        <i class="bi bi-arrow-counterclockwise"></i>
+        <i aria-hidden="true" class="bi bi-arrow-counterclockwise"></i>
         Restaurar
       </button>
 
       <button type="submit" class="btn btn-primary">
-        <i class="bi bi-check-circle"></i>
+        <i aria-hidden="true" class="bi bi-check-circle"></i>
         Enviar
       </button>
 
       <button type="button" id="btnVolverEditarPaciente" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i>
+        <i aria-hidden="true" class="bi bi-arrow-left"></i>
         Volver
       </button>
     </form>
@@ -642,13 +646,14 @@
 
     <div class="contenedor-tabla-scroll">
       <table border="1">
+        <caption class="visually-hidden">Sesiones del paciente</caption>
         <thead>
           <tr>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Fecha realización</th>
-            <th>Ejercicios</th>
-            <th>Acción</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Fecha realización</th>
+            <th scope="col">Ejercicios</th>
+            <th scope="col">Acción</th>
           </tr>
         </thead>
         <tbody id="tablaSesionesPaciente"></tbody>
@@ -658,17 +663,17 @@
     <br><br>
 
     <button type="button" class="btn btn-primary" onclick="irCrearSesion()">
-      <i class="bi bi-plus-circle"></i> Crear sesión</button>
+      <i aria-hidden="true" class="bi bi-plus-circle"></i> Crear sesión</button>
 
     <button type="button" onclick="recargarSesionesPaciente()" class="btn btn-outline-primary">
-      <i class="bi bi-arrow-clockwise"></i>
+      <i aria-hidden="true" class="bi bi-arrow-clockwise"></i>
       Recargar sesiones
     </button>
 
     <br><br><br>
 
     <button type="button" class="btn btn-outline-secondary" onclick="volverDesdeSesionesPaciente()">
-      <i class="bi bi-arrow-left"></i> Volver</button>
+      <i aria-hidden="true" class="bi bi-arrow-left"></i> Volver</button>
   </div>
 
   <div id="pantallaResultadosSesion" class="pantalla oculto">
@@ -690,18 +695,19 @@
 
     <div class="table-responsive">
       <table class="table table-hover align-middle">
+        <caption class="visually-hidden">Resultados de la sesión</caption>
         <thead>
           <tr>
-            <th>Nº</th>
-            <th>Ejercicio</th>
-            <th>Tipo</th>
-            <th>Int.</th>
-            <th>WER</th>
-            <th>Coinc.</th>
-            <th>Resp. ms</th>
-            <th>Habla ms</th>
-            <th>Éxito %</th>
-            <th>Audio</th>
+            <th scope="col">Nº</th>
+            <th scope="col">Ejercicio</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Int.</th>
+            <th scope="col">WER</th>
+            <th scope="col">Coinc.</th>
+            <th scope="col">Resp. ms</th>
+            <th scope="col">Habla ms</th>
+            <th scope="col">Éxito %</th>
+            <th scope="col">Audio</th>
           </tr>
         </thead>
         <tbody id="tablaResultadosSesion"></tbody>
@@ -711,12 +717,12 @@
     <br><br>
 
     <button type="button" class="btn btn-primary" onclick="generarInformeSesion()">
-      <i class="bi bi-file-earmark-pdf"></i> Generar informe de la sesión</button>
+      <i aria-hidden="true" class="bi bi-file-earmark-pdf"></i> Generar informe de la sesión</button>
 
     <br><br><br>
 
     <button type="button" class="btn btn-outline-secondary" onclick="volverDesdeResultadosSesion()">
-      <i class="bi bi-arrow-left"></i> Volver</button>
+      <i aria-hidden="true" class="bi bi-arrow-left"></i> Volver</button>
   </div>
 
   <div id="pantallaProgresoPaciente" class="pantalla oculto">
@@ -735,10 +741,10 @@
 
     <div>
       <button type="button" class="btn btn-primary" onclick="generarInformeProgresoPaciente()">
-        <i class="bi bi-file-earmark-pdf"></i> Generar informe</button>
+        <i aria-hidden="true" class="bi bi-file-earmark-pdf"></i> Generar informe</button>
 
       <button type="button" class="btn btn-outline-primary" onclick="exportarDatosPacienteCSV()">
-        <i class="bi bi-filetype-csv"></i> Exportar datos en formato CSV</button>
+        <i aria-hidden="true" class="bi bi-filetype-csv"></i> Exportar datos en formato CSV</button>
     </div>
 
     <br><br>
@@ -776,7 +782,7 @@
     <br><br>
 
     <button type="button" class="btn btn-outline-secondary" onclick="volverDesdeProgresoPaciente()">
-      <i class="bi bi-arrow-left"></i> Volver</button>
+      <i aria-hidden="true" class="bi bi-arrow-left"></i> Volver</button>
   </div>
 
   <div id="pantallaCrearSesion" class="pantalla oculto">
@@ -820,12 +826,12 @@
     <br><br>
 
     <button type="button" class="btn btn-primary" onclick="guardarNuevaSesion()">
-      <i class="bi bi-check-circle"></i> Crear sesión</button>
+      <i aria-hidden="true" class="bi bi-check-circle"></i> Crear sesión</button>
 
     <br><br><br>
 
     <button type="button" class="btn btn-outline-secondary" onclick="volverDesdeCrearSesion()">
-      <i class="bi bi-arrow-left"></i> Volver</button>
+      <i aria-hidden="true" class="bi bi-arrow-left"></i> Volver</button>
   </div>
 
   <div id="pantallaEditarSesion" class="pantalla oculto">
@@ -868,16 +874,16 @@
     <br><br>
 
     <button type="button" class="btn btn-outline-secondary" onclick="volverDesdeEditarSesion()">
-      <i class="bi bi-arrow-left"></i> Volver</button>
+      <i aria-hidden="true" class="bi bi-arrow-left"></i> Volver</button>
 
     <button type="button" class="btn btn-outline-danger" onclick="cancelarSesionEditando()">
-      <i class="bi bi-x-circle"></i> Cancelar sesión</button>
+      <i aria-hidden="true" class="bi bi-x-circle"></i> Cancelar sesión</button>
 
     <button type="button" class="btn btn-outline-primary" onclick="restablecerPantallaEditarSesion()">
-      <i class="bi bi-arrow-counterclockwise"></i> Restablecer</button>
+      <i aria-hidden="true" class="bi bi-arrow-counterclockwise"></i> Restablecer</button>
 
     <button type="button" class="btn btn-primary" onclick="guardarEdicionSesion()">
-      <i class="bi bi-check-circle"></i> Editar sesión</button>
+      <i aria-hidden="true" class="bi bi-check-circle"></i> Editar sesión</button>
   </div>
 
   <div id="pantallaAccesibilidad" class="pantalla oculto">
@@ -897,7 +903,7 @@
         <br><br>
 
         <button type="button" class="btn btn-primary" onclick="aplicarEstiloAccesibilidad()">
-          <i class="bi bi-check-circle"></i>
+          <i aria-hidden="true" class="bi bi-check-circle"></i>
           Aplicar estilo
         </button>
 
@@ -989,7 +995,7 @@
     <br><br><br>
 
     <button type="button" class="btn btn-outline-secondary" onclick="volverDesdeAccesibilidad()">
-      <i class="bi bi-arrow-left"></i>
+      <i aria-hidden="true" class="bi bi-arrow-left"></i>
       Volver
     </button>
   </div>
@@ -1004,7 +1010,7 @@
           <div class="card border-0 shadow-sm">
             <div class="card-body">
               <h2 class="h5 mb-3">
-                <i class="bi bi-person-lines-fill"></i>
+                <i aria-hidden="true" class="bi bi-person-lines-fill"></i>
                 Datos del profesional
               </h2>
 
@@ -1033,7 +1039,7 @@
           <div class="card border-0 shadow-sm">
             <div class="card-body text-center">
               <h2 class="h5 mb-3">
-                <i class="bi bi-image"></i>
+                <i aria-hidden="true" class="bi bi-image"></i>
                 Foto de perfil
               </h2>
 
@@ -1044,7 +1050,7 @@
 
               <div class="mt-3">
                 <button type="button" class="btn btn-outline-primary" onclick="seleccionarNuevaFotoPerfil()">
-                  <i class="bi bi-upload"></i>
+                  <i aria-hidden="true" class="bi bi-upload"></i>
                   Cambiar foto
                 </button>
               </div>
@@ -1060,12 +1066,12 @@
 
       <div class="mt-4 d-flex gap-2 flex-wrap">
         <button type="button" class="btn btn-outline-secondary" onclick="volverDesdeEditarProfesional()">
-          <i class="bi bi-arrow-left"></i>
+          <i aria-hidden="true" class="bi bi-arrow-left"></i>
           Volver
         </button>
 
         <button type="submit" class="btn btn-primary">
-          <i class="bi bi-check-circle"></i>
+          <i aria-hidden="true" class="bi bi-check-circle"></i>
           Guardar cambios
         </button>
       </div>
