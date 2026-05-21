@@ -641,7 +641,7 @@ function filtrarPapeleraEjercicios() {
   let filtro = document.getElementById("filtroPapeleraEjercicios").value;
 
   let ejerciciosInactivos = ejercicios.filter(function (ejercicio) {
-    return ejercicio.activo == 0;
+    return ejercicio.activo == 0 || ejercicio.activo == "0";
   });
 
   if (filtro == "todos") {
@@ -952,7 +952,7 @@ function irPapeleraEjercicios() {
   resetearFiltroPapeleraEjercicios();
 
   let ejerciciosInactivos = ejercicios.filter(function (ejercicio) {
-    return ejercicio.activo == 0;
+    return ejercicio.activo == 0 || ejercicio.activo == "0";
   });
 
   pintarTablaPapeleraEjercicios(ejerciciosInactivos);
