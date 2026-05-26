@@ -34,10 +34,17 @@ var filtroFotosPerfil = function (req, file, cb) {
     }
 };
 
-exports.subirFotoPerfil = multer({
-    storage: almacenamientoFotosPerfil,
-    fileFilter: filtroFotosPerfil
-}).single("foto_perfil");
+exports.subirFotoPerfil = function (req, resp, next) {
+    multer({
+        storage: almacenamientoFotosPerfil,
+        fileFilter: filtroFotosPerfil
+    }).single("foto_perfil")(req, resp, function (err) {
+        if (err) {
+            return resp.status(403).json({ mensaje: "Tipo de archivo no permitido: " + err.message });
+        }
+        next();
+    });
+};
 
 var conexion = require("../database/conexion");
 
@@ -154,7 +161,7 @@ exports.actualizarProfesional = function (req, resp) {
 exports.obtenerPacientesDeProfesional = function (req, resp) {
     var id_profesional = parseInt(req.params.id);
 
-    if (!id_profesional) {
+    if (isNaN(id_profesional)) {
         console.log("Identificador de profesional no válido");
         return resp.status(400).json("Identificador de profesional no válido");
     }

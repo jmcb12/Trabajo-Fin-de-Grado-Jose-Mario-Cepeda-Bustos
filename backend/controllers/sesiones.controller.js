@@ -219,8 +219,7 @@ exports.obtenerSesionesPorPaciente = function (req, resp) {
                 resp.status(200).json(sesiones);
             }
             else {
-                console.log("No se han encontrado sesiones asociadas a ese paciente");
-                resp.status(404).json("No se han encontrado sesiones asociadas a ese paciente");
+                resp.status(200).json([]);
             }
         }
     });
@@ -300,8 +299,8 @@ exports.asociarEjercicioASesion = function (req, resp) {
                 resp.status(201).json(resultado);
             }
             else {
-                console.log("No se ha podido asociar el ejercicio a la sesión");
-                resp.status(500).json("No se ha podido asociar el ejercicio a la sesión");
+                console.log("No se ha podido asociar el ejercicio a la sesión: recurso no encontrado");
+                resp.status(404).json("No se ha podido asociar el ejercicio a la sesión");
             }
         }
     });

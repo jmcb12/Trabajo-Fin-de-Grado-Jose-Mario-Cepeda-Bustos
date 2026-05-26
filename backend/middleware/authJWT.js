@@ -1,4 +1,5 @@
 const jwtSeguro = require("../security/jwt");
+const jwt = require("jsonwebtoken");
 
 function authJWT(req, resp, next) {
     const cabecera = req.headers["authorization"];
@@ -17,14 +18,16 @@ function authJWT(req, resp, next) {
 
     try {
         const usuarioToken = jwtSeguro.verificarToken(token);
-
         req.usuario = usuarioToken;
-
         next();
     }
     catch (error) {
+        if (error instanceof jwt.TokenExpiredError) {
+            console.log("Token caducado", error.message);
+            return resp.status(401).json({ mensaje: "Token caducado" });
+        }
         console.log("Token no válido", error.message);
-        return resp.status(401).json({ mensaje: "Token no válido o caducado" });
+        return resp.status(401).json({ mensaje: "Token no válido" });
     }
 }
 
